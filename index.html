@@ -3,11 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Maxim Safrutin</title>
+  <title>Мое Резюме</title>
   
+  <!-- Tailwind CSS для стилей -->
   <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Иконки Phosphor (работают без сложной установки) -->
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
   
+  <!-- React и инструменты для его запуска прямо в браузере -->
   <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -23,191 +27,355 @@
     .safe-area-bottom {
       padding-bottom: env(safe-area-inset-bottom);
     }
+    /* Убираем синюю подсветку при клике на мобилках */
     body { -webkit-tap-highlight-color: transparent; }
   </style>
 </head>
-
 <body class="bg-slate-900 text-slate-100">
-<div id="root"></div>
+  <div id="root"></div>
 
-<script type="text/babel">
+  <!-- Весь код приложения -->
+  <script type="text/babel">
+    const { useState, useEffect } = React;
 
-const { useState, useEffect } = React;
-
-const resumeData = {
-
-  profile: {
-    name: "Максим Сафрутин",
-
-    role: "Автомобильный брокер премиального сегмента",
-
-    location: "Самара, Россия",
-
-    bio:
-      "С 1993 года в переговорах, с 2020 — в автомобильной отрасли. Увеличиваю прибыль компаний через доверие клиента, решая его задачу. Конвертирую запрос в результативно закрытую сделку.",
-
-    avatar: "./Ава Сафрутин от 26.05.2022.png",
-
-    socials: [
-      {
-        name: "Telegram",
-        iconClass: "ph-paper-plane-right",
-        url: "https://t.me/max_safrutin"
+    // --- ДАННЫЕ РЕЗЮМЕ (РЕДАКТИРУЙТЕ ЗДЕСЬ) ---
+    const resumeData = {
+      profile: {
+        name: "Алексей Смирнов",
+        role: "Senior Frontend Developer",
+        location: "Москва, Россия (готов к релокации)",
+        bio: "Создаю быстрые и удобные интерфейсы. Одержим качеством кода и UX. Превращаю сложные задачи в простые решения. Более 5 лет в коммерческой разработке.",
+        avatar: "./Ава Сафрутин от 26.05.2022.png", 
+        socials: [
+          { name: "GitHub", iconClass: "ph-github-logo", url: "#" },
+          { name: "LinkedIn", iconClass: "ph-linkedin-logo", url: "#" },
+          { name: "Portfolio", iconClass: "ph-globe", url: "#" }
+        ]
+      },
+      skills: [
+        { name: "JavaScript / TypeScript", level: 95, category: "Core" },
+        { name: "React / Next.js", level: 90, category: "Frontend" },
+        { name: "Tailwind CSS", level: 85, category: "UI" },
+        { name: "Node.js", level: 60, category: "Backend" },
+        { name: "Figma", level: 70, category: "Design" },
+        { name: "Git / CI/CD", level: 80, category: "Tools" },
+      ],
+      experience: [
+        {
+          company: "TechCorp Global",
+          role: "Senior Frontend Developer",
+          period: "2021 — Наст. время",
+          description: "Лид команды из 5 человек. Переписал легаси-проект на Next.js, ускорив загрузку на 40%. Внедрил дизайн-систему.",
+          tags: ["React", "Team Lead", "Architecture"]
+        },
+        {
+          company: "Creative Studio",
+          role: "Middle Web Developer",
+          period: "2019 — 2021",
+          description: "Разработка промо-сайтов для крупных брендов. Анимации на GSAP, сложные 3D сцены на Three.js.",
+          tags: ["Vue.js", "GSAP", "WebGL"]
+        },
+        {
+          company: "Freelance",
+          role: "Fullstack Developer",
+          period: "2018 — 2019",
+          description: "Создание интернет-магазинов и CRM систем под ключ для малого бизнеса.",
+          tags: ["PHP", "JS", "MySQL"]
+        }
+      ],
+      contacts: {
+        email: "alex.smirnov@example.com",
+        phone: "+7 (999) 000-00-00",
+        telegram: "@alex_dev"
       }
-    ]
-  },
+    };
 
-  skills: [
-    { name: "Переговоры", level: 95 },
-    { name: "Продажи", level: 95 },
-    { name: "Автомобильный рынок", level: 90 },
-    { name: "Подбор автомобилей", level: 90 },
-    { name: "Работа с клиентами", level: 95 }
-  ],
+    function App() {
+      const [activeTab, setActiveTab] = useState('profile');
+      const [darkMode, setDarkMode] = useState(true);
+      const [mounted, setMounted] = useState(false);
 
-  contacts: {
-    email: "example@mail.ru",
-    phone: "+7 000 000 00 00",
-    telegram: "@max_safrutin"
-  }
+      useEffect(() => {
+        setMounted(true);
+      }, []);
 
-};
+      if (!mounted) return null;
 
+      const toggleTheme = () => setDarkMode(!darkMode);
 
-function App() {
+      const TabButton = ({ id, iconClass, label }) => (
+        <button
+          onClick={() => setActiveTab(id)}
+          className={`flex flex-col items-center justify-center w-full py-2 transition-all duration-300 ${
+            activeTab === id 
+              ? (darkMode ? 'text-blue-400' : 'text-blue-600') 
+              : (darkMode ? 'text-gray-500 hover:text-gray-300' : 'text-gray-400 hover:text-gray-600')
+          }`}
+        >
+          <i className={`ph ${iconClass} text-[24px] mb-1 transition-transform ${activeTab === id ? 'scale-110' : ''}`}></i>
+          <span className="text-[10px] font-medium">{label}</span>
+        </button>
+      );
 
-  const [activeTab, setActiveTab] = useState('profile');
-  const [darkMode, setDarkMode] = useState(true);
-  const [mounted, setMounted] = useState(false);
+      return (
+        <div className={`min-h-screen transition-colors duration-300 font-sans ${darkMode ? 'bg-slate-900 text-slate-100' : 'bg-gray-50 text-gray-800'}`}>
+          
+          {/* --- HEADER --- */}
+          <header className={`fixed top-0 w-full z-50 backdrop-blur-md border-b transition-colors duration-300 ${darkMode ? 'bg-slate-900/80 border-slate-800' : 'bg-white/80 border-gray-200'}`}>
+            <div className="max-w-md mx-auto px-4 h-16 flex items-center justify-between">
+              <h1 className="font-bold text-lg tracking-tight">
+                Resume<span className={darkMode ? 'text-blue-400' : 'text-blue-600'}>.App</span>
+              </h1>
+              <button 
+                onClick={toggleTheme}
+                className={`p-2 rounded-full transition-colors flex items-center justify-center ${darkMode ? 'bg-slate-800 text-yellow-400 hover:bg-slate-700' : 'bg-gray-100 text-slate-600 hover:bg-gray-200'}`}
+              >
+                {darkMode ? <i className="ph-fill ph-sun text-[20px]"></i> : <i className="ph-fill ph-moon text-[20px]"></i>}
+              </button>
+            </div>
+          </header>
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+          {/* --- MAIN CONTENT AREA --- */}
+          <main className="max-w-md mx-auto pt-20 pb-24 px-4 min-h-screen">
+            
+            {/* VIEW: PROFILE */}
+            {activeTab === 'profile' && (
+              <div className="space-y-6 animate-fadeIn">
+                <div className="text-center space-y-4">
+                  <div className="relative inline-block">
+                    <div className={`absolute inset-0 rounded-full blur-lg opacity-50 ${darkMode ? 'bg-blue-500' : 'bg-blue-300'}`}></div>
+                    <img 
+                      src={resumeData.profile.avatar} 
+                      alt="Profile" 
+                      className={`relative w-32 h-32 rounded-full border-4 shadow-xl mx-auto object-cover ${darkMode ? 'border-slate-800' : 'border-white'}`}
+                    />
+                    <div className="absolute bottom-1 right-1 bg-green-500 w-6 h-6 rounded-full border-4 border-slate-900" title="Available for work"></div>
+                  </div>
+                  
+                  <div>
+                    <h2 className="text-3xl font-bold mb-1">{resumeData.profile.name}</h2>
+                    <p className={`font-medium ${darkMode ? 'text-blue-400' : 'text-blue-600'}`}>{resumeData.profile.role}</p>
+                    <div className={`flex items-center justify-center gap-1 mt-2 text-sm ${darkMode ? 'text-slate-400' : 'text-gray-500'}`}>
+                      <i className="ph-fill ph-map-pin text-[14px]"></i>
+                      <span>{resumeData.profile.location}</span>
+                    </div>
+                  </div>
 
-  if (!mounted) return null;
+                  <div className="flex justify-center gap-3">
+                    {resumeData.profile.socials.map((social) => (
+                      <a 
+                        key={social.name}
+                        href={social.url}
+                        className={`p-3 rounded-2xl transition-all flex items-center justify-center ${
+                          darkMode 
+                            ? 'bg-slate-800 hover:bg-slate-700 hover:text-blue-400' 
+                            : 'bg-white shadow-sm hover:bg-gray-50 hover:text-blue-600 border border-gray-100'
+                        }`}
+                      >
+                        <i className={`ph ${social.iconClass} text-[20px]`}></i>
+                      </a>
+                    ))}
+                  </div>
+                </div>
 
-  const toggleTheme = () => setDarkMode(!darkMode);
+                <div className={`p-5 rounded-2xl ${darkMode ? 'bg-slate-800/50' : 'bg-white shadow-sm border border-gray-100'}`}>
+                  <h3 className="text-lg font-semibold mb-3">Обо мне</h3>
+                  <p className={`leading-relaxed ${darkMode ? 'text-slate-300' : 'text-gray-600'}`}>
+                    {resumeData.profile.bio}
+                  </p>
+                </div>
 
-  const TabButton = ({ id, iconClass, label }) => (
-    <button
-      onClick={() => setActiveTab(id)}
-      className={`flex flex-col items-center justify-center w-full py-2 ${
-        activeTab === id ? 'text-blue-400' : 'text-gray-500'
-      }`}
-    >
-      <i className={`ph ${iconClass} text-[24px]`}></i>
-      <span className="text-[10px]">{label}</span>
-    </button>
-  );
+                <button 
+                  onClick={() => setActiveTab('contacts')}
+                  className={`w-full py-4 rounded-xl font-bold shadow-lg transform transition-transform active:scale-95 flex items-center justify-center gap-2 ${
+                    darkMode 
+                      ? 'bg-blue-600 hover:bg-blue-500 text-white shadow-blue-900/20' 
+                      : 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-200'
+                  }`}
+                >
+                  Связаться со мной <i className="ph-fill ph-paper-plane-right text-[18px]"></i>
+                </button>
+              </div>
+            )}
 
-  return (
+            {/* VIEW: EXPERIENCE */}
+            {activeTab === 'experience' && (
+              <div className="space-y-6 animate-fadeIn">
+                <h2 className="text-2xl font-bold px-1">Опыт работы</h2>
+                <div className="space-y-4">
+                  {resumeData.experience.map((job, index) => (
+                    <div 
+                      key={index} 
+                      className={`p-5 rounded-2xl relative overflow-hidden group transition-all hover:translate-y-[-2px] ${
+                        darkMode ? 'bg-slate-800 hover:bg-slate-750' : 'bg-white shadow-sm border border-gray-100 hover:shadow-md'
+                      }`}
+                    >
+                      <div className={`absolute top-0 left-0 w-1 h-full ${index === 0 ? 'bg-blue-500' : 'bg-slate-600'}`}></div>
+                      <div className="flex justify-between items-start mb-2">
+                        <div>
+                          <h3 className="font-bold text-lg">{job.role}</h3>
+                          <p className={`text-sm ${darkMode ? 'text-blue-400' : 'text-blue-600'}`}>{job.company}</p>
+                        </div>
+                        <span className={`text-xs px-2 py-1 rounded-full ${darkMode ? 'bg-slate-700 text-slate-300' : 'bg-gray-100 text-gray-600'}`}>
+                          {job.period}
+                        </span>
+                      </div>
+                      <p className={`text-sm mb-4 leading-relaxed ${darkMode ? 'text-slate-400' : 'text-gray-600'}`}>
+                        {job.description}
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {job.tags.map(tag => (
+                          <span key={tag} className={`text-xs px-2 py-1 rounded-md border ${
+                            darkMode 
+                              ? 'border-slate-700 text-slate-400' 
+                              : 'border-gray-200 text-gray-500 bg-gray-50'
+                          }`}>
+                            #{tag}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                
+                <div className="mt-8">
+                   <button className={`w-full py-3 rounded-xl border-2 border-dashed flex items-center justify-center gap-2 font-medium transition-colors ${
+                     darkMode 
+                      ? 'border-slate-700 text-slate-500 hover:text-slate-300 hover:border-slate-500' 
+                      : 'border-gray-300 text-gray-500 hover:text-gray-700 hover:border-gray-400'
+                   }`}>
+                     <i className="ph-bold ph-download-simple text-[18px]"></i> Скачать резюме PDF
+                   </button>
+                </div>
+              </div>
+            )}
 
-<div className="min-h-screen bg-slate-900 text-slate-100">
+            {/* VIEW: SKILLS */}
+            {activeTab === 'skills' && (
+              <div className="space-y-6 animate-fadeIn">
+                <h2 className="text-2xl font-bold px-1">Навыки</h2>
+                <div className={`p-5 rounded-2xl ${darkMode ? 'bg-slate-800' : 'bg-white shadow-sm border border-gray-100'}`}>
+                  <div className="space-y-5">
+                    {resumeData.skills.map((skill, index) => (
+                      <div key={index}>
+                        <div className="flex justify-between text-sm mb-1.5">
+                          <span className="font-medium">{skill.name}</span>
+                          <span className={darkMode ? 'text-slate-400' : 'text-gray-500'}>{skill.level}%</span>
+                        </div>
+                        <div className={`w-full h-2 rounded-full overflow-hidden ${darkMode ? 'bg-slate-700' : 'bg-gray-100'}`}>
+                          <div 
+                            className={`h-full rounded-full ${darkMode ? 'bg-blue-500' : 'bg-blue-600'}`} 
+                            style={{ width: `${skill.level}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
 
-<header className="fixed top-0 w-full bg-slate-900/80 backdrop-blur border-b border-slate-800 z-50">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className={`p-4 rounded-2xl ${darkMode ? 'bg-slate-800' : 'bg-white shadow-sm border border-gray-100'}`}>
+                    <h3 className="font-bold mb-2 text-blue-500">Языки</h3>
+                    <ul className={`text-sm space-y-1 ${darkMode ? 'text-slate-300' : 'text-gray-600'}`}>
+                      <li>🇷🇺 Русский (Native)</li>
+                      <li>🇬🇧 Английский (B2)</li>
+                    </ul>
+                  </div>
+                  <div className={`p-4 rounded-2xl ${darkMode ? 'bg-slate-800' : 'bg-white shadow-sm border border-gray-100'}`}>
+                    <h3 className="font-bold mb-2 text-purple-500">Soft Skills</h3>
+                    <ul className={`text-sm space-y-1 ${darkMode ? 'text-slate-300' : 'text-gray-600'}`}>
+                      <li>• Коммуникация</li>
+                      <li>• Тайм-менеджмент</li>
+                      <li>• Менторство</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            )}
 
-<div className="max-w-md mx-auto px-4 h-16 flex items-center justify-between">
+            {/* VIEW: CONTACTS */}
+            {activeTab === 'contacts' && (
+              <div className="space-y-6 animate-fadeIn">
+                <h2 className="text-2xl font-bold px-1">Контакты</h2>
+                
+                <div className={`p-6 rounded-2xl text-center space-y-4 ${darkMode ? 'bg-slate-800' : 'bg-white shadow-sm border border-gray-100'}`}>
+                  <p className={`text-sm ${darkMode ? 'text-slate-400' : 'text-gray-500'}`}>Готов к новым проектам и предложениям</p>
+                  
+                  <a href={`mailto:${resumeData.contacts.email}`} className={`flex items-center gap-3 p-4 rounded-xl transition-colors ${darkMode ? 'bg-slate-700 hover:bg-slate-600' : 'bg-gray-50 hover:bg-gray-100'}`}>
+                    <div className="bg-blue-500/10 p-2 rounded-lg text-blue-500 flex items-center justify-center">
+                      <i className="ph-fill ph-envelope-simple text-[20px]"></i>
+                    </div>
+                    <div className="text-left">
+                      <p className="text-xs opacity-70">Email</p>
+                      <p className="font-medium truncate">{resumeData.contacts.email}</p>
+                    </div>
+                    <i className="ph-bold ph-caret-right text-[16px] ml-auto opacity-50"></i>
+                  </a>
 
-<h1 className="font-bold text-lg">
-Maxim Safrutin
-</h1>
+                  <a href={`tel:${resumeData.contacts.phone}`} className={`flex items-center gap-3 p-4 rounded-xl transition-colors ${darkMode ? 'bg-slate-700 hover:bg-slate-600' : 'bg-gray-50 hover:bg-gray-100'}`}>
+                    <div className="bg-green-500/10 p-2 rounded-lg text-green-500 flex items-center justify-center">
+                      <i className="ph-fill ph-map-pin text-[20px]"></i>
+                    </div>
+                    <div className="text-left">
+                      <p className="text-xs opacity-70">Телефон</p>
+                      <p className="font-medium">{resumeData.contacts.phone}</p>
+                    </div>
+                    <i className="ph-bold ph-caret-right text-[16px] ml-auto opacity-50"></i>
+                  </a>
 
-<button onClick={toggleTheme} className="p-2 rounded-full bg-slate-800">
-<i className="ph-fill ph-sun"></i>
-</button>
+                  <a href="#" className={`flex items-center gap-3 p-4 rounded-xl transition-colors ${darkMode ? 'bg-slate-700 hover:bg-slate-600' : 'bg-gray-50 hover:bg-gray-100'}`}>
+                    <div className="bg-sky-500/10 p-2 rounded-lg text-sky-500 flex items-center justify-center">
+                      <i className="ph-fill ph-paper-plane-right text-[20px]"></i>
+                    </div>
+                    <div className="text-left">
+                      <p className="text-xs opacity-70">Telegram</p>
+                      <p className="font-medium">{resumeData.contacts.telegram}</p>
+                    </div>
+                    <i className="ph-bold ph-caret-right text-[16px] ml-auto opacity-50"></i>
+                  </a>
+                </div>
 
-</div>
-</header>
+                <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
+                  <h3 className="font-semibold px-1">Написать сообщение</h3>
+                  <input 
+                    type="text" 
+                    placeholder="Ваше имя" 
+                    className={`w-full p-4 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
+                      darkMode ? 'bg-slate-800 text-white placeholder-slate-500' : 'bg-white border border-gray-200 text-gray-800 placeholder-gray-400'
+                    }`}
+                  />
+                  <textarea 
+                    rows="4"
+                    placeholder="Текст сообщения..." 
+                    className={`w-full p-4 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
+                      darkMode ? 'bg-slate-800 text-white placeholder-slate-500' : 'bg-white border border-gray-200 text-gray-800 placeholder-gray-400'
+                    }`}
+                  ></textarea>
+                  <button className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-900/20 transition-all active:scale-95">
+                    Отправить
+                  </button>
+                </form>
+              </div>
+            )}
 
-<main className="max-w-md mx-auto pt-20 pb-24 px-4">
+          </main>
 
-{activeTab === 'profile' && (
+          {/* --- BOTTOM NAVIGATION BAR --- */}
+          <nav className={`fixed bottom-0 w-full z-50 border-t ${darkMode ? 'bg-slate-900/90 border-slate-800 text-slate-400' : 'bg-white/90 border-gray-200 text-gray-400'} backdrop-blur-lg safe-area-bottom`}>
+            <div className="max-w-md mx-auto flex justify-around items-center h-16 px-2">
+              <TabButton id="profile" iconClass="ph-user" label="Профиль" />
+              <TabButton id="experience" iconClass="ph-briefcase" label="Опыт" />
+              <TabButton id="skills" iconClass="ph-code" label="Навыки" />
+              <TabButton id="contacts" iconClass="ph-envelope-simple" label="Контакты" />
+            </div>
+          </nav>
 
-<div className="space-y-6 animate-fadeIn">
+        </div>
+      );
+    }
 
-<div className="text-center space-y-4">
-
-<img
-src={resumeData.profile.avatar}
-className="w-32 h-32 rounded-full mx-auto object-cover"
-/>
-
-<div>
-
-<h2 className="text-3xl font-bold">
-{resumeData.profile.name}
-</h2>
-
-<p className="text-blue-400">
-{resumeData.profile.role}
-</p>
-
-<p className="text-sm text-slate-400">
-{resumeData.profile.location}
-</p>
-
-</div>
-
-<div className="flex justify-center gap-3">
-
-{resumeData.profile.socials.map((social) => (
-
-<a
-key={social.name}
-href={social.url}
-target="_blank"
-className="p-3 bg-slate-800 rounded-xl"
->
-
-<i className={`ph ${social.iconClass} text-xl`}></i>
-
-</a>
-
-))}
-
-</div>
-
-</div>
-
-<div className="p-5 bg-slate-800 rounded-2xl">
-
-<h3 className="font-semibold mb-2">
-Обо мне
-</h3>
-
-<p className="text-slate-300 text-sm">
-{resumeData.profile.bio}
-</p>
-
-</div>
-
-</div>
-
-)}
-
-</main>
-
-<nav className="fixed bottom-0 w-full border-t border-slate-800 bg-slate-900">
-
-<div className="max-w-md mx-auto flex justify-around h-16">
-
-<TabButton id="profile" iconClass="ph-user" label="Профиль" />
-<TabButton id="skills" iconClass="ph-code" label="Навыки" />
-<TabButton id="contacts" iconClass="ph-envelope-simple" label="Контакты" />
-
-</div>
-
-</nav>
-
-</div>
-
-);
-
-}
-
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(<App />);
-
-</script>
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
 </body>
 </html>
