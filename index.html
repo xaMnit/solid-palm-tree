@@ -3,45 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resume.Safrutin | Максим Сафрутин</title>
+    <title>Max Safrutin | Digital Dossier</title>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        appleGray: '#f5f5f7',
+                    }
+                }
+            }
+        }
+    </script>
 
     <style>
         body { 
             font-family: 'Inter', sans-serif; 
             -webkit-font-smoothing: antialiased; 
-            font-size: 14px; /* Уменьшаем базовый шрифт (зум на 30%) */
+            font-size: 14px;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
         .apple-shadow { box-shadow: 0 2px 12px rgba(0,0,0,0.04); }
-        .modal-blur { backdrop-filter: blur(20px); background: rgba(255,255,255,0.85); }
-        .dark .modal-blur { background: rgba(28,28,30,0.9); }
-        .nav-blur { backdrop-filter: blur(20px); background: rgba(255,255,255,0.7); }
-        .dark .nav-blur { background: rgba(0,0,0,0.7); }
-        .transition-all { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .nav-blur { backdrop-filter: blur(20px); background: rgba(255,255,255,0.8); }
+        .dark .nav-blur { background: rgba(0,0,0,0.8); }
+        .animate-fade-up { animation: fadeUp 0.5s ease-out forwards; }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
-<body class="bg-white text-[#1d1d1f] dark:bg-[#000000] dark:text-[#f5f5f7]">
+<body class="bg-white text-[#1d1d1f] dark:bg-black dark:text-[#f5f5f7]">
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState } = React;
+        const { useState, useEffect } = React;
+
+        // Компонент анимированного счетчика
+        const Counter = ({ endValue, suffix = "" }) => {
+            const [count, setCount] = useState(0);
+            useEffect(() => {
+                let start = 0;
+                const duration = 1000;
+                const increment = Math.ceil(endValue / (duration / 16));
+                const timer = setInterval(() => {
+                    start += increment;
+                    if (start >= endValue) {
+                        setCount(endValue);
+                        clearInterval(timer);
+                    } else {
+                        setCount(start);
+                    }
+                }, 16);
+                return () => clearInterval(timer);
+            }, [endValue]);
+            return <span>{count}{suffix}</span>;
+        };
 
         const Modal = ({ isOpen, onClose, title, children }) => {
             if (!isOpen) return null;
             return (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" style={{background: 'rgba(0,0,0,0.4)'}} onClick={onClose}>
-                    <div className="modal-blur dark:bg-[#1c1c1e] rounded-[2rem] max-w-lg w-full max-h-[85vh] overflow-y-auto p-8 shadow-2xl transition-all scale-100" onClick={e => e.stopPropagation()}>
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" onClick={onClose}>
+                    <div className="bg-white dark:bg-[#1c1c1e] rounded-[2rem] max-w-lg w-full max-h-[85vh] overflow-y-auto p-8 shadow-2xl" onClick={e => e.stopPropagation()}>
                         <div className="flex justify-between items-center mb-6">
-                            <h3 className="text-xl font-bold tracking-tight">{title}</h3>
-                            <button onClick={onClose} className="w-8 h-8 flex items-center justify-center bg-gray-100 dark:bg-gray-800 rounded-full text-sm">✕</button>
+                            <h3 className="text-xl font-bold">{title}</h3>
+                            <button onClick={onClose} className="w-8 h-8 flex items-center justify-center bg-gray-100 dark:bg-gray-800 rounded-full">✕</button>
                         </div>
-                        <div className="text-base leading-relaxed space-y-4 text-gray-700 dark:text-gray-300">{children}</div>
+                        <div className="text-base leading-relaxed space-y-4 text-gray-600 dark:text-gray-300">{children}</div>
                     </div>
                 </div>
             );
@@ -63,9 +96,9 @@
                     <nav className="fixed top-0 w-full nav-blur z-50 border-b border-gray-100 dark:border-gray-900">
                         <div className="max-w-4xl mx-auto px-6 h-14 flex items-center justify-between">
                             <button onClick={() => setActiveSection('profile')} className="text-base font-bold tracking-tight">
-                                Resume.<span className="text-blue-600">Safrutin</span>
+                                Max <span className="text-blue-600">Safrutin</span>
                             </button>
-                            <button onClick={toggleDarkMode} className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-all">
+                            <button onClick={toggleDarkMode} className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors">
                                 {darkMode ? <i className="fa-solid fa-sun text-sm"></i> : <i className="fa-solid fa-moon text-sm"></i>}
                             </button>
                         </div>
@@ -73,17 +106,17 @@
 
                     <main className="max-w-4xl mx-auto px-6 pt-20">
                         
-                        {/* SECTION: PROFILE (Home) */}
+                        {/* SECTION: PROFILE */}
                         {activeSection === 'profile' && (
-                            <div className="space-y-10 animate-in fade-in duration-500">
+                            <div className="space-y-10 animate-fade-up">
                                 <header className="flex flex-col items-center text-center py-6 space-y-4">
                                     <div className="w-32 h-32 md:w-40 md:h-40 rounded-[2.5rem] overflow-hidden apple-shadow ring-1 ring-black/5">
                                         <img src="https://ui-avatars.com/api/?name=Максим+Сафрутин&background=f5f5f7&color=000&size=512" alt="Maxim" className="w-full h-full object-cover" />
                                     </div>
                                     <div className="space-y-2">
                                         <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight">Максим Сафрутин</h1>
-                                        <p className="text-base md:text-lg text-gray-500 font-medium max-w-md mx-auto">
-                                            Менеджер по продажам автомобилей <span className="text-gray-400 font-light">(импорт и подбор под заказ)</span>
+                                        <p className="text-base md:text-lg text-gray-500 dark:text-gray-400 font-medium max-w-md mx-auto leading-tight">
+                                            Менеджер по продажам автомобилей <span className="text-gray-400 font-light block md:inline">(импорт и подбор под заказ)</span>
                                         </p>
                                         <p className="text-gray-400 font-medium text-sm flex items-center justify-center gap-2">
                                             <i className="fa-solid fa-location-dot"></i> Самара, Россия
@@ -91,28 +124,29 @@
                                     </div>
                                     <div className="flex gap-3">
                                         <button onClick={() => setActiveSection('contacts')} className="bg-[#0071e3] text-white px-6 py-2.5 rounded-full font-semibold text-sm hover:bg-[#0077ed] transition-all">Связаться</button>
-                                        <button onClick={() => setActiveSection('experience')} className="bg-[#f5f5f7] dark:bg-gray-800 text-[#1d1d1f] dark:text-white px-6 py-2.5 rounded-full font-semibold text-sm hover:bg-gray-200 transition-all">Открыть опыт</button>
+                                        <button onClick={() => setActiveSection('experience')} className="bg-gray-100 dark:bg-gray-800 text-[#1d1d1f] dark:text-white px-6 py-2.5 rounded-full font-semibold text-sm hover:opacity-80 transition-all">Открыть опыт</button>
                                     </div>
                                 </header>
 
+                                {/* Animated Stats */}
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                    <div className="bg-[#f5f5f7] dark:bg-[#1c1c1e] p-6 rounded-[1.5rem] text-center">
-                                        <div className="text-3xl font-bold mb-1">667+</div>
+                                    <div className="bg-[#f5f5f7] dark:bg-[#1c1c1e] p-6 rounded-[1.5rem] text-center border border-transparent dark:border-gray-800">
+                                        <div className="text-3xl font-bold mb-1"><Counter endValue={667} suffix="+" /></div>
                                         <div className="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Продано авто</div>
                                     </div>
-                                    <div className="bg-[#f5f5f7] dark:bg-[#1c1c1e] p-6 rounded-[1.5rem] text-center">
-                                        <div className="text-3xl font-bold mb-1">424+</div>
+                                    <div className="bg-[#f5f5f7] dark:bg-[#1c1c1e] p-6 rounded-[1.5rem] text-center border border-transparent dark:border-gray-800">
+                                        <div className="text-3xl font-bold mb-1"><Counter endValue={424} suffix="+" /></div>
                                         <div className="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Млн ₽ оборот</div>
                                     </div>
-                                    <div className="bg-[#f5f5f7] dark:bg-[#1c1c1e] p-6 rounded-[1.5rem] text-center">
-                                        <div className="text-3xl font-bold mb-1">22+</div>
+                                    <div className="bg-[#f5f5f7] dark:bg-[#1c1c1e] p-6 rounded-[1.5rem] text-center border border-transparent dark:border-gray-800">
+                                        <div className="text-3xl font-bold mb-1"><Counter endValue={22} suffix="+" /></div>
                                         <div className="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Млн ₽ прибыль</div>
                                     </div>
                                 </div>
 
                                 <section className="max-w-2xl mx-auto text-center space-y-6">
                                     <p className="text-lg md:text-xl leading-relaxed font-medium text-gray-800 dark:text-gray-200">
-                                        С 1993 года — в переговорах, с 2020 — в автомобильных. Увеличиваю прибыль компании через доверие и решение задачи клиента...
+                                        С 1993 года — в переговорах, с 2020 — в автомобильных. Увеличиваю прибыль компании через доверие и решение задачи клиента, то есть конвертирую запрос в сделку. Работаю системно и использую в том числе AI-инструменты для повышения конверсии продаж.
                                     </p>
                                     <button onClick={() => setIsAboutOpen(true)} className="text-[#0066cc] text-base font-semibold hover:underline underline-offset-4">
                                         Подробнее об экспертизе →
@@ -123,20 +157,20 @@
 
                         {/* SECTION: EXPERIENCE */}
                         {activeSection === 'experience' && (
-                            <div className="space-y-8 animate-in fade-in duration-500 max-w-3xl mx-auto">
-                                <h2 className="text-2xl font-bold tracking-tight mb-6">Опыт работы</h2>
+                            <div className="space-y-8 animate-fade-up max-w-3xl mx-auto">
+                                <h2 className="text-2xl font-bold tracking-tight">Опыт работы</h2>
                                 {[
                                     { company: "АвтоИмпорт Про", role: "Ведущий менеджер", year: "2020 — Наст. время", review: "Максим подобрал автомобиль, о котором я мечтал." },
                                     { company: "Premium Cars", role: "Sales Expert", year: "2018 — 2020", review: "Исключительный уровень сервиса." }
                                 ].map((item, idx) => (
                                     <div key={idx} className="flex flex-col md:flex-row gap-4">
-                                        <div className="md:w-1/2 bg-[#f5f5f7] dark:bg-[#1c1c1e] p-6 rounded-[1.5rem]">
+                                        <div className="md:w-1/2 bg-[#f5f5f7] dark:bg-[#1c1c1e] p-6 rounded-[1.5rem] border border-transparent dark:border-gray-800">
                                             <span className="text-blue-600 font-bold text-[10px] uppercase">{item.year}</span>
                                             <h3 className="text-xl font-bold mt-1">{item.company}</h3>
                                             <p className="text-sm text-gray-500">{item.role}</p>
                                         </div>
-                                        <div className="md:w-1/2 bg-white dark:bg-black p-6 rounded-[1.5rem] border border-gray-100 dark:border-gray-800 flex flex-col justify-center italic text-sm">
-                                            <p className="text-gray-600 dark:text-gray-400">"{item.review}"</p>
+                                        <div className="md:w-1/2 bg-white dark:bg-black p-6 rounded-[1.5rem] border border-gray-100 dark:border-gray-800 italic text-sm text-gray-600 dark:text-gray-400">
+                                            "{item.review}"
                                         </div>
                                     </div>
                                 ))}
@@ -145,38 +179,38 @@
 
                         {/* SECTION: SKILLS */}
                         {activeSection === 'skills' && (
-                            <div className="space-y-8 animate-in fade-in duration-500">
+                            <div className="space-y-8 animate-fade-up">
                                 <h2 className="text-2xl font-bold tracking-tight">Навыки и Стек</h2>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div className="bg-[#f5f5f7] dark:bg-[#1c1c1e] p-6 rounded-[2rem] space-y-3">
+                                    <div className="bg-[#f5f5f7] dark:bg-[#1c1c1e] p-6 rounded-[2rem] border border-transparent dark:border-gray-800 space-y-3">
                                         <h3 className="text-lg font-bold mb-4 flex items-center gap-2"><i className="fa-solid fa-chart-line text-blue-600"></i> Продажи</h3>
                                         {["B2B Продажи", "Сложные переговоры", "Импорт/Экспорт"].map(s => (
-                                            <div key={s} className="bg-white dark:bg-black p-3 rounded-xl text-xs font-medium apple-shadow">{s}</div>
+                                            <div key={s} className="bg-white dark:bg-black p-3 rounded-xl text-xs font-medium apple-shadow border border-gray-50 dark:border-gray-900">{s}</div>
                                         ))}
                                     </div>
-                                    <div className="bg-[#f5f5f7] dark:bg-[#1c1c1e] p-6 rounded-[2rem] space-y-3">
+                                    <div className="bg-[#f5f5f7] dark:bg-[#1c1c1e] p-6 rounded-[2rem] border border-transparent dark:border-gray-800 space-y-3">
                                         <h3 className="text-lg font-bold mb-4 flex items-center gap-2"><i className="fa-solid fa-robot text-blue-600"></i> AI & Tech</h3>
                                         {["ChatGPT Prompting", "CRM Архитектура", "Notion Expert"].map(s => (
-                                            <div key={s} className="bg-white dark:bg-black p-3 rounded-xl text-xs font-medium apple-shadow text-blue-600">{s}</div>
+                                            <div key={s} className="bg-white dark:bg-black p-3 rounded-xl text-xs font-medium apple-shadow text-blue-600 border border-gray-50 dark:border-gray-900">{s}</div>
                                         ))}
                                     </div>
                                 </div>
                             </div>
                         )}
 
-                        {/* SECTION: PERSONAL (New Section) */}
+                        {/* SECTION: PERSONAL */}
                         {activeSection === 'personal' && (
-                            <div className="space-y-6 animate-in fade-in duration-500 max-w-3xl mx-auto">
+                            <div className="space-y-6 animate-fade-up max-w-3xl mx-auto">
                                 <h2 className="text-2xl font-bold tracking-tight mb-4 text-center">Личное и Увлечения</h2>
                                 <div className="bg-[#1d1d1f] text-white p-8 rounded-[2rem]">
                                     <h3 className="text-xl font-bold mb-4">Девиз</h3>
                                     <p className="text-lg opacity-70 italic mb-4">«Система всегда побеждает хаос».</p>
                                     <p className="text-base leading-relaxed opacity-90 font-light">Увлекаюсь яхтингом и марафонским бегом. Считаю, что дисциплина в спорте напрямую переносится в бизнес.</p>
                                 </div>
-                                <div className="bg-[#f5f5f7] dark:bg-[#1c1c1e] p-8 rounded-[2rem]">
+                                <div className="bg-[#f5f5f7] dark:bg-[#1c1c1e] p-8 rounded-[2rem] border border-transparent dark:border-gray-800">
                                     <h3 className="text-xl font-bold mb-4">Путешествия</h3>
                                     <p className="text-base leading-relaxed text-gray-600 dark:text-gray-400">35 стран, от Исландии до Японии. Люблю изучать локальные бизнес-культуры и находить новые подходы в коммуникациях.</p>
-                                    <div className="text-4xl mt-6 flex gap-4">
+                                    <div className="text-4xl mt-6 flex gap-4 text-blue-600">
                                         <i className="fa-solid fa-earth-americas"></i>
                                         <i className="fa-solid fa-mountain"></i>
                                         <i className="fa-solid fa-car"></i>
@@ -187,19 +221,19 @@
 
                         {/* SECTION: CONTACTS */}
                         {activeSection === 'contacts' && (
-                            <div className="text-center py-6 animate-in fade-in duration-500">
+                            <div className="text-center py-6 animate-fade-up">
                                 <h2 className="text-3xl font-extrabold tracking-tight mb-2">Готовы к новому опыту?</h2>
                                 <p className="text-gray-400 mb-8">Свяжитесь со мной любым удобным способом</p>
                                 
                                 <div className="max-w-md mx-auto space-y-3">
-                                    <a href="tel:+79272651777" className="flex items-center justify-between p-5 bg-[#f5f5f7] dark:bg-[#1c1c1e] rounded-2xl hover:scale-[1.01] transition-all">
+                                    <a href="tel:+79272651777" className="flex items-center justify-between p-5 bg-[#f5f5f7] dark:bg-[#1c1c1e] rounded-2xl hover:scale-[1.01] transition-all border border-transparent dark:border-gray-800">
                                         <div className="text-left">
                                             <div className="text-[10px] text-gray-400 font-bold uppercase">Личный сотовый</div>
                                             <div className="text-lg font-bold">8 (927) 265-17-77</div>
                                         </div>
                                         <i className="fa-solid fa-phone text-blue-600"></i>
                                     </a>
-                                    <a href="tel:+79376420767" className="flex items-center justify-between p-5 bg-[#f5f5f7] dark:bg-[#1c1c1e] rounded-2xl hover:scale-[1.01] transition-all">
+                                    <a href="tel:+79376420767" className="flex items-center justify-between p-5 bg-[#f5f5f7] dark:bg-[#1c1c1e] rounded-2xl hover:scale-[1.01] transition-all border border-transparent dark:border-gray-800">
                                         <div className="text-left">
                                             <div className="text-[10px] text-gray-400 font-bold uppercase">Сотовый супруги</div>
                                             <div className="text-lg font-bold">8 (937) 642-07-67</div>
@@ -207,25 +241,25 @@
                                         <i className="fa-solid fa-phone text-blue-600"></i>
                                     </a>
                                     <div className="flex gap-3">
-                                        <a href="mailto:max.safrutin@gmail.com" className="flex-1 p-5 bg-[#f5f5f7] dark:bg-[#1c1c1e] rounded-2xl text-left">
+                                        <a href="mailto:max.safrutin@gmail.com" className="flex-1 p-5 bg-[#f5f5f7] dark:bg-[#1c1c1e] rounded-2xl text-left border border-transparent dark:border-gray-800">
                                             <div className="text-[10px] text-gray-400 font-bold uppercase">Gmail</div>
                                             <div className="text-sm font-bold truncate">max.safrutin@gmail.com</div>
                                         </a>
-                                        <a href="mailto:max.safr18@yandex.ru" className="flex-1 p-5 bg-[#f5f5f7] dark:bg-[#1c1c1e] rounded-2xl text-left">
+                                        <a href="mailto:max.safr18@yandex.ru" className="flex-1 p-5 bg-[#f5f5f7] dark:bg-[#1c1c1e] rounded-2xl text-left border border-transparent dark:border-gray-800">
                                             <div className="text-[10px] text-gray-400 font-bold uppercase">Yandex</div>
                                             <div className="text-sm font-bold truncate">max.safr18@yandex.ru</div>
                                         </a>
                                     </div>
-                                    <div className="p-5 bg-white dark:bg-black border border-gray-100 dark:border-gray-800 rounded-2xl text-left flex items-start gap-3">
+                                    <div className="p-5 bg-white dark:bg-black border border-gray-100 dark:border-gray-800 rounded-2xl text-left flex items-start gap-3 shadow-sm">
                                         <i className="fa-solid fa-map-pin mt-1 text-gray-400"></i>
-                                        <span className="text-sm text-gray-500 leading-snug">г. Самара, 443028, мкр-н Крутые ключи, ул. Мира</span>
+                                        <span className="text-sm text-gray-500 dark:text-gray-400 leading-snug">г. Самара, 443028, мкр-н Крутые ключи, ул. Мира</span>
                                     </div>
                                 </div>
                             </div>
                         )}
                     </main>
 
-                    {/* Bottom Tab Bar (Apple Style) */}
+                    {/* Navigation */}
                     <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[95%] max-w-lg nav-blur rounded-full apple-shadow border border-gray-200 dark:border-gray-800 z-50">
                         <div className="flex justify-around items-center h-16 px-2">
                             {[
@@ -247,9 +281,8 @@
                         </div>
                     </nav>
 
-                    {/* Modal About */}
                     <Modal isOpen={isAboutOpen} onClose={() => setIsAboutOpen(false)} title="О специалисте">
-                        <p className="text-sm">Более 12 лет в управлении продажами. Подход — через data-driven решения. В продажах выстраиваю собственную архитектуру процессов, которая делает результат для руководства прогнозируемым и масштабируемым.</p>
+                        <p className="text-sm leading-relaxed">Более 12 лет в управлении продажами. Подход — через data-driven решения. В продажах выстраиваю собственную архитектуру процессов, которая делает результат для руководства прогнозируемым и масштабируемым.</p>
                         
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 py-4">
                             {[
@@ -258,17 +291,17 @@
                                 { val: "1198+", icon: "fa-star", txt: "Положительных отзывов клиентов." },
                                 { val: ">876", icon: "fa-diagram-project", txt: "Фриланс-проектов реализовано." }
                             ].map((item, i) => (
-                                <div key={i} className="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-2xl flex items-start gap-3">
-                                    <i className={`fa-solid ${item.icon} text-blue-500 mt-1`}></i>
+                                <div key={i} className="p-4 bg-[#f5f5f7] dark:bg-gray-800/50 rounded-2xl flex items-start gap-3">
+                                    <i className={`fa-solid ${item.icon} text-blue-500 mt-1 text-xs`}></i>
                                     <div>
-                                        <div className="text-sm font-bold text-blue-600">{item.val}</div>
-                                        <div className="text-[11px] leading-tight text-gray-500">{item.txt}</div>
+                                        <div className="text-sm font-bold text-blue-600 leading-none">{item.val}</div>
+                                        <div className="text-[11px] leading-tight text-gray-500 mt-1">{item.txt}</div>
                                     </div>
                                 </div>
                             ))}
                         </div>
 
-                        <p className="text-xs text-gray-600 dark:text-gray-400 border-l-2 border-blue-200 dark:border-blue-900 pl-4 italic leading-relaxed">
+                        <p className="text-xs text-gray-500 dark:text-gray-400 border-l-2 border-blue-500 pl-4 italic leading-relaxed">
                             Убеждён, что эффективная работа строится на живых человеческих отношениях и взаимном доверии.
                         </p>
 
