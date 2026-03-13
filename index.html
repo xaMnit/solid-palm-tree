@@ -3,226 +3,306 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Digital Dossier | Professional Profile</title>
+    <title>Resume.Safrutin | Максим Сафрутин</title>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darkBg: '#0f172a',
+                        darkCard: '#1e293b'
+                    }
+                }
+            }
+        }
+    </script>
+
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #fcfcfc; color: #1d1d1f; }
-        .glass-card { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(0,0,0,0.05); }
-        .gradient-text { background: linear-gradient(90deg, #000, #666); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .modal-overlay { background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); }
-        details summary::-webkit-details-marker { display: none; }
-        .smooth-transition { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        body { font-family: 'Inter', sans-serif; transition: background-color 0.3s ease; }
+        .glass-card { backdrop-filter: blur(10px); border: 1px solid rgba(0,0,0,0.05); }
+        .dark .glass-card { border: 1px solid rgba(255,255,255,0.1); }
+        .nav-active { color: #3b82f6; border-top: 2px solid #3b82f6; }
+        .modal-overlay { background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-in { animation: fadeIn 0.4s ease-out forwards; }
     </style>
 </head>
-<body>
+<body class="bg-slate-50 text-slate-900 dark:bg-darkBg dark:text-slate-100">
     <div id="root"></div>
 
     <script type="text/babel">
         const { useState, useEffect } = React;
 
         // --- UI Компоненты ---
-
         const Modal = ({ isOpen, onClose, title, children }) => {
             if (!isOpen) return null;
             return (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 modal-overlay" onClick={onClose}>
-                    <div className="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-8 shadow-2xl" onClick={e => e.stopPropagation()}>
+                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 modal-overlay" onClick={onClose}>
+                    <div className="bg-white dark:bg-darkCard rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-8 shadow-2xl shadow-blue-500/10" onClick={e => e.stopPropagation()}>
                         <div className="flex justify-between items-center mb-6">
                             <h3 className="text-2xl font-bold">{title}</h3>
-                            <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full">✕</button>
+                            <button onClick={onClose} className="p-2 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-full">✕</button>
                         </div>
-                        <div className="text-gray-600 leading-relaxed">{children}</div>
+                        <div className="text-slate-600 dark:text-slate-300 leading-relaxed space-y-4">{children}</div>
                     </div>
                 </div>
             );
         };
 
-        const AnimatedCounter = ({ value, label }) => {
-            const [count, setCount] = useState(0);
-            useEffect(() => {
-                let start = 0;
-                const end = parseInt(value);
-                if (start === end) return;
-                let timer = setInterval(() => {
-                    start += Math.ceil(end / 50);
-                    if (start >= end) {
-                        setCount(end);
-                        clearInterval(timer);
-                    } else {
-                        setCount(start);
-                    }
-                }, 30);
-                return () => clearInterval(timer);
-            }, [value]);
-
-            return (
-                <div className="p-6 bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md smooth-transition">
-                    <div className="text-3xl font-bold text-black mb-1">{count}{value.includes('+') ? '+' : ''}</div>
-                    <div className="text-sm text-gray-500 uppercase tracking-wider font-medium">{label}</div>
-                </div>
-            );
-        };
-
-        // --- Секции ---
-
         const App = () => {
-            const [activeModal, setActiveModal] = useState(null);
-            const [activeTab, setActiveTab] = useState('sales');
+            const [activeSection, setActiveSection] = useState('profile');
+            const [darkMode, setDarkMode] = useState(false);
+            const [isAboutOpen, setIsAboutOpen] = useState(false);
 
-            const skills = {
-                sales: ["B2B продажи", "Воронки в CRM", "Холодный поиск", "Работа с возражениями"],
-                tech: ["ChatGPT / Prompt Engineering", "Python (основы)", "SQL", "Notion Architecture"],
-                analytics: ["Power BI", "Unit-экономика", "Google Sheets (Expert)"]
+            const toggleDarkMode = () => {
+                setDarkMode(!darkMode);
+                document.documentElement.classList.toggle('dark');
             };
 
+            // Компонент Контактов для переиспользования
+            const ContactsList = () => (
+                <div className="space-y-4 max-w-lg mx-auto">
+                    <div className="bg-white dark:bg-darkCard p-6 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm space-y-4">
+                        <a href="tel:+79272651777" className="flex items-center justify-between p-3 hover:bg-blue-50 dark:hover:bg-slate-700 rounded-xl transition-colors">
+                            <div className="flex flex-col text-left">
+                                <span className="text-xs text-slate-400">Сотовый личный</span>
+                                <span className="font-semibold">8 (927) 265-17-77</span>
+                            </div>
+                            <span className="text-blue-500 text-xl">📞</span>
+                        </a>
+                        <a href="tel:+79376420767" className="flex items-center justify-between p-3 hover:bg-blue-50 dark:hover:bg-slate-700 rounded-xl transition-colors">
+                            <div className="flex flex-col text-left">
+                                <span className="text-xs text-slate-400">Сотовый супруги</span>
+                                <span className="font-semibold">8 (937) 642-07-67</span>
+                            </div>
+                            <span className="text-blue-500 text-xl">📞</span>
+                        </a>
+                        <div className="border-t border-slate-100 dark:border-slate-700 my-2"></div>
+                        <a href="mailto:max.safrutin@gmail.com" className="flex items-center justify-between p-3 hover:bg-blue-50 dark:hover:bg-slate-700 rounded-xl transition-colors">
+                            <span className="font-medium">max.safrutin@gmail.com</span>
+                            <span className="text-blue-500">📧</span>
+                        </a>
+                        <a href="mailto:max.safr18@yandex.ru" className="flex items-center justify-between p-3 hover:bg-blue-50 dark:hover:bg-slate-700 rounded-xl transition-colors">
+                            <span className="font-medium">max.safr18@yandex.ru</span>
+                            <span className="text-blue-500">📨</span>
+                        </a>
+                        <div className="p-3 bg-slate-50 dark:bg-slate-800 rounded-xl text-sm text-slate-500">
+                            📍 г. Самара, 443028, мкр-н Крутые ключи, ул. Мира
+                        </div>
+                    </div>
+                    <div className="flex gap-4 justify-center">
+                        <a href="https://t.me/" className="bg-sky-500 text-white px-8 py-3 rounded-full font-medium">Telegram</a>
+                        <a href="https://wa.me/79272651777" className="bg-green-500 text-white px-8 py-3 rounded-full font-medium">WhatsApp</a>
+                    </div>
+                </div>
+            );
+
             return (
-                <div className="max-w-4xl mx-auto px-6 py-12">
-                    
-                    {/* 1. HERO BLOCK */}
-                    <header className="text-center py-20 mb-12">
-                        <h1 className="text-5xl md:text-7xl font-bold mb-6 tracking-tight gradient-text">Иван Иванов</h1>
-                        <p className="text-xl md:text-2xl text-gray-500 mb-10 font-light">Senior Sales Architect & Operations Manager</p>
+                <div className="min-h-screen pb-24 lg:pb-0 lg:pt-0">
+                    {/* Header / Navbar */}
+                    <nav className="fixed top-0 w-full bg-white/80 dark:bg-darkBg/80 backdrop-blur-md z-50 border-b border-slate-100 dark:border-slate-800">
+                        <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
+                            <button onClick={() => setActiveSection('profile')} className="text-xl font-bold tracking-tighter">
+                                Resume.<span className="text-blue-600">Safrutin</span>
+                            </button>
+                            <button onClick={toggleDarkMode} className="p-2 rounded-full bg-slate-100 dark:bg-slate-800">
+                                {darkMode ? '☀️' : '🌙'}
+                            </button>
+                        </div>
+                    </nav>
+
+                    {/* Основной контент */}
+                    <main className="max-w-5xl mx-auto px-6 pt-24 animate-in">
                         
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
-                            <AnimatedCounter value="630+" label="Продано авто" />
-                            <AnimatedCounter value="311" label="Млн ₽ оборот" />
-                            <AnimatedCounter value="14" label="Млн ₽ прибыль" />
-                        </div>
-
-                        <div className="flex flex-wrap justify-center gap-4">
-                            <a href="#contacts" className="bg-black text-white px-8 py-4 rounded-full font-medium hover:bg-gray-800 smooth-transition">Связаться</a>
-                            <button onClick={() => document.getElementById('experience').scrollIntoView()} className="bg-gray-100 text-black px-8 py-4 rounded-full font-medium hover:bg-gray-200 smooth-transition">Открыть опыт</button>
-                        </div>
-                    </header>
-
-                    {/* 2. WHO AM I */}
-                    <section className="mb-24 text-center">
-                        <p className="text-2xl text-gray-700 leading-snug mb-6 max-w-2xl mx-auto">
-                            Специализируюсь на построении системных продаж и автоматизации бизнес-процессов. Помогаю компаниям расти через цифры и AI-инструменты.
-                        </p>
-                        <button onClick={() => setActiveModal('about')} className="text-blue-600 font-medium hover:underline">Подробнее об экспертизе →</button>
-                    </section>
-
-                    {/* 4. EXPERIENCE (Timeline) */}
-                    <section id="experience" className="mb-24">
-                        <h2 className="text-3xl font-bold mb-10">Опыт работы</h2>
-                        <div className="space-y-8 border-l-2 border-gray-100 ml-4 pl-8 relative">
-                            {[
-                                { company: "Global Auto Group", role: "Head of Sales", year: "2021 — 2024", desc: "Увеличение прибыли отдела на 40% за год." },
-                                { company: "Tech Solutions", role: "Account Manager", year: "2018 — 2021", desc: "Внедрение CRM и автоматизация отчетности." }
-                            ].map((job, i) => (
-                                <div key={i} className="relative mb-12">
-                                    <div className="absolute -left-[41px] top-1 w-4 h-4 rounded-full bg-black border-4 border-white"></div>
-                                    <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-50 hover:border-gray-200 smooth-transition cursor-pointer" 
-                                         onClick={() => setActiveModal(`job-${i}`)}>
-                                        <span className="text-sm text-gray-400 font-medium">{job.year}</span>
-                                        <h3 className="text-xl font-bold mt-1">{job.company}</h3>
-                                        <p className="text-gray-500">{job.role}</p>
-                                        <p className="mt-4 text-blue-600 text-sm font-medium italic">Нажми, чтобы увидеть результаты ↓</p>
+                        {activeSection === 'profile' && (
+                            <div className="space-y-12">
+                                {/* Hero */}
+                                <header className="flex flex-col md:flex-row items-center gap-8 py-10">
+                                    <div className="w-32 h-32 md:w-48 md:h-48 rounded-3xl overflow-hidden shadow-xl ring-4 ring-white dark:ring-slate-800 shrink-0">
+                                        <img src="https://ui-avatars.com/api/?name=Максим+Сафрутин&background=0D8ABC&color=fff&size=256" alt="Maxim Safrutin" className="w-full h-full object-cover" />
                                     </div>
-                                    <Modal 
-                                        isOpen={activeModal === `job-${i}`} 
-                                        onClose={() => setActiveModal(null)} 
-                                        title={`${job.role} @ ${job.company}`}
-                                    >
-                                        <h4 className="font-bold text-black mb-2">Ключевые задачи:</h4>
-                                        <ul className="list-disc ml-5 mb-4">
-                                            <li>Управление командой из 15 человек</li>
-                                            <li>Оптимизация воронки продаж</li>
-                                        </ul>
-                                        <h4 className="font-bold text-black mb-2">Результаты:</h4>
-                                        <div className="bg-green-50 p-4 rounded-xl text-green-800">{job.desc}</div>
-                                    </Modal>
+                                    <div className="text-center md:text-left">
+                                        <h1 className="text-4xl md:text-6xl font-extrabold mb-2">Максим Сафрутин</h1>
+                                        <p className="text-lg text-slate-500 dark:text-slate-400 mb-4 flex items-center justify-center md:justify-start gap-2">
+                                            <span>Менеджер по продажам автомобилей (импорт и подбор под заказ)</span>
+                                        </p>
+                                        <div className="flex items-center justify-center md:justify-start gap-2 text-slate-400 text-sm mb-6 uppercase tracking-widest">
+                                            <span>📍 Самара, Россия</span>
+                                        </div>
+                                        <div className="flex flex-wrap justify-center md:justify-start gap-3">
+                                            <button onClick={() => setActiveSection('contacts')} className="bg-black dark:bg-white dark:text-black text-white px-6 py-3 rounded-2xl font-semibold transition-transform hover:scale-105">Связаться</button>
+                                            <button onClick={() => setActiveSection('experience')} className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-6 py-3 rounded-2xl font-semibold transition-transform hover:scale-105">Открыть опыт</button>
+                                        </div>
+                                    </div>
+                                </header>
+
+                                {/* Stats */}
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                    <div className="bg-white dark:bg-darkCard p-8 rounded-[2rem] border border-slate-100 dark:border-slate-800 text-center">
+                                        <div className="text-4xl font-black text-blue-600 mb-1">667+</div>
+                                        <div className="text-xs uppercase text-slate-400 font-bold tracking-widest">Продано авто</div>
+                                    </div>
+                                    <div className="bg-white dark:bg-darkCard p-8 rounded-[2rem] border border-slate-100 dark:border-slate-800 text-center">
+                                        <div className="text-4xl font-black text-blue-600 mb-1">424+</div>
+                                        <div className="text-xs uppercase text-slate-400 font-bold tracking-widest">Млн ₽ оборот</div>
+                                    </div>
+                                    <div className="bg-white dark:bg-darkCard p-8 rounded-[2rem] border border-slate-100 dark:border-slate-800 text-center">
+                                        <div className="text-4xl font-black text-blue-600 mb-1">22+</div>
+                                        <div className="text-xs uppercase text-slate-400 font-bold tracking-widest">Млн ₽ прибыль</div>
+                                    </div>
                                 </div>
-                            ))}
-                        </div>
-                    </section>
 
-                    {/* 5. REVIEWS (Cards) */}
-                    <section className="mb-24">
-                        <h2 className="text-3xl font-bold mb-8">Отзывы</h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-                                <p className="text-gray-600 mb-6 italic">"Иван перестроил нашу CRM за месяц, после чего конверсия выросла вдвое..."</p>
-                                <div className="flex justify-between items-center">
-                                    <div>
-                                        <div className="font-bold">Александр Витте</div>
-                                        <div className="text-sm text-gray-400">CEO, AutoDrive</div>
+                                {/* About Section */}
+                                <section className="max-w-3xl mx-auto text-center space-y-6">
+                                    <p className="text-xl md:text-2xl leading-relaxed font-light italic">
+                                        "С 1993 года — в переговорах, с 2020 — в автомобильных. Увеличиваю прибыль компании через доверие и решение задачи клиента, то есть конвертирую запрос в сделку. Работаю системно и использую в том числе AI-инструменты для повышения конверсии продаж."
+                                    </p>
+                                    <button onClick={() => setIsAboutOpen(true)} className="text-blue-500 font-bold py-2 px-4 rounded-full border border-blue-100 dark:border-blue-900/30 bg-blue-50/50 dark:bg-blue-900/10">
+                                        Подробнее об экспертизе →
+                                    </button>
+                                </section>
+
+                                {/* Personal & Travel (Moved to Profile according to instructions) */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="bg-slate-900 text-white p-8 rounded-[2.5rem]">
+                                        <h3 className="text-2xl font-bold mb-4">Личное</h3>
+                                        <p className="opacity-70 italic mb-4">«Система всегда побеждает хаос».</p>
+                                        <p className="opacity-90 leading-relaxed">Увлекаюсь яхтингом и марафонским бегом. Считаю, что дисциплина в спорте напрямую переносится в бизнес.</p>
                                     </div>
-                                    <button onClick={() => setActiveModal('review-1')} className="text-xs bg-gray-100 px-3 py-2 rounded-lg hover:bg-gray-200">Весь текст</button>
+                                    <div className="bg-blue-600 text-white p-8 rounded-[2.5rem]">
+                                        <h3 className="text-2xl font-bold mb-4">Путешествия</h3>
+                                        <p className="opacity-90 leading-relaxed">35 стран, от Исландии до Японии. Люблю изучать локальные бизнес-культуры и находить новые подходы в коммуникациях.</p>
+                                        <div className="text-3xl mt-6">🌍 🏔️ 🏎️</div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </section>
+                        )}
 
-                    {/* 6 & 7. SKILLS (Tabs) */}
-                    <section className="mb-24 bg-gray-50 p-8 rounded-3xl">
-                        <h2 className="text-3xl font-bold mb-8 text-center">Навыки и Стек</h2>
-                        <div className="flex justify-center gap-2 mb-8 bg-gray-200 p-1 rounded-xl w-fit mx-auto">
-                            {['sales', 'tech', 'analytics'].map(tab => (
+                        {activeSection === 'experience' && (
+                            <div className="space-y-12 pb-12">
+                                <h2 className="text-4xl font-extrabold">Опыт и Отзывы</h2>
+                                
+                                {/* Timeline с Отзывами (ПК: бок о бок, Моб: друг под другом) */}
+                                <div className="space-y-12">
+                                    {[
+                                        { company: "АвтоИмпорт Про", role: "Ведущий менеджер", year: "2020 — Наст. время", content: "Работа с заказами из Европы и Китая.", review: "Максим — профессионал. Подобрал BMW в идеале под мой бюджет за 2 недели." },
+                                        { company: "Премиум Групп", role: "Sales Expert", year: "2015 — 2020", content: "Прямые продажи премиального сегмента.", review: "Лучший результат по конверсии в отделе." }
+                                    ].map((item, idx) => (
+                                        <div key={idx} className="flex flex-col lg:flex-row gap-6">
+                                            {/* Карточка работы */}
+                                            <div className="lg:w-1/2 bg-white dark:bg-darkCard p-8 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm relative">
+                                                <div className="absolute -left-3 top-10 w-6 h-6 bg-blue-500 rounded-full border-4 border-white dark:border-darkBg hidden lg:block"></div>
+                                                <span className="text-blue-500 font-bold text-sm">{item.year}</span>
+                                                <h3 className="text-2xl font-bold mt-1">{item.company}</h3>
+                                                <p className="text-slate-500 mb-4">{item.role}</p>
+                                                <p className="text-slate-600 dark:text-slate-300">{item.content}</p>
+                                            </div>
+                                            {/* Карточка отзыва */}
+                                            <div className="lg:w-1/2 bg-blue-50 dark:bg-blue-900/20 p-8 rounded-3xl border border-blue-100 dark:border-blue-900/30 italic relative">
+                                                <span className="absolute top-4 left-4 text-4xl text-blue-200 dark:text-blue-800 font-serif">“</span>
+                                                <p className="text-slate-700 dark:text-slate-300 relative z-10">{item.review}</p>
+                                                <div className="mt-4 text-sm font-bold text-blue-600">— Клиент / Коллега</div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {activeSection === 'skills' && (
+                            <div className="space-y-12">
+                                <h2 className="text-4xl font-extrabold">Навыки и Стек</h2>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                    <div className="bg-white dark:bg-darkCard p-8 rounded-3xl border border-slate-100 dark:border-slate-800">
+                                        <h3 className="text-xl font-bold mb-6 flex items-center gap-2"><span>📈</span> Продажи и Переговоры</h3>
+                                        <div className="flex flex-wrap gap-2">
+                                            {["B2B & B2C", "Сложные переговоры", "Импорт авто", "Управление воронкой"].map(s => (
+                                                <span key={s} className="bg-slate-100 dark:bg-slate-800 px-4 py-2 rounded-xl text-sm">{s}</span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <div className="bg-white dark:bg-darkCard p-8 rounded-3xl border border-slate-100 dark:border-slate-800">
+                                        <h3 className="text-xl font-bold mb-6 flex items-center gap-2"><span>🤖</span> AI и Технологии</h3>
+                                        <div className="flex flex-wrap gap-2">
+                                            {["ChatGPT (Prompts)", "CRM системы", "Data Analytics", "Notion/Obsidian"].map(s => (
+                                                <span key={s} className="bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-4 py-2 rounded-xl text-sm">{s}</span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {activeSection === 'contacts' && (
+                            <div className="text-center py-12 space-y-12">
+                                <h2 className="text-4xl font-extrabold">Готовы к новому опыту?</h2>
+                                <ContactsList />
+                            </div>
+                        )}
+                    </main>
+
+                    {/* Мобильная навигация (Fixed Bottom) */}
+                    <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] max-w-md bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border border-slate-200 dark:border-slate-800 rounded-[2rem] shadow-2xl z-50">
+                        <div className="flex justify-around items-center h-16 px-4">
+                            {[
+                                { id: 'profile', label: 'Профиль', icon: '👤' },
+                                { id: 'experience', label: 'Опыт', icon: '💼' },
+                                { id: 'skills', label: 'Навыки', icon: '⚡' },
+                                { id: 'contacts', label: 'Контакты', icon: '📞' }
+                            ].map(tab => (
                                 <button 
-                                    key={tab}
-                                    onClick={() => setActiveTab(tab)}
-                                    className={`px-6 py-2 rounded-lg text-sm font-medium smooth-transition ${activeTab === tab ? 'bg-white shadow-sm' : 'text-gray-500 hover:text-black'}`}
+                                    key={tab.id}
+                                    onClick={() => setActiveSection(tab.id)}
+                                    className={`flex flex-col items-center justify-center transition-all ${activeSection === tab.id ? 'text-blue-600 scale-110' : 'text-slate-400'}`}
                                 >
-                                    {tab.toUpperCase()}
+                                    <span className="text-xl">{tab.icon}</span>
+                                    <span className="text-[10px] font-bold uppercase mt-1">{tab.label}</span>
                                 </button>
                             ))}
                         </div>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            {skills[activeTab].map(skill => (
-                                <div key={skill} className="bg-white p-4 rounded-xl text-center shadow-sm text-sm font-medium border border-gray-100">
-                                    {skill}
-                                </div>
-                            ))}
-                        </div>
-                    </section>
+                    </nav>
 
-                    {/* 10. PERSONAL & TRAVEL */}
-                    <section className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-24">
-                        <div className="bg-black text-white p-10 rounded-3xl">
-                            <h3 className="text-2xl font-bold mb-4">Личное</h3>
-                            <p className="opacity-80 leading-relaxed">
-                                «Система всегда побеждает хаос». <br/><br/>
-                                Увлекаюсь яхтингом и марафонским бегом. Считаю, что дисциплина в спорте напрямую переносится в бизнес.
-                            </p>
+                    {/* Модалка об экспертизе */}
+                    <Modal isOpen={isAboutOpen} onClose={() => setIsAboutOpen(false)} title="О специалисте">
+                        <p className="text-lg">Более 12 лет в управлении продажами. Подход — через data-driven решения. В продажах выстраиваю собственную архитектуру процессов, которая делает результат для руководства прогнозируемым и масштабируемым.</p>
+                        
+                        <div className="grid grid-cols-2 gap-4 my-6">
+                            <div className="bg-slate-50 dark:bg-slate-800 p-4 rounded-2xl">
+                                <div className="text-blue-600 font-bold">192+ недель</div>
+                                <div className="text-xs text-slate-500">Опыт преподавания и работы с аудиторией.</div>
+                            </div>
+                            <div className="bg-slate-50 dark:bg-slate-800 p-4 rounded-2xl">
+                                <div className="text-blue-600 font-bold">1340+ дней</div>
+                                <div className="text-xs text-slate-500">Продаж в автобизнесе.</div>
+                            </div>
+                            <div className="bg-slate-50 dark:bg-slate-800 p-4 rounded-2xl">
+                                <div className="text-blue-600 font-bold">1198+</div>
+                                <div className="text-xs text-slate-500">Положительных отзывов.</div>
+                            </div>
+                            <div className="bg-slate-50 dark:bg-slate-800 p-4 rounded-2xl">
+                                <div className="text-blue-600 font-bold">>876</div>
+                                <div className="text-xs text-slate-500">Фриланс-проектов.</div>
+                            </div>
                         </div>
-                        <div className="bg-blue-600 text-white p-10 rounded-3xl relative overflow-hidden">
-                            <h3 className="text-2xl font-bold mb-4">Путешествия</h3>
-                            <p className="opacity-80">35 стран, от Исландии до Японии. Люблю изучать локальные бизнес-культуры.</p>
-                            <div className="mt-8 text-4xl">🌍 🏔️ ✈️</div>
-                        </div>
-                    </section>
 
-                    {/* 12. CONTACTS */}
-                    <footer id="contacts" className="text-center py-20 bg-white rounded-[3rem] shadow-xl border border-gray-100">
-                        <h2 className="text-4xl font-bold mb-4">Готовы к новому проекту?</h2>
-                        <p className="text-gray-500 mb-10">Напишите мне в удобном мессенджере</p>
-                        <div className="flex flex-wrap justify-center gap-4 px-6">
-                            <a href="tel:+70000000000" className="flex items-center gap-2 bg-gray-100 px-6 py-3 rounded-2xl hover:bg-gray-200 smooth-transition">
-                                📞 Позвонить
-                            </a>
-                            <a href="https://t.me/" className="flex items-center gap-2 bg-[#229ED9] text-white px-6 py-3 rounded-2xl hover:opacity-90 smooth-transition">
-                                Telegram
-                            </a>
-                            <a href="mailto:test@test.com" className="flex items-center gap-2 bg-black text-white px-6 py-3 rounded-2xl hover:bg-gray-800 smooth-transition">
-                                Email
-                            </a>
-                        </div>
-                    </footer>
+                        <p className="border-l-4 border-blue-500 pl-4 py-2 italic bg-blue-50 dark:bg-blue-900/10 rounded-r-xl">
+                            Убеждён, что эффективная работа строится не только на договорах и регламентах, но прежде всего на живых человеческих отношениях и взаимном доверии.
+                        </p>
 
-                    {/* Modals Data */}
-                    <Modal isOpen={activeModal === 'about'} onClose={() => setActiveModal(null)} title="О специалисте">
-                        <p>Более 10 лет в управлении продажами. Мой подход базируется на Data-driven решениях. Я не просто "продаю", я строю архитектуру, которая делает процесс прогнозируемым и масштабируемым.</p>
-                    </Modal>
-
-                    <Modal isOpen={activeModal === 'review-1'} onClose={() => setActiveModal(null)} title="Отзыв: Александр Витте">
-                        <p>Иван продемонстрировал исключительный уровень понимания бизнес-процессов. Помимо настройки CRM, он провел обучение всей команды (20+ человек) и внедрил систему ежедневной отчетности, которая сэкономила нам до 15 часов менеджерского времени в неделю.</p>
+                        <button 
+                            onClick={() => { setIsAboutOpen(false); setActiveSection('skills'); }} 
+                            className="w-full mt-6 py-4 bg-black dark:bg-white dark:text-black text-white rounded-2xl font-bold transition-all hover:bg-blue-600"
+                        >
+                            Подробнее про навыки
+                        </button>
                     </Modal>
                 </div>
             );
