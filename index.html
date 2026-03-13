@@ -44,7 +44,6 @@
     <script type="text/babel">
         const { useState, useEffect } = React;
 
-        // Компонент анимированного счетчика
         const Counter = ({ endValue, suffix = "" }) => {
             const [count, setCount] = useState(0);
             useEffect(() => {
@@ -92,7 +91,6 @@
 
             return (
                 <div className="min-h-screen pb-28">
-                    {/* Header */}
                     <nav className="fixed top-0 w-full nav-blur z-50 border-b border-gray-100 dark:border-gray-900">
                         <div className="max-w-4xl mx-auto px-6 h-14 flex items-center justify-between">
                             <button onClick={() => setActiveSection('profile')} className="text-base font-bold tracking-tight">
@@ -106,7 +104,6 @@
 
                     <main className="max-w-4xl mx-auto px-6 pt-20">
                         
-                        {/* SECTION: PROFILE */}
                         {activeSection === 'profile' && (
                             <div className="space-y-10 animate-fade-up">
                                 <header className="flex flex-col items-center text-center py-6 space-y-4">
@@ -115,9 +112,12 @@
                                     </div>
                                     <div className="space-y-2">
                                         <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight">Максим Сафрутин</h1>
-                                        <p className="text-base md:text-lg text-gray-500 dark:text-gray-400 font-medium max-w-md mx-auto leading-tight">
-                                            Менеджер по продажам автомобилей <span className="text-gray-400 font-light block md:inline">(импорт и подбор под заказ)</span>
-                                        </p>
+                                        <div className="text-base md:text-lg text-gray-500 dark:text-gray-400 font-medium max-w-md mx-auto leading-tight">
+                                            Менеджер по продажам автомобилей
+                                            <span className="text-gray-400 font-light block text-sm md:text-base mt-1">
+                                                (импорт и подбор под заказ)
+                                            </span>
+                                        </div>
                                         <p className="text-gray-400 font-medium text-sm flex items-center justify-center gap-2">
                                             <i className="fa-solid fa-location-dot"></i> Самара, Россия
                                         </p>
@@ -128,7 +128,6 @@
                                     </div>
                                 </header>
 
-                                {/* Animated Stats */}
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                     <div className="bg-[#f5f5f7] dark:bg-[#1c1c1e] p-6 rounded-[1.5rem] text-center border border-transparent dark:border-gray-800">
                                         <div className="text-3xl font-bold mb-1"><Counter endValue={667} suffix="+" /></div>
@@ -145,9 +144,10 @@
                                 </div>
 
                                 <section className="max-w-2xl mx-auto text-center space-y-6">
-                                    <p className="text-lg md:text-xl leading-relaxed font-medium text-gray-800 dark:text-gray-200">
-                                        С 1993 года — в переговорах, с 2020 — в автомобильных. Увеличиваю прибыль компании через доверие и решение задачи клиента, то есть конвертирую запрос в сделку. Работаю системно и использую в том числе AI-инструменты для повышения конверсии продаж.
-                                    </p>
+                                    <div className="text-lg md:text-xl leading-relaxed font-medium text-gray-800 dark:text-gray-200">
+                                        <p>С 1993 года — в переговорах, с 2020 — в автомобильных. Увеличиваю прибыль компании через доверие и решение задачи клиента, то есть конвертирую запрос в сделку.</p>
+                                        <p className="mt-4">Работаю системно в том числе с AI-инструментами для повышения конверсии продаж.</p>
+                                    </div>
                                     <button onClick={() => setIsAboutOpen(true)} className="text-[#0066cc] text-base font-semibold hover:underline underline-offset-4">
                                         Подробнее об экспертизе →
                                     </button>
@@ -155,7 +155,6 @@
                             </div>
                         )}
 
-                        {/* SECTION: EXPERIENCE */}
                         {activeSection === 'experience' && (
                             <div className="space-y-8 animate-fade-up max-w-3xl mx-auto">
                                 <h2 className="text-2xl font-bold tracking-tight">Опыт работы</h2>
@@ -177,7 +176,6 @@
                             </div>
                         )}
 
-                        {/* SECTION: SKILLS */}
                         {activeSection === 'skills' && (
                             <div className="space-y-8 animate-fade-up">
                                 <h2 className="text-2xl font-bold tracking-tight">Навыки и Стек</h2>
@@ -198,7 +196,6 @@
                             </div>
                         )}
 
-                        {/* SECTION: PERSONAL */}
                         {activeSection === 'personal' && (
                             <div className="space-y-6 animate-fade-up max-w-3xl mx-auto">
                                 <h2 className="text-2xl font-bold tracking-tight mb-4 text-center">Личное и Увлечения</h2>
@@ -219,7 +216,6 @@
                             </div>
                         )}
 
-                        {/* SECTION: CONTACTS */}
                         {activeSection === 'contacts' && (
                             <div className="text-center py-6 animate-fade-up">
                                 <h2 className="text-3xl font-extrabold tracking-tight mb-2">Готовы к новому опыту?</h2>
@@ -259,7 +255,6 @@
                         )}
                     </main>
 
-                    {/* Navigation */}
                     <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[95%] max-w-lg nav-blur rounded-full apple-shadow border border-gray-200 dark:border-gray-800 z-50">
                         <div className="flex justify-around items-center h-16 px-2">
                             {[
@@ -282,14 +277,19 @@
                     </nav>
 
                     <Modal isOpen={isAboutOpen} onClose={() => setIsAboutOpen(false)} title="О специалисте">
-                        <p className="text-sm leading-relaxed">Более 12 лет в управлении продажами. Подход — через data-driven решения. В продажах выстраиваю собственную архитектуру процессов, которая делает результат для руководства прогнозируемым и масштабируемым.</p>
+                        <div className="space-y-4 text-sm leading-relaxed">
+                            <p>Более 12 лет в управлении продажами. Решения принимаю на основе аналитики и цифр. Архитектуру процессов веду к прогнозируемым и масштабируемым результатам.</p>
+                            <p className="bg-blue-50 dark:bg-blue-900/10 p-4 rounded-2xl text-blue-700 dark:text-blue-300 font-medium">
+                                Родился Козерогом в год Лошади 30 декабря 1990 года, женат, трое детей, в планах — купить / построить дом
+                            </p>
+                        </div>
                         
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 py-4">
                             {[
                                 { val: "192+ нед.", icon: "fa-chalkboard-user", txt: "Преподавание и работа с аудиторией." },
                                 { val: "1340+ дн.", icon: "fa-car", txt: "Опыт продаж в автобизнесе." },
                                 { val: "1198+", icon: "fa-star", txt: "Положительных отзывов клиентов." },
-                                { val: ">876", icon: "fa-diagram-project", txt: "Фриланс-проектов реализовано." }
+                                { val: "876+", icon: "fa-diagram-project", txt: "Фриланс-проектов реализовано." }
                             ].map((item, i) => (
                                 <div key={i} className="p-4 bg-[#f5f5f7] dark:bg-gray-800/50 rounded-2xl flex items-start gap-3">
                                     <i className={`fa-solid ${item.icon} text-blue-500 mt-1 text-xs`}></i>
@@ -302,7 +302,7 @@
                         </div>
 
                         <p className="text-xs text-gray-500 dark:text-gray-400 border-l-2 border-blue-500 pl-4 italic leading-relaxed">
-                            Убеждён, что эффективная работа строится на живых человеческих отношениях и взаимном доверии.
+                            Убеждён, что эффективная работа строится не только на договорах и регламентах, но прежде всего на живых человеческих отношениях и взаимном доверии. Именно такие отношения между специалистом и работодателем позволяют достигать общей цели — устойчивого роста и финансового результата.
                         </p>
 
                         <button 
