@@ -45,7 +45,6 @@
     <script type="text/babel">
         const { useState, useEffect } = React;
 
-        // --- ДАННЫЕ ОПЫТА (ОРИГИНАЛЫ) ---
         const ExperienceData = [
             {
                 id: 1,
@@ -129,7 +128,6 @@
             );
         };
 
-        // --- НОВЫЙ КОМПОНЕНТ КАРТОЧКИ ---
         const ExperienceCard = ({ item, onOpenFull }) => {
             const [isOpen, setIsOpen] = useState(false);
             return (
@@ -204,7 +202,7 @@
                             <div className="space-y-10 animate-fade-up">
                                 <header className="flex flex-col items-center text-center py-6 space-y-4">
                                     <div className="w-32 h-32 md:w-40 md:h-40 rounded-[2.5rem] overflow-hidden apple-shadow ring-1 ring-black/5">
-                                        <img src="https://ui-avatars.com/api/?name=Максим+Сафрутин&background=1c1c1e&color=fff&size=512" alt="Maxim" className="w-full h-full object-cover" />
+                                        <img src="./assets/avatar/avatar_safrutin_pro.png" alt="Maxim" className="w-full h-full object-cover" />
                                     </div>
                                     <div className="space-y-2">
                                         <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight">Максим Сафрутин</h1>
@@ -355,7 +353,6 @@
                         </div>
                     </nav>
 
-                    {/* Модалка "О специалисте" (ТВОЯ ОРИГИНАЛЬНАЯ) */}
                     <Modal isOpen={isAboutOpen} onClose={() => setIsAboutOpen(false)} title="О специалисте">
                         <div className="space-y-4 text-sm leading-relaxed text-gray-800 dark:text-gray-200">
                             <p>Более 12 лет в управлении продажами. Решения принимаю на основе аналитики и цифр. Архитектуру процессов веду к прогнозируемым и масштабируемым результатам. Увеличиваю прибыль компании через доверие клиента и решение его задачи, то есть конвертирую запрос в сделку.</p>
@@ -390,7 +387,6 @@
                         </button>
                     </Modal>
 
-                    {/* Дополнительная модалка для ОРИГИНАЛЬНЫХ текстов из опыта */}
                     <Modal isOpen={fullModal.open} onClose={() => setFullModal({ ...fullModal, open: false })} title={fullModal.title}>
                         <div className="whitespace-pre-wrap">{fullModal.content}</div>
                     </Modal>
