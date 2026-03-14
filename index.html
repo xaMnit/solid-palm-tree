@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,9 +16,7 @@
             darkMode: 'class',
             theme: {
                 extend: {
-                    colors: {
-                        appleGray: '#f5f5f7',
-                    }
+                    colors: { appleBlue: '#0071e3' }
                 }
             }
         }
@@ -28,14 +26,15 @@
         body { 
             font-family: 'Inter', sans-serif; 
             -webkit-font-smoothing: antialiased; 
-            font-size: 14px;
-            transition: background-color 0.3s ease, color 0.3s ease;
+            transition: background-color 0.3s ease;
         }
-        .apple-shadow { box-shadow: 0 2px 12px rgba(0,0,0,0.04); }
+        .apple-shadow { box-shadow: 0 4px 24px rgba(0,0,0,0.04); }
         .nav-blur { backdrop-filter: blur(20px); background: rgba(255,255,255,0.8); }
         .dark .nav-blur { background: rgba(0,0,0,0.8); }
+        .timeline-line { position: absolute; left: 20px; top: 0; bottom: 0; width: 2px; background: #f0f0f2; }
+        .dark .timeline-line { background: #1c1c1e; }
         .animate-fade-up { animation: fadeUp 0.5s ease-out forwards; }
-        @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body class="bg-white text-[#1d1d1f] dark:bg-black dark:text-[#f5f5f7]">
@@ -44,6 +43,7 @@
     <script type="text/babel">
         const { useState, useEffect } = React;
 
+        // --- ВСПОМОГАТЕЛЬНЫЕ КОМПОНЕНТЫ ---
         const Counter = ({ endValue, suffix = "" }) => {
             const [count, setCount] = useState(0);
             useEffect(() => {
@@ -52,12 +52,8 @@
                 const increment = Math.ceil(endValue / (duration / 20));
                 const timer = setInterval(() => {
                     start += increment;
-                    if (start >= endValue) {
-                        setCount(endValue);
-                        clearInterval(timer);
-                    } else {
-                        setCount(start);
-                    }
+                    if (start >= endValue) { setCount(endValue); clearInterval(timer); } 
+                    else { setCount(start); }
                 }, 20);
                 return () => clearInterval(timer);
             }, [endValue]);
@@ -67,22 +63,164 @@
         const Modal = ({ isOpen, onClose, title, children }) => {
             if (!isOpen) return null;
             return (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" onClick={onClose}>
-                    <div className="bg-white dark:bg-[#1c1c1e] rounded-[2rem] max-w-lg w-full max-h-[85vh] overflow-y-auto p-8 shadow-2xl animate-fade-up" onClick={e => e.stopPropagation()}>
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md" onClick={onClose}>
+                    <div className="bg-white dark:bg-[#1c1c1e] rounded-[2.5rem] max-w-lg w-full max-h-[85vh] overflow-y-auto p-8 shadow-2xl animate-fade-up" onClick={e => e.stopPropagation()}>
                         <div className="flex justify-between items-center mb-6">
                             <h3 className="text-xl font-bold">{title}</h3>
                             <button onClick={onClose} className="w-8 h-8 flex items-center justify-center bg-gray-100 dark:bg-gray-800 rounded-full hover:bg-gray-200 transition-colors">✕</button>
                         </div>
-                        <div className="text-base leading-relaxed space-y-4 text-gray-700 dark:text-gray-300">{children}</div>
+                        <div className="text-base leading-relaxed space-y-4">{children}</div>
                     </div>
                 </div>
             );
         };
 
+        // --- ДАННЫЕ ОПЫТА ---
+        const ExperienceData = [
+            {
+                id: 12,
+                period: "09/2023 — 02/2026",
+                company: "АМК УРАЛ-ЛАДА КОРП",
+                legal: "ООО «Урал-Лада» (а/м холдинг АМК)",
+                url: "https://urallada63.lada.ru",
+                address: "Самара, Мира, 1",
+                mapUrl: "https://yandex.ru/maps/org/ural_lada/228897792896",
+                role: "Корпоративный менеджер по работе с ЮЛ",
+                focus: "Развитие B2B-продаж LADA, переговоры с ЛПР, тендеры и ЭДО.",
+                resultsPreview: "630+ авто, 311 млн ₽ оборота, 14 млн ₽ прибыли.",
+                reviewPreview: "«Ему можно доверить целое направление. Максим доводит задачи до результата...»",
+                reviewAuthor: "Анастасия Мовчан (Корп. РОП)",
+                fullTasks: "Продажа автомобилей LADA юридическим лицам; поиск и привлечение корпоративных клиентов; ведение переговоров; участие в тендерах; ЭДО через Диадок.",
+                fullResults: "Единственный менеджер корп. отдела: реализовал более 630 автомобилей; 311 млн ₽ оборота; выстроил устойчивые партнёрские отношения в регионе.",
+                fullReview: "Максим — один из тех сотрудников, кому можно доверить направление. Если он берётся за задачу, он доводит её до результата. Я уверенно рекомендую его на руководящие позиции."
+            },
+            {
+                id: 11,
+                period: "06/2023 — 09/2023",
+                company: "АМК УРАЛ-ЛАДА РОЗНИЦА",
+                legal: "ООО «Урал-Лада» (а/м холдинг АМК)",
+                url: "https://urallada63.lada.ru",
+                address: "Самара, Мира, 1",
+                mapUrl: "https://yandex.ru/maps/org/ural_lada/228897792896",
+                role: "Менеджер отдела продаж новых авто",
+                focus: "Продажи новых LADA, trade-in, запуск дилерского центра с нуля.",
+                resultsPreview: "Участие в открытии салона, оптимизация рабочих листов.",
+                reviewPreview: "«На старте помог запустить работу отдела и удержать процессы...»",
+                reviewAuthor: "Джамиль Якупов (РОП LADA)",
+                fullTasks: "Работа с входящими клиентами; презентации; тест-драйвы; координация подготовки авто к выдаче.",
+                fullResults: "Участие в запуске ДЦ; внедрена форма рабочего листа менеджера, упростившая внутренний контроль этапов продаж.",
+                fullReview: "Максим фактически подменил меня на старте — помог запустить работу отдела. Он умеет глубоко погружаться в процессы. Двери компании для него всегда открыты."
+            },
+            {
+                id: 10,
+                period: "01/2023 — 06/2023",
+                company: "АМК АВТОСЕТЬ.РФ",
+                legal: "ИП Ладохин П. С. (а/м холдинг АМК)",
+                url: "https://автосеть.рф/",
+                address: "Самара, Мира, 1",
+                mapUrl: "https://yandex.ru/maps/org/avtoset_rf/148557016667",
+                role: "Менеджер по продажам авто с пробегом",
+                focus: "Продажи БУ авто, работа с трафиком, презентации.",
+                resultsPreview: "Стабильное 1–2 место по продажам со второго месяца.",
+                reviewPreview: "«Быстро вошёл в работу и уверенно вышел в число лучших...»",
+                reviewAuthor: "Артём Закарян (РОП Автосеть.РФ)",
+                fullTasks: "Выявление потребностей; презентации; сопровождение сделок до выдачи; работа в CRM.",
+                fullResults: "Стабильное выполнение планов; книга продаж сдана на 97/100 баллов за 2 дня.",
+                fullReview: "В обучении проявил себя мгновенно. В переговорах не теряется, умеет вести диалог даже на этапе жёсткого торга."
+            },
+            {
+                id: 9,
+                period: "06/2022 — 08/2022",
+                company: "РусБизнесАвто (РБА)",
+                legal: "ООО «РусБизнесАвто»",
+                url: "https://spb.rbauto.ru/contacts/samara/",
+                address: "п. Берёза, 51",
+                mapUrl: "https://yandex.ru/maps/org/rusbiznesavto/68913014104",
+                role: "Региональный менеджер (спецтехника)",
+                focus: "Продажи коммерческого транспорта, холодные звонки, встречи.",
+                resultsPreview: "780+ обработанных контактов, сдан внутренний экзамен.",
+                reviewPreview: "«Единственный кандидат, который приехал и презентовал себя сам...»",
+                reviewAuthor: "Тимур Хафизов (РОП РБА)",
+                fullTasks: "Продажа грузовой и строительной техники; выезды к клиентам; ведение базы в CRM.",
+                fullResults: "Пройдено профильное обучение; обработано 780 контактов; практический опыт на рынке спецтехники.",
+                fullReview: "Максим произвёл впечатление человека, который понимает, как работают продажи. Уверенно представил себя и быстро включился."
+            },
+            {
+                id: 8,
+                period: "03/2022 — 05/2022",
+                company: "БашАвтономГаз",
+                legal: "ООО «БашАвтономГаз»",
+                url: "https://vk.com/bashgaz63",
+                address: "Ленинская, 168",
+                mapUrl: "https://yandex.ru/maps/?text=Самара%2C Ленинская 168",
+                role: "Региональный менеджер",
+                focus: "Автономное газоснабжение, поиск клиентов и партнеров.",
+                resultsPreview: "Реализованы 2 системы отопления под ключ для баз отдыха.",
+                reviewPreview: "«Умеет вести диалог, задаёт правильные вопросы...»",
+                reviewAuthor: "Александр (Инженер/МОП)",
+                fullTasks: "Поиск новых клиентов; привлечение партнеров; сопровождение сделок до оплаты.",
+                fullResults: "Продан газгольдер физлицу; реализованы 2 системы для бизнеса; запущена партнерка в Оренбурге.",
+                fullReview: "Максим старался разобраться в продукте, работал с CRM. У него хорошее понимание потребностей клиента."
+            },
+            {
+                id: 7,
+                period: "08/2021 — 02/2022",
+                company: "Волга-Авто",
+                legal: "ООО «Волга Ватт»",
+                url: "#",
+                address: "Нагорная, 149",
+                mapUrl: "https://yandex.ru/maps/?text=Самара%2C Нагорная 149",
+                role: "Мульти менеджер / Логист",
+                focus: "Закупка и продажа авто и спецтехники, CRM, шаблоны КП.",
+                resultsPreview: "983+ запроса, сформирована база из 276 партнеров.",
+                reviewPreview: "«Всё проходило спокойно, корректно и по делу...»",
+                reviewAuthor: "Ирина (Бухгалтер)",
+                fullTasks: "Комплексное сопровождение сделок; логистика; работа с поставщиками.",
+                fullResults: "Налажена CRM система; создан фирменный шаблон КП; сопровождено до выдачи 7 единиц техники.",
+                fullReview: "Максим вежливый и приятный человек. Легко находил контакт в офисе, создавал хорошую атмосферу."
+            },
+            {
+                id: 6,
+                period: "12/2020 — 08/2021",
+                company: "Volvo Car (Самара-Авто)",
+                legal: "ООО «Самара-Авто»",
+                url: "https://volvo.smavto.com",
+                address: "Московское шоссе, 264",
+                mapUrl: "https://yandex.ru/maps/?text=Самара%2C Московское шоссе 264",
+                role: "Менеджер отдела продаж Volvo",
+                focus: "Премиальный сегмент, XC60/XC90, лизинг и флит-продажи.",
+                resultsPreview: "27 выдано авто на сумму 114,8 млн ₽.",
+                reviewPreview: "«Работа с высокими чеками и стандартами шведского бренда...»",
+                reviewAuthor: "Станислав Махин (РОП Volvo)",
+                fullTasks: "Продажа новых Volvo; работа в шоу-руме; тест-драйвы; лизинг.",
+                fullResults: "Сумма продаж 114.8 млн ₽; 27 выданных авто; успешное соблюдение стандартов Volvo.",
+                fullReview: "Опыт работы в премиальном сегменте с требовательными клиентами."
+            },
+            {
+                id: 5,
+                period: "05/2008 — Наст. время",
+                company: "MC / Event (Фриланс)",
+                legal: "Проектная работа",
+                url: "https://vk.com/max_wedding63",
+                address: "Самара / Москва",
+                mapUrl: "https://yandex.ru/maps/?text=Самара",
+                role: "Организатор событий",
+                focus: "Ивенты, работа с аудиторией, управление эмоциями.",
+                resultsPreview: "Собственная команда и база лояльных клиентов.",
+                reviewPreview: "«Системный подход даже в творческих задачах...»",
+                reviewAuthor: "Клиенты (VK/Padlet)",
+                fullTasks: "Организация семейных и корпоративных событий; поиск клиентов; подрядчики.",
+                fullResults: "15+ лет опыта; собственная база клиентов; сотни проведенных мероприятий.",
+                fullReview: "Отзывы доступны в VK (более 100 рекомендаций)."
+            }
+        ];
+
+        // --- ГЛАВНОЕ ПРИЛОЖЕНИЕ ---
         const App = () => {
             const [activeSection, setActiveSection] = useState('profile');
-            const [darkMode, setDarkMode] = useState(false);
+            const [darkMode, setDarkMode] = useState(true); // Ночной режим по умолчанию
             const [isAboutOpen, setIsAboutOpen] = useState(false);
+            const [selectedExp, setSelectedExp] = useState(null);
 
             const toggleDarkMode = () => {
                 setDarkMode(!darkMode);
@@ -90,10 +228,11 @@
             };
 
             return (
-                <div className="min-h-screen pb-28">
+                <div className="min-h-screen pb-28 bg-white text-[#1d1d1f] dark:bg-black dark:text-[#f5f5f7]">
+                    {/* Навигация */}
                     <nav className="fixed top-0 w-full nav-blur z-50 border-b border-gray-100 dark:border-gray-900">
                         <div className="max-w-4xl mx-auto px-6 h-14 flex items-center justify-between">
-                            <button onClick={() => setActiveSection('profile')} className="text-base font-bold tracking-tight">
+                            <button onClick={() => setActiveSection('profile')} className="text-base font-bold">
                                 Max <span className="text-blue-600">Safrutin</span>
                             </button>
                             <button onClick={toggleDarkMode} className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors">
@@ -103,156 +242,118 @@
                     </nav>
 
                     <main className="max-w-4xl mx-auto px-6 pt-20">
+                        {/* СЕКЦИЯ: ПРОФИЛЬ */}
                         {activeSection === 'profile' && (
                             <div className="space-y-10 animate-fade-up">
                                 <header className="flex flex-col items-center text-center py-6 space-y-4">
                                     <div className="w-32 h-32 md:w-40 md:h-40 rounded-[2.5rem] overflow-hidden apple-shadow ring-1 ring-black/5">
-                                        <img src="./assets/avatar/avatar_safrutin_pro.png" alt="Maxim" className="w-full h-full object-cover" />
+                                        <img src="https://ui-avatars.com/api/?name=Максим+Сафрутин&background=f5f5f7&color=000&size=512" alt="Maxim" />
                                     </div>
                                     <div className="space-y-2">
                                         <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight">Максим Сафрутин</h1>
-                                        <div className="text-base md:text-lg text-gray-500 dark:text-gray-400 font-medium max-w-md mx-auto leading-tight">
+                                        <div className="text-base md:text-lg text-gray-500 font-medium">
                                             Менеджер по продажам автомобилей
-                                            <span className="text-gray-400 font-light block text-sm md:text-base mt-1">
-                                                (импорт и подбор под заказ)
-                                            </span>
+                                            <span className="text-gray-400 block text-sm mt-1">(импорт и подбор)</span>
                                         </div>
-                                        <p className="text-gray-400 font-medium text-sm flex items-center justify-center gap-2">
-                                            <i className="fa-solid fa-location-dot"></i> Самара, Россия
-                                        </p>
                                     </div>
                                     <div className="flex gap-3">
-                                        <button onClick={() => setActiveSection('contacts')} className="bg-[#0071e3] text-white px-6 py-2.5 rounded-full font-semibold text-sm hover:bg-[#0077ed] transition-all">Связаться</button>
-                                        <button onClick={() => setActiveSection('experience')} className="bg-gray-100 dark:bg-gray-800 text-[#1d1d1f] dark:text-white px-6 py-2.5 rounded-full font-semibold text-sm hover:opacity-80 transition-all">Открыть опыт</button>
+                                        <button onClick={() => setActiveSection('contacts')} className="bg-[#0071e3] text-white px-6 py-2.5 rounded-full font-semibold text-sm">Связаться</button>
+                                        <button onClick={() => setActiveSection('experience')} className="bg-gray-100 dark:bg-gray-800 px-6 py-2.5 rounded-full font-semibold text-sm">Опыт работы</button>
                                     </div>
                                 </header>
 
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                    <div className="bg-[#f5f5f7] dark:bg-[#1c1c1e] p-6 rounded-[1.5rem] text-center border border-transparent dark:border-gray-800">
+                                    <div className="bg-[#f5f5f7] dark:bg-[#1c1c1e] p-6 rounded-[1.5rem] text-center">
                                         <div className="text-3xl font-bold mb-1"><Counter endValue={667} suffix="+" /></div>
                                         <div className="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Продано авто</div>
                                     </div>
-                                    <div className="bg-[#f5f5f7] dark:bg-[#1c1c1e] p-6 rounded-[1.5rem] text-center border border-transparent dark:border-gray-800">
+                                    <div className="bg-[#f5f5f7] dark:bg-[#1c1c1e] p-6 rounded-[1.5rem] text-center">
                                         <div className="text-3xl font-bold mb-1"><Counter endValue={424} suffix="+" /></div>
                                         <div className="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Млн ₽ оборот</div>
                                     </div>
-                                    <div className="bg-[#f5f5f7] dark:bg-[#1c1c1e] p-6 rounded-[1.5rem] text-center border border-transparent dark:border-gray-800">
+                                    <div className="bg-[#f5f5f7] dark:bg-[#1c1c1e] p-6 rounded-[1.5rem] text-center">
                                         <div className="text-3xl font-bold mb-1"><Counter endValue={22} suffix="+" /></div>
                                         <div className="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Млн ₽ прибыль</div>
                                     </div>
                                 </div>
 
                                 <section className="max-w-2xl mx-auto text-center space-y-6">
-                                    <div className="text-lg md:text-xl leading-relaxed font-medium text-gray-800 dark:text-gray-200">
-                                        <p>С 1993 года — в переговорах, с 2020 — в автомобильных. Работаю системно и гибко используя в том числе AI-инструменты для повышения конверсии продаж.</p>
-                                    </div>
-                                    <button onClick={() => setIsAboutOpen(true)} className="text-[#0066cc] text-base font-semibold hover:underline underline-offset-4">
-                                        Подробнее об экспертизе →
-                                    </button>
+                                    <p className="text-lg md:text-xl font-medium text-gray-800 dark:text-gray-200">
+                                        С 1993 года — в переговорах, с 2020 — в автомобильных. Работаю системно и гибко используя в том числе AI-инструменты для повышения конверсии продаж.
+                                    </p>
+                                    <button onClick={() => setIsAboutOpen(true)} className="text-[#0066cc] font-semibold">Подробнее об экспертизе →</button>
                                 </section>
                             </div>
                         )}
 
-                        {/* Остальные секции без изменений */}
+                        {/* СЕКЦИЯ: ОПЫТ (ТАЙМЛАЙН) */}
                         {activeSection === 'experience' && (
-                            <div className="space-y-8 animate-fade-up max-w-3xl mx-auto">
-                                <h2 className="text-2xl font-bold tracking-tight">Опыт работы</h2>
-                                {[
-                                    { company: "АвтоИмпорт Про", role: "Ведущий менеджер", year: "2020 — Наст. время", review: "Максим подобрал автомобиль, о котором я мечтал." },
-                                    { company: "Premium Cars", role: "Sales Expert", year: "2018 — 2020", review: "Исключительный уровень сервиса." }
-                                ].map((item, idx) => (
-                                    <div key={idx} className="flex flex-col md:flex-row gap-4">
-                                        <div className="md:w-1/2 bg-[#f5f5f7] dark:bg-[#1c1c1e] p-6 rounded-[1.5rem] border border-transparent dark:border-gray-800">
-                                            <span className="text-blue-600 font-bold text-[10px] uppercase">{item.year}</span>
-                                            <h3 className="text-xl font-bold mt-1">{item.company}</h3>
-                                            <p className="text-sm text-gray-500">{item.role}</p>
-                                        </div>
-                                        <div className="md:w-1/2 bg-white dark:bg-black p-6 rounded-[1.5rem] border border-gray-100 dark:border-gray-800 italic text-sm text-gray-600 dark:text-gray-400">
-                                            "{item.review}"
+                            <div className="space-y-12 animate-fade-up max-w-2xl mx-auto relative">
+                                <h2 className="text-3xl font-bold mb-10 text-center">Опыт и Достижения</h2>
+                                <div className="timeline-line"></div>
+                                
+                                {ExperienceData.map((item) => (
+                                    <div key={item.id} className="relative pl-12 pb-12 group">
+                                        <div className="absolute left-[18px] top-2 w-1.5 h-1.5 rounded-full bg-blue-600 ring-4 ring-blue-100 dark:ring-blue-900/30 z-10 transition-transform group-hover:scale-150"></div>
+                                        <div className="bg-[#f5f5f7] dark:bg-[#1c1c1e] rounded-[2rem] p-6 border border-transparent hover:border-blue-500/30 transition-all apple-shadow">
+                                            <div className="text-[11px] font-bold text-gray-400 mb-2">{item.period}</div>
+                                            
+                                            <div className="mb-4">
+                                                <a href={item.url} target="_blank" className="text-lg font-extrabold text-[#0071e3] hover:underline block leading-tight">
+                                                    {item.company} <i className="fa-solid fa-arrow-up-right-from-square text-[10px] ml-1"></i>
+                                                </a>
+                                                <div className="text-[10px] text-gray-400 uppercase tracking-tight mt-0.5">{item.legal}</div>
+                                                <a href={item.mapUrl} target="_blank" className="flex items-center gap-1.5 text-[11px] text-gray-500 hover:text-blue-500 mt-2 transition-colors">
+                                                    <i className="fa-solid fa-location-dot"></i> {item.address}
+                                                </a>
+                                            </div>
+
+                                            <div className="text-base font-bold mb-4 text-gray-800 dark:text-white">{item.role}</div>
+
+                                            <div className="space-y-4">
+                                                <div>
+                                                    <div className="text-[9px] uppercase tracking-widest text-gray-400 font-bold mb-1">Фокус:</div>
+                                                    <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">{item.focus}</p>
+                                                </div>
+                                                <div>
+                                                    <div className="text-[9px] uppercase tracking-widest text-gray-400 font-bold mb-1">Результат:</div>
+                                                    <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">{item.resultsPreview}</p>
+                                                </div>
+                                                <div className="border-l-2 border-blue-500/20 pl-4 py-1">
+                                                    <div className="text-[9px] uppercase tracking-widest text-gray-400 font-bold mb-1">Отзыв:</div>
+                                                    <p className="text-sm italic text-gray-500 dark:text-gray-400 line-clamp-2 mb-1">{item.reviewPreview}</p>
+                                                    <div className="text-[10px] font-bold text-gray-800 dark:text-gray-300">— {item.reviewAuthor}</div>
+                                                </div>
+                                            </div>
+
+                                            <button 
+                                                onClick={() => setSelectedExp(item)}
+                                                className="mt-6 w-full py-3 bg-white dark:bg-black rounded-xl text-xs font-bold border border-gray-100 dark:border-gray-800 hover:bg-gray-50 transition-all"
+                                            >
+                                                Подробности и весь текст <i className="fa-solid fa-chevron-right ml-1"></i>
+                                            </button>
                                         </div>
                                     </div>
                                 ))}
                             </div>
                         )}
 
-                        {activeSection === 'skills' && (
-                            <div className="space-y-8 animate-fade-up">
-                                <h2 className="text-2xl font-bold tracking-tight">Навыки и Стек</h2>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div className="bg-[#f5f5f7] dark:bg-[#1c1c1e] p-6 rounded-[2rem] border border-transparent dark:border-gray-800 space-y-3">
-                                        <h3 className="text-lg font-bold mb-4 flex items-center gap-2"><i className="fa-solid fa-chart-line text-blue-600"></i> Продажи</h3>
-                                        {["B2B Продажи", "Сложные переговоры", "Импорт/Экспорт"].map(s => (
-                                            <div key={s} className="bg-white dark:bg-black p-3 rounded-xl text-xs font-medium apple-shadow border border-gray-50 dark:border-gray-900">{s}</div>
-                                        ))}
-                                    </div>
-                                    <div className="bg-[#f5f5f7] dark:bg-[#1c1c1e] p-6 rounded-[2rem] border border-transparent dark:border-gray-800 space-y-3">
-                                        <h3 className="text-lg font-bold mb-4 flex items-center gap-2"><i className="fa-solid fa-robot text-blue-600"></i> AI & Tech</h3>
-                                        {["ChatGPT Prompting", "CRM Архитектура", "Notion Expert"].map(s => (
-                                            <div key={s} className="bg-white dark:bg-black p-3 rounded-xl text-xs font-medium apple-shadow text-blue-600 border border-gray-50 dark:border-gray-900">{s}</div>
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-
-                        {activeSection === 'personal' && (
-                            <div className="space-y-6 animate-fade-up max-w-3xl mx-auto">
-                                <h2 className="text-2xl font-bold tracking-tight mb-4 text-center">Личное и Увлечения</h2>
-                                <div className="bg-[#1d1d1f] text-white p-8 rounded-[2rem]">
-                                    <h3 className="text-xl font-bold mb-4">Девиз</h3>
-                                    <p className="text-lg opacity-70 italic mb-4">«Система всегда побеждает хаос».</p>
-                                    <p className="text-base leading-relaxed opacity-90 font-light">Увлекаюсь яхтингом и марафонским бегом. Считаю, что дисциплина в спорте напрямую переносится в бизнес.</p>
-                                </div>
-                                <div className="bg-[#f5f5f7] dark:bg-[#1c1c1e] p-8 rounded-[2rem] border border-transparent dark:border-gray-800">
-                                    <h3 className="text-xl font-bold mb-4">Путешествия</h3>
-                                    <p className="text-base leading-relaxed text-gray-600 dark:text-gray-400">35 стран, от Исландии до Японии. Люблю изучать локальные бизнес-культуры и находить новые подходы в коммуникациях.</p>
-                                    <div className="text-4xl mt-6 flex gap-4 text-blue-600">
-                                        <i className="fa-solid fa-earth-americas"></i>
-                                        <i className="fa-solid fa-mountain"></i>
-                                        <i className="fa-solid fa-car"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-
+                        {/* КОНТАКТЫ */}
                         {activeSection === 'contacts' && (
-                            <div className="text-center py-6 animate-fade-up">
-                                <h2 className="text-3xl font-extrabold tracking-tight mb-2">Готовы к новому опыту?</h2>
-                                <p className="text-gray-400 mb-8">Свяжитесь со мной любым удобным способом</p>
-                                <div className="max-w-md mx-auto space-y-3">
-                                    <a href="tel:+79272651777" className="flex items-center justify-between p-5 bg-[#f5f5f7] dark:bg-[#1c1c1e] rounded-2xl hover:scale-[1.01] transition-all border border-transparent dark:border-gray-800 shadow-sm">
-                                        <div className="text-left">
-                                            <div className="text-[10px] text-gray-400 font-bold uppercase">Личный сотовый</div>
-                                            <div className="text-lg font-bold">8 (927) 265-17-77</div>
-                                        </div>
-                                        <i className="fa-solid fa-phone text-blue-600"></i>
-                                    </a>
-                                    <a href="tel:+79376420767" className="flex items-center justify-between p-5 bg-[#f5f5f7] dark:bg-[#1c1c1e] rounded-2xl hover:scale-[1.01] transition-all border border-transparent dark:border-gray-800 shadow-sm">
-                                        <div className="text-left">
-                                            <div className="text-[10px] text-gray-400 font-bold uppercase">Сотовый супруги</div>
-                                            <div className="text-lg font-bold">8 (937) 642-07-67</div>
-                                        </div>
-                                        <i className="fa-solid fa-phone text-blue-600"></i>
-                                    </a>
-                                    <div className="flex gap-3">
-                                        <a href="mailto:max.safrutin@gmail.com" className="flex-1 p-5 bg-[#f5f5f7] dark:bg-[#1c1c1e] rounded-2xl text-left border border-transparent dark:border-gray-800 shadow-sm transition-all hover:scale-[1.02]">
-                                            <div className="text-[10px] text-gray-400 font-bold uppercase">Gmail</div>
-                                            <div className="text-sm font-bold truncate">max.safrutin@gmail.com</div>
-                                        </a>
-                                        <a href="mailto:max.safr18@yandex.ru" className="flex-1 p-5 bg-[#f5f5f7] dark:bg-[#1c1c1e] rounded-2xl text-left border border-transparent dark:border-gray-800 shadow-sm transition-all hover:scale-[1.02]">
-                                            <div className="text-[10px] text-gray-400 font-bold uppercase">Yandex</div>
-                                            <div className="text-sm font-bold truncate">max.safr18@yandex.ru</div>
-                                        </a>
+                            <div className="max-w-md mx-auto space-y-3 animate-fade-up py-10">
+                                <h2 className="text-2xl font-bold text-center mb-6">Контакты</h2>
+                                <a href="tel:+79272651777" className="flex items-center justify-between p-5 bg-[#f5f5f7] dark:bg-[#1c1c1e] rounded-2xl shadow-sm">
+                                    <div className="text-left">
+                                        <div className="text-[10px] text-gray-400 font-bold uppercase">Личный сотовый</div>
+                                        <div className="text-lg font-bold">8 (927) 265-17-77</div>
                                     </div>
-                                    <div className="p-5 bg-white dark:bg-black border border-gray-100 dark:border-gray-800 rounded-2xl text-left flex items-start gap-3 shadow-sm">
-                                        <i className="fa-solid fa-map-pin mt-1 text-gray-400"></i>
-                                        <span className="text-sm text-gray-500 dark:text-gray-400 leading-snug">г. Самара, 443028, мкр-н Крутые ключи, ул. Мира</span>
-                                    </div>
-                                </div>
+                                    <i className="fa-solid fa-phone text-blue-600"></i>
+                                </a>
                             </div>
                         )}
                     </main>
 
+                    {/* Таб-бар */}
                     <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[95%] max-w-lg nav-blur rounded-full apple-shadow border border-gray-200 dark:border-gray-800 z-50">
                         <div className="flex justify-around items-center h-16 px-2">
                             {[
@@ -260,13 +361,9 @@
                                 { id: 'experience', label: 'Опыт', icon: 'fa-briefcase' },
                                 { id: 'skills', label: 'Навыки', icon: 'fa-bolt' },
                                 { id: 'personal', label: 'Личное', icon: 'fa-heart' },
-                                { id: 'contacts', label: 'Контакты', icon: 'fa-address-book' }
+                                { id: 'contacts', label: 'Связь', icon: 'fa-address-book' }
                             ].map(tab => (
-                                <button 
-                                    key={tab.id}
-                                    onClick={() => setActiveSection(tab.id)}
-                                    className={`flex flex-col items-center justify-center transition-all flex-1 ${activeSection === tab.id ? 'text-blue-600' : 'text-gray-400'}`}
-                                >
+                                <button key={tab.id} onClick={() => setActiveSection(tab.id)} className={`flex flex-col items-center justify-center transition-all flex-1 ${activeSection === tab.id ? 'text-blue-600' : 'text-gray-400'}`}>
                                     <i className={`fa-solid ${tab.icon} text-lg`}></i>
                                     <span className="text-[9px] font-bold uppercase mt-1 tracking-tighter">{tab.label}</span>
                                 </button>
@@ -274,13 +371,9 @@
                         </div>
                     </nav>
 
+                    {/* МОДАЛЬНОЕ ОКНО: О СПЕЦИАЛИСТЕ */}
                     <Modal isOpen={isAboutOpen} onClose={() => setIsAboutOpen(false)} title="О специалисте">
-                        <div className="space-y-4 text-sm leading-relaxed text-gray-800 dark:text-gray-200">
-                            <p>Более 12 лет в управлении продажами. Решения принимаю на основе аналитики и цифр. Архитектуру процессов веду к прогнозируемым и масштабируемым результатам. Увеличиваю прибыль компании через доверие клиента и решение его задачи, то есть конвертирую запрос в сделку.</p>
-                            
-                            <p className="pt-2">Родился Козерогом в год Лошади 30 декабря 1990 года, женат, трое детей, в планах — купить / построить дом</p>
-                        </div>
-                        
+                        <p>Более 12 лет в управлении продажами. Решения принимаю на основе аналитики и цифр. Архитектуру процессов веду к прогнозируемым и масштабируемым результатам. Увеличиваю прибыль компании через доверие клиента и решение его задачи, то есть конвертирую запрос в сделку.</p>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 py-6">
                             {[
                                 { val: 1340, icon: "fa-car", txt: "Опыт продаж в автобизнесе.", suffix: " дн." },
@@ -288,29 +381,37 @@
                                 { val: 876, icon: "fa-diagram-project", txt: "Фриланс-проектов реализовано.", suffix: "+" },
                                 { val: 192, icon: "fa-chalkboard-user", txt: "Преподавание и работа с аудиторией.", suffix: " нед." }
                             ].map((item, i) => (
-                                <div key={i} className="p-4 bg-[#f5f5f7] dark:bg-gray-800/50 rounded-2xl flex items-start gap-3 border border-transparent dark:border-gray-800">
+                                <div key={i} className="p-4 bg-[#f5f5f7] dark:bg-gray-800/50 rounded-2xl flex items-start gap-3">
                                     <i className={`fa-solid ${item.icon} text-blue-500 mt-1 text-xs`}></i>
                                     <div>
-                                        <div className="text-sm font-bold text-blue-600 leading-none">
-                                            <Counter endValue={item.val} suffix={item.suffix} />
-                                        </div>
-                                        <div className="text-[11px] leading-tight text-gray-500 mt-1">{item.txt}</div>
+                                        <div className="text-sm font-bold text-blue-600"><Counter endValue={item.val} suffix={item.suffix} /></div>
+                                        <div className="text-[11px] leading-tight text-gray-500">{item.txt}</div>
                                     </div>
                                 </div>
                             ))}
                         </div>
-
-                        <p className="text-xs text-gray-500 dark:text-gray-400 border-l-2 border-blue-500 pl-4 italic leading-relaxed">
-                            Убеждён, что эффективная работа строится не только на договорах и регламентах, но прежде всего на живых человеческих отношениях и взаимном доверии. Именно такие отношения между специалистом и работодателем позволяют достигать общей цели — устойчивого роста и финансового результата.
-                        </p>
-
-                        <button 
-                            onClick={() => { setIsAboutOpen(false); setActiveSection('skills'); }}
-                            className="w-full mt-6 bg-black dark:bg-white text-white dark:text-black py-4 rounded-2xl font-bold text-sm hover:opacity-90 transition-all"
-                        >
-                            Подробнее про навыки
-                        </button>
                     </Modal>
+
+                    {/* МОДАЛЬНОЕ ОКНО: ДЕТАЛИ ОПЫТА */}
+                    {selectedExp && (
+                        <Modal isOpen={true} onClose={() => setSelectedExp(null)} title={selectedExp.company}>
+                            <div className="space-y-6">
+                                <div>
+                                    <h4 className="text-[10px] uppercase tracking-widest text-blue-600 font-bold mb-2">Обязанности и задачи</h4>
+                                    <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">{selectedExp.fullTasks}</p>
+                                </div>
+                                <div>
+                                    <h4 className="text-[10px] uppercase tracking-widest text-green-600 font-bold mb-2">Результаты</h4>
+                                    <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">{selectedExp.fullResults}</p>
+                                </div>
+                                <div className="bg-gray-50 dark:bg-gray-900/50 p-5 rounded-2xl italic border border-gray-100 dark:border-gray-800">
+                                    <h4 className="text-[10px] uppercase tracking-widest text-orange-600 font-bold mb-2 not-italic">Полный отзыв</h4>
+                                    <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">"{selectedExp.fullReview}"</p>
+                                    <div className="mt-3 text-xs font-bold not-italic">— {selectedExp.reviewAuthor}</div>
+                                </div>
+                            </div>
+                        </Modal>
+                    )}
                 </div>
             );
         };
