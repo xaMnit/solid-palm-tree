@@ -1,422 +1,295 @@
 <!DOCTYPE html>
-<html lang="ru" class="dark">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Max Safrutin | Digital Dossier</title>
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        appleGray: '#f5f5f7',
-                    }
-                }
-            }
-        }
-    </script>
-
+    <title>Опыт работы | Максим Сафрутин</title>
     <style>
-        body { 
-            font-family: 'Inter', sans-serif; 
-            -webkit-font-smoothing: antialiased; 
-            font-size: 14px;
-            transition: background-color 0.3s ease, color 0.3s ease;
+        :root {
+            --primary: #2563eb;
+            --accent: #3b82f6;
+            --bg: #f8fafc;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --white: #ffffff;
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
         }
-        .apple-shadow { box-shadow: 0 2px 12px rgba(0,0,0,0.04); }
-        .nav-blur { backdrop-filter: blur(20px); background: rgba(255,255,255,0.8); }
-        .dark .nav-blur { background: rgba(0,0,0,0.8); }
-        .animate-fade-up { animation: fadeUp 0.5s ease-out forwards; }
-        @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .rotate-180 { transform: rotate(180deg); }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1 { text-align: center; color: var(--text); margin-bottom: 40px; }
+
+        .experience-item {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow);
+            border-left: 5px solid var(--primary);
+            position: relative;
+        }
+
+        /* Бейдж периода */
+        .date-badge {
+            display: inline-block;
+            background: #e0e7ff;
+            color: var(--primary);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .company-name {
+            font-size: 1.4rem;
+            font-weight: 800;
+            margin: 5px 0;
+            color: #0f172a;
+        }
+
+        .job-title {
+            font-size: 1.1rem;
+            color: var(--accent);
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        /* Сетка для Обязанностей и Задач */
+        .grid-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        @media (max-width: 600px) {
+            .grid-info { grid-template-columns: 1fr; }
+        }
+
+        h4 {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-light);
+            margin-bottom: 10px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .list-unstyled {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            font-size: 0.95rem;
+        }
+
+        .list-unstyled li {
+            margin-bottom: 8px;
+            padding-left: 15px;
+            position: relative;
+        }
+
+        .list-unstyled li::before {
+            content: "•";
+            color: var(--primary);
+            position: absolute;
+            left: 0;
+        }
+
+        /* Блок Результатов — «Киллер-фича» */
+        .results-box {
+            background: #f0fdf4;
+            border: 1px dashed #22c55e;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+        }
+
+        .results-box h4 {
+            color: #166534;
+            border-color: #dcfce7;
+        }
+
+        /* Отзывы (Аккордеон) */
+        details {
+            margin-top: 15px;
+            background: #f1f5f9;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        summary {
+            padding: 12px 20px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-light);
+            list-style: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        summary::after { content: "▼"; font-size: 0.7rem; transition: 0.3s; }
+        details[open] summary::after { transform: rotate(180deg); }
+
+        .testimonial {
+            padding: 20px;
+            border-top: 1px solid #e2e8f0;
+            font-style: italic;
+            font-size: 0.9rem;
+            color: #475569;
+        }
+
+        .author {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+            font-style: normal;
+            color: var(--text);
+        }
+
+        /* Стили для творческого блока (архив) */
+        .creative-item {
+            border-left: 5px solid var(--text-light);
+            opacity: 0.9;
+        }
+
+        .highlight-num {
+            font-weight: bold;
+            color: var(--primary);
+        }
     </style>
 </head>
-<body class="bg-white text-[#1d1d1f] dark:bg-black dark:text-[#f5f5f7]">
-    <div id="root"></div>
+<body>
 
-    <script type="text/babel">
-        const { useState, useEffect } = React;
+<div class="container">
+    <h1>Профессиональный опыт</h1>
 
-        const ExperienceData = [
-            {
-                id: 1,
-                period: "09/2023 — 02/2026",
-                company: "АМК УРАЛ-ЛАДА КОРП",
-                legal: "ООО «Урал-Лада» (а/м холдинг АМК)",
-                address: "Самара, Мира, 1",
-                mapUrl: "https://yandex.ru/maps/org/ural_lada/228897792896",
-                role: "Корпоративный менеджер по работе с ЮЛ",
-                focus: "Развитие B2B-продаж LADA, переговоры с ЛПР, тендеры и ЭДО.",
-                result: "630+ авто, 311 млн ₽ оборота, 14 млн ₽ прибыли.",
-                reviewShort: "«Ему можно доверить целое направление...» — Анастасия Мовчан",
-                fullFocus: "Развитие B2B-продаж LADA, активный поиск клиентов, холодные звонки, встречи и переговоры с ЛПР. Обеспечение корпоративных поставок, сопровождение сделок через CRM, 1С и электронный документооборот (Диадок). Работа с тендерными площадками.",
-                fullResult: "Продано более 630 автомобилей LADA. Обеспечен оборот свыше 311 млн ₽. Валовая прибыль составила более 14 млн ₽. Сформирована и систематизирована база клиентов, выстроены устойчивые партнёрские отношения с компаниями региона.",
-                fullReview: "«Ему можно доверить целое направление. Максим берёт полную ответственность за весь процесс, не требует микроменеджмента и всегда доводит поставленные задачи до конкретного результата.»\n— Анастасия Мовчан (Корпоративный РОП АМК)"
-            },
-            {
-                id: 2,
-                period: "06/2023 — 09/2023",
-                company: "АМК УРАЛ-ЛАДА РОЗНИЦА",
-                legal: "ООО «Урал-Лада» (а/м холдинг АМК)",
-                address: "Самара, Мира, 1",
-                mapUrl: "https://yandex.ru/maps/org/ural_lada/228897792896",
-                role: "Менеджер отдела продаж новых авто",
-                focus: "Продажи LADA, trade-in, запуск дилерского центра.",
-                result: "Успешный старт ДЦ, оптимизация рабочих листов.",
-                reviewShort: "«Помог запустить работу отдела...» — Джамиль Якупов",
-                fullFocus: "Продажи новых автомобилей LADA физическим лицам. Оценка и прием автомобилей по системе trade-in. Продажа дополнительных услуг: КАСКО, ОСАГО, кредитные продукты.",
-                fullResult: "Участвовал в запуске нового дилерского центра с нуля. Разработал и внедрил оптимизированный «рабочий лист менеджера», что позволило сократить время на оформление первичной документации и улучшить контроль воронки.",
-                fullReview: "«На старте фактически помог удержать и запустить работу отдела. Проявил высокую стрессоустойчивость в период формирования команды.»\n— Джамиль Якупов (РОП LADA)"
-            },
-            {
-                id: 3,
-                period: "05/2008 — Наст. время",
-                company: "MC / Event (Фриланс)",
-                legal: "На договорах между физ. лицами",
-                address: "Места где работал (Padlet)",
-                mapUrl: "https://padlet.com/maxsafrutin/padlet-c0o969gn0sq2bpsu",
-                role: "Организатор, ведущий",
-                focus: "Управление событиями, переговоры с подрядчиками.",
-                result: "Сотни успешных кейсов, база лояльных клиентов.",
-                reviewShort: "«Профессионал в коммуникациях...» — Клиенты",
-                fullFocus: "Полный цикл организации частных и корпоративных мероприятий. Написание сценариев, подбор команды, контроль технического обеспечения. Ведение коммуникации с аудиторией (MC).",
-                fullResult: "За 15 лет реализовано более 800 проектов разного масштаба. Сформирована устойчивая репутация и личный бренд на рынке Event-услуг Самары и области.",
-                fullReview: "Все отзывы и примеры работ доступны по ссылке на Padlet. Контакты прямых заказчиков предоставляются по запросу."
-            }
-        ];
+    <div class="experience-item">
+        <span class="date-badge">09/2023 — 02/2026</span>
+        <div class="company-name">ООО “Урал-Лада” (а/м холдинг АМК)</div>
+        <div class="job-title">Корпоративный менеджер по работе с юр. лицами</div>
+        
+        <div class="grid-info">
+            <div>
+                <h4>Обязанности</h4>
+                <ul class="list-unstyled">
+                    <li>Продажа LADA юридическим лицам и тендеры</li>
+                    <li>Сопровождение в Диадок и 1С/CRM</li>
+                    <li>Взаимодействие с фин. службами клиентов</li>
+                </ul>
+            </div>
+            <div>
+                <h4>Задачи</h4>
+                <ul class="list-unstyled">
+                    <li>Развитие корпоративного канала продаж</li>
+                    <li>Индивидуальные КП и презентации</li>
+                    <li>Перевыполнение плановых показателей</li>
+                </ul>
+            </div>
+        </div>
 
-        const Counter = ({ endValue, suffix = "" }) => {
-            const [count, setCount] = useState(0);
-            useEffect(() => {
-                let start = 0;
-                const duration = 1000;
-                const increment = Math.ceil(endValue / (duration / 20));
-                const timer = setInterval(() => {
-                    start += increment;
-                    if (start >= endValue) {
-                        setCount(endValue);
-                        clearInterval(timer);
-                    } else {
-                        setCount(start);
-                    }
-                }, 20);
-                return () => clearInterval(timer);
-            }, [endValue]);
-            return <span>{count}{suffix}</span>;
-        };
+        <div class="results-box">
+            <h4>Ключевые результаты</h4>
+            <p>Реализовал более <span class="highlight-num">630 автомобилей</span>. Оборот <span class="highlight-num">311 млн ₽</span>. Валовая прибыль <span class="highlight-num">14 млн ₽</span>. Единственный менеджер отдела, выстроивший систему с нуля.</p>
+        </div>
 
-        const Modal = ({ isOpen, onClose, title, children }) => {
-            if (!isOpen) return null;
-            return (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" onClick={onClose}>
-                    <div className="bg-white dark:bg-[#1c1c1e] rounded-[2rem] max-w-lg w-full max-h-[85vh] overflow-y-auto p-8 shadow-2xl animate-fade-up" onClick={e => e.stopPropagation()}>
-                        <div className="flex justify-between items-center mb-6">
-                            <h3 className="text-xl font-bold">{title}</h3>
-                            <button onClick={onClose} className="w-8 h-8 flex items-center justify-center bg-gray-100 dark:bg-gray-800 rounded-full hover:bg-gray-200 transition-colors">✕</button>
-                        </div>
-                        <div className="text-base leading-relaxed space-y-4 text-gray-700 dark:text-gray-300">{children}</div>
-                    </div>
-                </div>
-            );
-        };
+        <details>
+            <summary>Читать 4 отзыва коллег (Анастасия М., Игорь У., Владислав Б., Дмитрий М.)</summary>
+            <div class="testimonial">
+                "Максим — один из тех, кому можно доверить направление. Если берется за задачу — доводит до результата."
+                <span class="author">— Анастасия Мовчан, Корп. РОП ДЦ “АМК“</span>
+            </div>
+            <div class="testimonial">
+                "Сильный переговорщик. Специально проверял его «тайным покупателем» — это пример того, как надо общаться."
+                <span class="author">— Игорь Уваров, Корп. МОП</span>
+            </div>
+        </details>
+    </div>
 
-        const ExperienceCard = ({ item, onOpenFull }) => {
-            const [isOpen, setIsOpen] = useState(false);
-            return (
-                <div className="bg-[#f5f5f7] dark:bg-[#1c1c1e] rounded-[2rem] border border-transparent dark:border-gray-800 overflow-hidden mb-4 transition-all">
-                    <div className="p-6 cursor-pointer" onClick={() => setIsOpen(!isOpen)}>
-                        <div className="flex justify-between items-start">
-                            <div className="space-y-1">
-                                <span className="text-blue-600 font-bold text-[10px] uppercase">{item.period}</span>
-                                <div className="flex items-center gap-2">
-                                    <h3 className="text-xl font-bold">{item.company}</h3>
-                                    {/* Иконка глобуса для перехода на сайт/карту */}
-                                    <a 
-                                        href={item.mapUrl} 
-                                        target="_blank" 
-                                        onClick={e => e.stopPropagation()} 
-                                        className="text-blue-500 hover:text-blue-700 transition-colors"
-                                    >
-                                        <i className="fa-solid fa-globe text-xs"></i>
-                                    </a>
-                                </div>
-                                <div className="text-sm font-semibold text-gray-600 dark:text-gray-300 mt-2">{item.role}</div>
-                                <div className="flex items-center gap-1.5 text-xs text-blue-500 mt-1">
-                                    <i className="fa-solid fa-location-dot"></i>
-                                    <span className="opacity-80">{item.address}</span>
-                                </div>
-                            </div>
-                            <div className={`w-8 h-8 rounded-full bg-white dark:bg-black flex items-center justify-center transition-transform ${isOpen ? 'rotate-180' : ''}`}>
-                                <i className="fa-solid fa-chevron-down text-[10px]"></i>
-                            </div>
-                        </div>
-                    </div>
-                    {isOpen && (
-                        <div className="px-6 pb-6 pt-2 space-y-5 animate-fade-up border-t border-gray-200 dark:border-gray-800/50">
-                            {/* Блок с Юр. лицом переехал сюда */}
-                            <div className="pt-2">
-                                <h4 className="text-[10px] font-bold uppercase text-gray-400">Юридическое лицо:</h4>
-                                <p className="text-xs italic text-gray-500">{item.legal}</p>
-                            </div>
-                            
-                            <div className="space-y-1">
-                                <h4 className="text-[10px] font-bold uppercase text-gray-400">Фокус:</h4>
-                                <p className="text-sm">{item.focus}</p>
-                                <button onClick={() => onOpenFull("Подробные задачи", item.fullFocus)} className="text-xs text-blue-600 font-bold mt-1">подробнее</button>
-                            </div>
-                            <div className="space-y-1">
-                                <h4 className="text-[10px] font-bold uppercase text-gray-400">Результат:</h4>
-                                <p className="text-sm">{item.result}</p>
-                                <button onClick={() => onOpenFull("Полные результаты", item.fullResult)} className="text-xs text-blue-600 font-bold mt-1">подробнее</button>
-                            </div>
-                            <div className="p-4 bg-white dark:bg-black rounded-2xl border border-gray-100 dark:border-gray-800">
-                                <h4 className="text-[10px] font-bold uppercase text-gray-400 mb-1">Отзыв:</h4>
-                                <p className="text-sm italic opacity-80">{item.reviewShort}</p>
-                                <button onClick={() => onOpenFull("Отзыв целиком", item.fullReview)} className="text-xs text-blue-600 font-bold mt-2">подробнее</button>
-                            </div>
-                        </div>
-                    )}
-                </div>
-            );
-        };
-        const App = () => {
-            const [activeSection, setActiveSection] = useState('profile');
-            const [darkMode, setDarkMode] = useState(true);
-            const [isAboutOpen, setIsAboutOpen] = useState(false);
-            const [fullModal, setFullModal] = useState({ open: false, title: '', content: '' });
+    <div class="experience-item">
+        <span class="date-badge">06/2023 — 09/2023</span>
+        <div class="company-name">ООО “Урал-Лада” (а/м холдинг АМК)</div>
+        <div class="job-title">Менеджер отдела продаж новых автомобилей</div>
+        
+        <div class="grid-info">
+            <div>
+                <h4>Обязанности</h4>
+                <ul class="list-unstyled">
+                    <li>Продажа новых авто и Trade-in</li>
+                    <li>Тест-драйвы и презентации</li>
+                </ul>
+            </div>
+            <div>
+                <h4>Задачи</h4>
+                <ul class="list-unstyled">
+                    <li>Запуск процессов нового автосалона</li>
+                    <li>Координация подготовки выдачи</li>
+                </ul>
+            </div>
+        </div>
 
-            const toggleDarkMode = () => {
-                setDarkMode(!darkMode);
-                document.documentElement.classList.toggle('dark');
-            };
+        <div class="results-box" style="background: #f0f9ff; border-color: #3b82f6;">
+            <h4>Результаты</h4>
+            <p>Участие в открытии ДЦ «с нуля». Внедрена форма рабочего листа, упростившая контроль этапов сделок.</p>
+        </div>
 
-            return (
-                <div className="min-h-screen pb-28">
-                    <nav className="fixed top-0 w-full nav-blur z-50 border-b border-gray-100 dark:border-gray-900">
-                        <div className="max-w-4xl mx-auto px-6 h-14 flex items-center justify-between">
-                            <button onClick={() => setActiveSection('profile')} className="text-base font-bold tracking-tight">
-                                Max <span className="text-blue-600">Safrutin</span>
-                            </button>
-                            <button onClick={toggleDarkMode} className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors">
-                                {darkMode ? <i className="fa-solid fa-sun text-sm"></i> : <i className="fa-solid fa-moon text-sm"></i>}
-                            </button>
-                        </div>
-                    </nav>
+        <details>
+            <summary>Читать 4 отзыва (Джамиль Я., Рахим С., Петр Т., Иван Г.)</summary>
+            <div class="testimonial">
+                "Фактически подменил меня на старте, помог запустить работу отдела. Оставил видеоуроки для будущих менеджеров."
+                <span class="author">— Джамиль Якупов, РОП LADA</span>
+            </div>
+        </details>
+    </div>
 
-                    <main className="max-w-4xl mx-auto px-6 pt-20">
-                        {activeSection === 'profile' && (
-                            <div className="space-y-10 animate-fade-up">
-                                <header className="flex flex-col items-center text-center py-6 space-y-4">
-                                    <div className="w-32 h-32 md:w-40 md:h-40 rounded-[2.5rem] overflow-hidden apple-shadow ring-1 ring-black/5">
-                                        <img src="./assets/avatar/avatar_safrutin_pro.png" alt="Maxim" className="w-full h-full object-cover" />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight">Максим Сафрутин</h1>
-                                        <div className="text-base md:text-lg text-gray-500 dark:text-gray-400 font-medium max-w-md mx-auto leading-tight">
-                                            Менеджер по продажам автомобилей
-                                            <span className="text-gray-400 font-light block text-sm md:text-base mt-1">
-                                                (импорт и подбор под заказ)
-                                            </span>
-                                        </div>
-                                        <p className="text-gray-400 font-medium text-sm flex items-center justify-center gap-2">
-                                            <i className="fa-solid fa-location-dot"></i> Самара, Россия
-                                        </p>
-                                    </div>
-                                    <div className="flex gap-3">
-                                        <button onClick={() => setActiveSection('contacts')} className="bg-[#0071e3] text-white px-6 py-2.5 rounded-full font-semibold text-sm hover:bg-[#0077ed] transition-all">Связаться</button>
-                                        <button onClick={() => setActiveSection('experience')} className="bg-gray-100 dark:bg-gray-800 text-[#1d1d1f] dark:text-white px-6 py-2.5 rounded-full font-semibold text-sm hover:opacity-80 transition-all">Открыть опыт</button>
-                                    </div>
-                                </header>
+    <div class="experience-item">
+        <span class="date-badge">01/2023 — 06/2023</span>
+        <div class="company-name">Автосеть.РФ (холдинг АМК)</div>
+        <div class="job-title">Менеджер отдела продаж автомобилей с пробегом</div>
+        
+        <div class="results-box">
+            <p><strong>Результат:</strong> Со второго месяца стабильное <span class="highlight-num">1–2 место</span> по объему продаж в отделе.</p>
+        </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                    <div className="bg-[#f5f5f7] dark:bg-[#1c1c1e] p-6 rounded-[1.5rem] text-center border border-transparent dark:border-gray-800">
-                                        <div className="text-3xl font-bold mb-1"><Counter endValue={667} suffix="+" /></div>
-                                        <div className="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Продано авто</div>
-                                    </div>
-                                    <div className="bg-[#f5f5f7] dark:bg-[#1c1c1e] p-6 rounded-[1.5rem] text-center border border-transparent dark:border-gray-800">
-                                        <div className="text-3xl font-bold mb-1"><Counter endValue={424} suffix="+" /></div>
-                                        <div className="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Млн ₽ оборот</div>
-                                    </div>
-                                    <div className="bg-[#f5f5f7] dark:bg-[#1c1c1e] p-6 rounded-[1.5rem] text-center border border-transparent dark:border-gray-800">
-                                        <div className="text-3xl font-bold mb-1"><Counter endValue={22} suffix="+" /></div>
-                                        <div className="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Млн ₽ прибыль</div>
-                                    </div>
-                                </div>
+        <details>
+            <summary>Отзывы (Артём З., Ильяс С., Максим П., Даниил М.)</summary>
+            <div class="testimonial">
+                "Разобрал книгу продаж за 2 дня и сдал на 97 баллов из 100. Очень быстро вошел в топ-3."
+                <span class="author">— Артём Закарян, РОП БУ</span>
+            </div>
+        </details>
+    </div>
 
-                                <section className="max-w-2xl mx-auto text-center space-y-6">
-                                    <div className="text-lg md:text-xl leading-relaxed font-medium text-gray-800 dark:text-gray-200">
-                                        <p>С 1993 года — в переговорах, с 2020 — в автомобильных. Работаю системно и гибко используя в том числе AI-инструменты для повышения конверсии продаж.</p>
-                                    </div>
-                                    <button onClick={() => setIsAboutOpen(true)} className="text-[#0066cc] text-base font-semibold hover:underline underline-offset-4">
-                                        Подробнее об экспертизе →
-                                    </button>
-                                </section>
-                            </div>
-                        )}
+    <div class="experience-item creative-item">
+        <span class="date-badge">2008 — Наст. время</span>
+        <div class="company-name">Freelance / Event Industry</div>
+        <div class="job-title">Организатор, ведущий, звукооператор</div>
+        <p>Собственная база клиентов и команда по организации событий. 15+ лет опыта в коммуникациях и управлении атмосферой.</p>
+        <a href="https://vk.com/topic-43062392_28983541" target="_blank" style="color: var(--primary); font-size: 0.9rem;">Посмотреть отзывы в VK</a>
+    </div>
 
-                        {activeSection === 'experience' && (
-                            <div className="space-y-6 animate-fade-up max-w-3xl mx-auto pb-10">
-                                <h2 className="text-2xl font-bold tracking-tight mb-6">Опыт работы</h2>
-                                {ExperienceData.map(item => (
-                                    <ExperienceCard 
-                                        key={item.id} 
-                                        item={item} 
-                                        onOpenFull={(title, content) => setFullModal({ open: true, title, content })}
-                                    />
-                                ))}
-                            </div>
-                        )}
+    <div class="experience-item creative-item">
+        <span class="date-badge">2009 — 2013</span>
+        <div class="company-name">СамГТУ / Педагогическая деятельность</div>
+        <div class="job-title">Инструктор, тренер по фитнес-аэробике (Хип-хоп)</div>
+        <p><strong>Результаты:</strong> Золотые призеры городских соревнований, финалисты ПФО. Опыт сплочения коллективов и постановки программ.</p>
+    </div>
 
-                        {activeSection === 'skills' && (
-                            <div className="space-y-8 animate-fade-up">
-                                <h2 className="text-2xl font-bold tracking-tight">Навыки и Стек</h2>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div className="bg-[#f5f5f7] dark:bg-[#1c1c1e] p-6 rounded-[2rem] border border-transparent dark:border-gray-800 space-y-3">
-                                        <h3 className="text-lg font-bold mb-4 flex items-center gap-2"><i className="fa-solid fa-chart-line text-blue-600"></i> Продажи</h3>
-                                        {["B2B Продажи", "Сложные переговоры", "Импорт/Экспорт"].map(s => (
-                                            <div key={s} className="bg-white dark:bg-black p-3 rounded-xl text-xs font-medium apple-shadow border border-gray-50 dark:border-gray-900">{s}</div>
-                                        ))}
-                                    </div>
-                                    <div className="bg-[#f5f5f7] dark:bg-[#1c1c1e] p-6 rounded-[2rem] border border-transparent dark:border-gray-800 space-y-3">
-                                        <h3 className="text-lg font-bold mb-4 flex items-center gap-2"><i className="fa-solid fa-robot text-blue-600"></i> AI & Tech</h3>
-                                        {["ChatGPT Prompting", "CRM Архитектура", "Notion Expert"].map(s => (
-                                            <div key={s} className="bg-white dark:bg-black p-3 rounded-xl text-xs font-medium apple-shadow text-blue-600 border border-gray-50 dark:border-gray-900">{s}</div>
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
-                        )}
+</div>
 
-                        {activeSection === 'personal' && (
-                            <div className="space-y-6 animate-fade-up max-w-3xl mx-auto">
-                                <h2 className="text-2xl font-bold tracking-tight mb-4 text-center">Личное и Увлечения</h2>
-                                <div className="bg-[#1d1d1f] text-white p-8 rounded-[2rem]">
-                                    <h3 className="text-xl font-bold mb-4">Девиз</h3>
-                                    <p className="text-lg opacity-70 italic mb-4">«Система всегда побеждает хаос».</p>
-                                    <p className="text-base leading-relaxed opacity-90 font-light">Увлекаюсь яхтингом и марафонским бегом. Считаю, что дисциплина в спорте напрямую переносится в бизнес.</p>
-                                </div>
-                                <div className="bg-[#f5f5f7] dark:bg-[#1c1c1e] p-8 rounded-[2rem] border border-transparent dark:border-gray-800">
-                                    <h3 className="text-xl font-bold mb-4">Путешествия</h3>
-                                    <p className="text-base leading-relaxed text-gray-600 dark:text-gray-400">35 стран, от Исландии до Японии. Люблю изучать локальные бизнес-культуры и находить новые подходы в коммуникациях.</p>
-                                    <div className="text-4xl mt-6 flex gap-4 text-blue-600">
-                                        <i className="fa-solid fa-earth-americas"></i>
-                                        <i className="fa-solid fa-mountain"></i>
-                                        <i className="fa-solid fa-car"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-
-                        {activeSection === 'contacts' && (
-                            <div className="text-center py-6 animate-fade-up">
-                                <h2 className="text-3xl font-extrabold tracking-tight mb-2">Готовы к новому опыту?</h2>
-                                <p className="text-gray-400 mb-8">Свяжитесь со мной любым удобным способом</p>
-                                <div className="max-w-md mx-auto space-y-3">
-                                    <a href="tel:+79272651777" className="flex items-center justify-between p-5 bg-[#f5f5f7] dark:bg-[#1c1c1e] rounded-2xl hover:scale-[1.01] transition-all border border-transparent dark:border-gray-800 shadow-sm">
-                                        <div className="text-left">
-                                            <div className="text-[10px] text-gray-400 font-bold uppercase">Личный сотовый</div>
-                                            <div className="text-lg font-bold">8 (927) 265-17-77</div>
-                                        </div>
-                                        <i className="fa-solid fa-phone text-blue-600"></i>
-                                    </a>
-                                    <a href="tel:+79376420767" className="flex items-center justify-between p-5 bg-[#f5f5f7] dark:bg-[#1c1c1e] rounded-2xl hover:scale-[1.01] transition-all border border-transparent dark:border-gray-800 shadow-sm">
-                                        <div className="text-left">
-                                            <div className="text-[10px] text-gray-400 font-bold uppercase">Сотовый супруги</div>
-                                            <div className="text-lg font-bold">8 (937) 642-07-67</div>
-                                        </div>
-                                        <i className="fa-solid fa-phone text-blue-600"></i>
-                                    </a>
-                                    <div className="flex gap-3">
-                                        <a href="mailto:max.safrutin@gmail.com" className="flex-1 p-5 bg-[#f5f5f7] dark:bg-[#1c1c1e] rounded-2xl text-left border border-transparent dark:border-gray-800 shadow-sm transition-all hover:scale-[1.02]">
-                                            <div className="text-[10px] text-gray-400 font-bold uppercase">Gmail</div>
-                                            <div className="text-sm font-bold truncate">max.safrutin@gmail.com</div>
-                                        </a>
-                                        <a href="mailto:max.safr18@yandex.ru" className="flex-1 p-5 bg-[#f5f5f7] dark:bg-[#1c1c1e] rounded-2xl text-left border border-transparent dark:border-gray-800 shadow-sm transition-all hover:scale-[1.02]">
-                                            <div className="text-[10px] text-gray-400 font-bold uppercase">Yandex</div>
-                                            <div className="text-sm font-bold truncate">max.safr18@yandex.ru</div>
-                                        </a>
-                                    </div>
-                                    <div className="p-5 bg-white dark:bg-black border border-gray-100 dark:border-gray-800 rounded-2xl text-left flex items-start gap-3 shadow-sm">
-                                        <i className="fa-solid fa-map-pin mt-1 text-gray-400"></i>
-                                        <span className="text-sm text-gray-500 dark:text-gray-400 leading-snug">г. Самара, 443028, мкр-н Крутые ключи, ул. Мира</span>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-                    </main>
-
-                    <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[95%] max-w-lg nav-blur rounded-full apple-shadow border border-gray-200 dark:border-gray-800 z-50">
-                        <div className="flex justify-around items-center h-16 px-2">
-                            {[
-                                { id: 'profile', label: 'Профиль', icon: 'fa-user' },
-                                { id: 'experience', label: 'Опыт', icon: 'fa-briefcase' },
-                                { id: 'skills', label: 'Навыки', icon: 'fa-bolt' },
-                                { id: 'personal', label: 'Личное', icon: 'fa-heart' },
-                                { id: 'contacts', label: 'Контакты', icon: 'fa-address-book' }
-                            ].map(tab => (
-                                <button 
-                                    key={tab.id}
-                                    onClick={() => setActiveSection(tab.id)}
-                                    className={`flex flex-col items-center justify-center transition-all flex-1 ${activeSection === tab.id ? 'text-blue-600' : 'text-gray-400'}`}
-                                >
-                                    <i className={`fa-solid ${tab.icon} text-lg`}></i>
-                                    <span className="text-[9px] font-bold uppercase mt-1 tracking-tighter">{tab.label}</span>
-                                </button>
-                            ))}
-                        </div>
-                    </nav>
-
-                    <Modal isOpen={isAboutOpen} onClose={() => setIsAboutOpen(false)} title="О специалисте">
-                        <div className="space-y-4 text-sm leading-relaxed text-gray-800 dark:text-gray-200">
-                            <p>Более 12 лет в управлении продажами. Решения принимаю на основе аналитики и цифр. Архитектуру процессов веду к прогнозируемым и масштабируемым результатам. Увеличиваю прибыль компании через доверие клиента и решение его задачи, то есть конвертирую запрос в сделку.</p>
-                            <p className="pt-2">Родился Козерогом в год Лошади 30 декабря 1990 года, женат, трое детей, в планах — купить / построить дом</p>
-                        </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 py-6">
-                            {[
-                                { val: 1340, icon: "fa-car", txt: "Опыт продаж в автобизнесе.", suffix: " дн." },
-                                { val: 1198, icon: "fa-star", txt: "Положительных отзывов клиентов.", suffix: "+" },
-                                { val: 876, icon: "fa-diagram-project", txt: "Фриланс-проектов реализовано.", suffix: "+" },
-                                { val: 192, icon: "fa-chalkboard-user", txt: "Преподавание и работа с аудиторией.", suffix: " нед." }
-                            ].map((item, i) => (
-                                <div key={i} className="p-4 bg-[#f5f5f7] dark:bg-gray-800/50 rounded-2xl flex items-start gap-3 border border-transparent dark:border-gray-800">
-                                    <i className={`fa-solid ${item.icon} text-blue-500 mt-1 text-xs`}></i>
-                                    <div>
-                                        <div className="text-sm font-bold text-blue-600 leading-none">
-                                            <Counter endValue={item.val} suffix={item.suffix} />
-                                        </div>
-                                        <div className="text-[11px] leading-tight text-gray-500 mt-1">{item.txt}</div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 border-l-2 border-blue-500 pl-4 italic leading-relaxed">
-                            Убеждён, что эффективная работа строится не только на договорах и регламентах, но прежде всего на живых человеческих отношениях и взаимном доверии.
-                        </p>
-                        <button 
-                            onClick={() => { setIsAboutOpen(false); setActiveSection('skills'); }}
-                            className="w-full mt-6 bg-black dark:bg-white text-white dark:text-black py-4 rounded-2xl font-bold text-sm"
-                        >
-                            Подробнее про навыки
-                        </button>
-                    </Modal>
-
-                    <Modal isOpen={fullModal.open} onClose={() => setFullModal({ ...fullModal, open: false })} title={fullModal.title}>
-                        <div className="whitespace-pre-wrap">{fullModal.content}</div>
-                    </Modal>
-                </div>
-            );
-        };
-
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
-    </script>
 </body>
 </html>
