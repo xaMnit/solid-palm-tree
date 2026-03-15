@@ -646,7 +646,6 @@
 
         const AccordionItem = ({ title, score, description, bullets }) => {
             const [isOpen, setIsOpen] = useState(false);
-
             return (
                 <div className="bg-[#f5f5f7] dark:bg-[#1c1c1e] rounded-[1.5rem] p-5 mb-3 border border-transparent dark:border-gray-800 transition-all apple-shadow">
                     <div className="flex justify-between items-center cursor-pointer" onClick={() => setIsOpen(!isOpen)}>
@@ -663,7 +662,6 @@
                             <i className="fa-solid fa-chevron-down text-[10px]"></i>
                         </div>
                     </div>
-
                     {isOpen && (
                         <div className="mt-5 pt-4 border-t border-gray-200 dark:border-gray-800 animate-fade-up">
                             <p className="text-sm text-gray-700 dark:text-gray-300 mb-4 leading-relaxed">{description}</p>
@@ -711,15 +709,35 @@
                     <span className="text-xs md:text-sm text-gray-500 dark:text-gray-400">{desc}</span>
                 </div>
                 <div className="flex gap-1.5 shrink-0 bg-white dark:bg-black px-4 py-2 rounded-full border border-gray-100 dark:border-gray-900 apple-shadow">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                        <i
-                            key={star}
-                            className={`fa-solid fa-star text-sm ${star <= rating ? 'text-blue-500' : 'text-gray-200 dark:text-gray-800'}`}
-                        ></i>
+                    {[1, 2, 3, 4, 5].map(star => (
+                        <i key={star} className={`fa-solid fa-star text-sm ${star <= rating ? 'text-blue-500' : 'text-gray-200 dark:text-gray-800'}`}></i>
                     ))}
                 </div>
             </div>
         );
+
+        const SkillsSectionAccordion = ({ title, icon, children, defaultOpen = false }) => {
+            const [isOpen, setIsOpen] = useState(defaultOpen);
+
+            return (
+                <div className="space-y-6">
+                    <div className="flex justify-between items-center cursor-pointer px-2" onClick={() => setIsOpen(!isOpen)}>
+                        <h3 className="text-xl font-bold tracking-tight flex items-center gap-3">
+                            <i className={`fa-solid ${icon} text-blue-600`}></i> {title}
+                        </h3>
+                        <div className={`w-8 h-8 rounded-full bg-white dark:bg-black flex items-center justify-center transition-transform duration-300 shrink-0 apple-shadow ${isOpen ? 'rotate-180' : ''}`}>
+                            <i className="fa-solid fa-chevron-down text-[10px]"></i>
+                        </div>
+                    </div>
+
+                    {isOpen && (
+                        <div className="animate-fade-up">
+                            {children}
+                        </div>
+                    )}
+                </div>
+            );
+        };
 
         const App = () => {
             const [activeSection, setActiveSection] = useState('profile');
@@ -845,10 +863,7 @@
                                     </div>
                                 </div>
 
-                                <div className="space-y-6">
-                                    <h3 className="text-xl font-bold tracking-tight px-2 flex items-center gap-3">
-                                        <i className="fa-solid fa-chart-simple text-blue-600"></i> Ключевые показатели
-                                    </h3>
+                                <SkillsSectionAccordion title="Ключевые показатели" icon="fa-chart-simple" defaultOpen={true}>
                                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                                         <div className="bg-[#f5f5f7] dark:bg-[#1c1c1e] p-6 rounded-[2rem] border border-transparent dark:border-gray-800 apple-shadow flex flex-col justify-center items-center text-center">
                                             <div className="text-2xl md:text-3xl font-extrabold text-blue-600 mb-2">12+ лет</div>
@@ -871,12 +886,9 @@
                                             <div className="text-xs font-medium text-gray-500 dark:text-gray-400">Преподавания и работы с аудиторией</div>
                                         </div>
                                     </div>
-                                </div>
+                                </SkillsSectionAccordion>
 
-                                <div className="space-y-6">
-                                    <h3 className="text-xl font-bold tracking-tight px-2 flex items-center gap-3">
-                                        <i className="fa-solid fa-laptop-code text-blue-600"></i> Технический стек
-                                    </h3>
+                                <SkillsSectionAccordion title="Технический стек" icon="fa-laptop-code">
                                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                                         <TechCard title="CRM-системы" subtitle="ведение сделок, воронки" tools={["Bitrix24", "AmoCRM", "Salesforce", "1С CRM"]} icon="fa-users" />
                                         <TechCard title="Аналитика данных" subtitle="прогнозирование продаж" tools={["Excel", "Google Sheets", "Сводные таблицы"]} icon="fa-chart-pie" />
@@ -889,13 +901,10 @@
                                         <TechCard title="Автоматизация" subtitle="ускорение процессов" tools={["Notion", "ChatGPT", "ИИ ассистенты"]} icon="fa-robot" />
                                         <TechCard title="Управление задачами" subtitle="контроль сроков" tools={["Notion", "Trello", "Todoist", "Obsidian"]} icon="fa-list-check" />
                                     </div>
-                                </div>
+                                </SkillsSectionAccordion>
 
-                                <div className="space-y-6">
-                                    <div className="px-2">
-                                        <h3 className="text-xl font-bold tracking-tight mb-2 flex items-center gap-3">
-                                            <i className="fa-solid fa-brain text-blue-600"></i> Интеллектуальные компетенции
-                                        </h3>
+                                <SkillsSectionAccordion title="Интеллектуальные компетенции" icon="fa-brain">
+                                    <div className="px-2 mb-4">
                                         <p className="text-sm text-gray-500 dark:text-gray-400">
                                             Уровень профессиональных компетенций (самооценка по 10-балльной шкале), обеспечившие текущие навыки.
                                         </p>
@@ -918,12 +927,9 @@
                                             <AccordionItem title="Долгосрочные отношения" score="4.1" description="Поддержание связи после сделки и превращение клиентов в адвокатов бренда." bullets={["Сбор рекомендаций и отзывов", "Мотивация клиента запускать «сарафанное радио»"]} />
                                         </div>
                                     </div>
-                                </div>
+                                </SkillsSectionAccordion>
 
-                                <div className="space-y-6">
-                                    <h3 className="text-xl font-bold tracking-tight px-2 flex items-center gap-3">
-                                        <i className="fa-regular fa-star text-blue-600"></i> Профессиональные качества
-                                    </h3>
+                                <SkillsSectionAccordion title="Профессиональные качества" icon="fa-star">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <StarRating label="Коммуникабельность" desc="умение быстро выстраивать контакт и доверие" rating={3} />
                                         <StarRating label="Ответственность" desc="довожу задачи и сделки до результата" rating={4} />
@@ -934,7 +940,7 @@
                                         <StarRating label="Убедительность" desc="аргументация и ведение переговоров" rating={3} />
                                         <StarRating label="Инициативность" desc="не жду указаний, предлагаю решения" rating={2} />
                                     </div>
-                                </div>
+                                </SkillsSectionAccordion>
                             </div>
                         )}
 
