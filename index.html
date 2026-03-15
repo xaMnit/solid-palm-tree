@@ -551,25 +551,31 @@
 
                                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                                                     <div className="p-4 bg-white dark:bg-black rounded-[1.5rem] border border-gray-100 dark:border-gray-800 apple-shadow experience-box-light">
-                                                        <h4 className="text-[10px] font-bold uppercase text-gray-400 mb-2">Обязанности</h4>
-                                                        <div className="text-sm flex items-start gap-2">
-                                                            <i className="fa-solid fa-briefcase text-[12px] text-gray-400 mt-[3px]"></i>
+                                                        <h4 className="text-[10px] font-bold uppercase text-gray-400 mb-2 flex items-center gap-2">
+                                                            <i className="fa-solid fa-briefcase text-[12px] text-gray-400"></i>
+                                                            <span>Обязанности</span>
+                                                        </h4>
+                                                        <div className="text-sm">
                                                             <span>{item.fullFocus}</span>
                                                         </div>
                                                     </div>
 
                                                     <div className="p-4 bg-white dark:bg-black rounded-[1.5rem] border border-gray-100 dark:border-gray-800 apple-shadow experience-box-light">
-                                                        <h4 className="text-[10px] font-bold uppercase text-gray-400 mb-2">Задачи</h4>
-                                                        <div className="text-sm flex items-start gap-2">
-                                                            <i className="fa-solid fa-list-check text-[12px] text-gray-400 mt-[3px]"></i>
+                                                        <h4 className="text-[10px] font-bold uppercase text-gray-400 mb-2 flex items-center gap-2">
+                                                            <i className="fa-solid fa-list-check text-[12px] text-gray-400"></i>
+                                                            <span>Задачи</span>
+                                                        </h4>
+                                                        <div className="text-sm">
                                                             <span>{item.fullTasks}</span>
                                                         </div>
                                                     </div>
 
                                                     <div className="p-4 bg-white dark:bg-black rounded-[1.5rem] border border-gray-100 dark:border-gray-800 apple-shadow experience-box-light">
-                                                        <h4 className="text-[10px] font-bold uppercase text-gray-400 mb-2">Ключевые результаты</h4>
-                                                        <div className="text-sm flex items-start gap-2">
-                                                            <i className="fa-solid fa-check text-[12px] text-gray-400 mt-[3px]"></i>
+                                                        <h4 className="text-[10px] font-bold uppercase text-gray-400 mb-2 flex items-center gap-2">
+                                                            <i className="fa-solid fa-check text-[12px] text-gray-400"></i>
+                                                            <span>Ключевые результаты</span>
+                                                        </h4>
+                                                        <div className="text-sm">
                                                             <span>{item.fullResult}</span>
                                                         </div>
                                                     </div>
