@@ -93,59 +93,294 @@
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
 
-        const ExperienceData = Array.from({ length: 13 }, (_, i) => {
-            const num = i + 1;
-            return {
-                id: num,
-                period: `Кол-во времени ${num}`,
-                company: `Название организации ${num}`,
-                companySite: `#`,
-                role: `Название должности ${num}`,
-                fullCompanyName: `Название полное организации ${num}`,
-                orgDescription: `Описание организации ${num}`,
-                address: `Адрес ${num}`,
-                addressLink: `#`,
-                previewFocus: `Обязанности и задачи кратко ${num}`,
-                previewResult: `Результаты ${num} кратко`,
-                fullFocus: `Обязанности полностью ${num}`,
-                fullTasks: `Задачи полностью ${num}`,
-                fullResult: `Результаты полностью ${num}`,
+        const ExperienceData = [
+            {
+                id: 1,
+                period: "Кол-во времени 1",
+                company: "Название организации 1",
+                companySite: "#",
+                role: "Название должности 1",
+                fullCompanyName: "Название полное организации 1",
+                orgDescription: "Описание организации 1",
+                address: "Адрес 1",
+                addressLink: "#",
+                previewFocus: "Обязанности и задачи кратко 1",
+                previewResult: "Результаты 1 кратко",
+                fullFocus: "Обязанности полностью 1",
+                fullTasks: "Задачи полностью 1",
+                fullResult: "Результаты полностью 1",
                 recommendations: [
-                    {
-                        id: 1,
-                        name: `Имя ${num}.1`,
-                        role: `Должность ${num}.1`,
-                        phone: `+700000000${num}1`,
-                        review: `Отзыв ${num}.1`,
-                        fullReview: `Полностью отзыв ${num}.1`
-                    },
-                    {
-                        id: 2,
-                        name: `Имя ${num}.2`,
-                        role: `Должность ${num}.2`,
-                        phone: `+700000000${num}2`,
-                        review: `Отзыв ${num}.2`,
-                        fullReview: `Полностью отзыв ${num}.2`
-                    },
-                    {
-                        id: 3,
-                        name: `Имя ${num}.3`,
-                        role: `Должность ${num}.3`,
-                        phone: `+700000000${num}3`,
-                        review: `Отзыв ${num}.3`,
-                        fullReview: `Полностью отзыв ${num}.3`
-                    },
-                    {
-                        id: 4,
-                        name: `Имя ${num}.4`,
-                        role: `Должность ${num}.4`,
-                        phone: `+700000000${num}4`,
-                        review: `Отзыв ${num}.4`,
-                        fullReview: `Полностью отзыв ${num}.4`
-                    }
+                    { id: 1, name: "Имя 1.1", role: "Должность 1.1", phone: "+70000000011", review: "Отзыв 1.1", fullReview: "Полностью отзыв 1.1" },
+                    { id: 2, name: "Имя 1.2", role: "Должность 1.2", phone: "+70000000012", review: "Отзыв 1.2", fullReview: "Полностью отзыв 1.2" },
+                    { id: 3, name: "Имя 1.3", role: "Должность 1.3", phone: "+70000000013", review: "Отзыв 1.3", fullReview: "Полностью отзыв 1.3" },
+                    { id: 4, name: "Имя 1.4", role: "Должность 1.4", phone: "+70000000014", review: "Отзыв 1.4", fullReview: "Полностью отзыв 1.4" }
                 ]
-            };
-        });
+            },
+            {
+                id: 2,
+                period: "Кол-во времени 2",
+                company: "Название организации 2",
+                companySite: "#",
+                role: "Название должности 2",
+                fullCompanyName: "Название полное организации 2",
+                orgDescription: "Описание организации 2",
+                address: "Адрес 2",
+                addressLink: "#",
+                previewFocus: "Обязанности и задачи кратко 2",
+                previewResult: "Результаты 2 кратко",
+                fullFocus: "Обязанности полностью 2",
+                fullTasks: "Задачи полностью 2",
+                fullResult: "Результаты полностью 2",
+                recommendations: [
+                    { id: 1, name: "Имя 2.1", role: "Должность 2.1", phone: "+70000000021", review: "Отзыв 2.1", fullReview: "Полностью отзыв 2.1" },
+                    { id: 2, name: "Имя 2.2", role: "Должность 2.2", phone: "+70000000022", review: "Отзыв 2.2", fullReview: "Полностью отзыв 2.2" },
+                    { id: 3, name: "Имя 2.3", role: "Должность 2.3", phone: "+70000000023", review: "Отзыв 2.3", fullReview: "Полностью отзыв 2.3" },
+                    { id: 4, name: "Имя 2.4", role: "Должность 2.4", phone: "+70000000024", review: "Отзыв 2.4", fullReview: "Полностью отзыв 2.4" }
+                ]
+            },
+            {
+                id: 3,
+                period: "Кол-во времени 3",
+                company: "Название организации 3",
+                companySite: "#",
+                role: "Название должности 3",
+                fullCompanyName: "Название полное организации 3",
+                orgDescription: "Описание организации 3",
+                address: "Адрес 3",
+                addressLink: "#",
+                previewFocus: "Обязанности и задачи кратко 3",
+                previewResult: "Результаты 3 кратко",
+                fullFocus: "Обязанности полностью 3",
+                fullTasks: "Задачи полностью 3",
+                fullResult: "Результаты полностью 3",
+                recommendations: [
+                    { id: 1, name: "Имя 3.1", role: "Должность 3.1", phone: "+70000000031", review: "Отзыв 3.1", fullReview: "Полностью отзыв 3.1" },
+                    { id: 2, name: "Имя 3.2", role: "Должность 3.2", phone: "+70000000032", review: "Отзыв 3.2", fullReview: "Полностью отзыв 3.2" },
+                    { id: 3, name: "Имя 3.3", role: "Должность 3.3", phone: "+70000000033", review: "Отзыв 3.3", fullReview: "Полностью отзыв 3.3" },
+                    { id: 4, name: "Имя 3.4", role: "Должность 3.4", phone: "+70000000034", review: "Отзыв 3.4", fullReview: "Полностью отзыв 3.4" }
+                ]
+            },
+            {
+                id: 4,
+                period: "Кол-во времени 4",
+                company: "Название организации 4",
+                companySite: "#",
+                role: "Название должности 4",
+                fullCompanyName: "Название полное организации 4",
+                orgDescription: "Описание организации 4",
+                address: "Адрес 4",
+                addressLink: "#",
+                previewFocus: "Обязанности и задачи кратко 4",
+                previewResult: "Результаты 4 кратко",
+                fullFocus: "Обязанности полностью 4",
+                fullTasks: "Задачи полностью 4",
+                fullResult: "Результаты полностью 4",
+                recommendations: [
+                    { id: 1, name: "Имя 4.1", role: "Должность 4.1", phone: "+70000000041", review: "Отзыв 4.1", fullReview: "Полностью отзыв 4.1" },
+                    { id: 2, name: "Имя 4.2", role: "Должность 4.2", phone: "+70000000042", review: "Отзыв 4.2", fullReview: "Полностью отзыв 4.2" },
+                    { id: 3, name: "Имя 4.3", role: "Должность 4.3", phone: "+70000000043", review: "Отзыв 4.3", fullReview: "Полностью отзыв 4.3" },
+                    { id: 4, name: "Имя 4.4", role: "Должность 4.4", phone: "+70000000044", review: "Отзыв 4.4", fullReview: "Полностью отзыв 4.4" }
+                ]
+            },
+            {
+                id: 5,
+                period: "Кол-во времени 5",
+                company: "Название организации 5",
+                companySite: "#",
+                role: "Название должности 5",
+                fullCompanyName: "Название полное организации 5",
+                orgDescription: "Описание организации 5",
+                address: "Адрес 5",
+                addressLink: "#",
+                previewFocus: "Обязанности и задачи кратко 5",
+                previewResult: "Результаты 5 кратко",
+                fullFocus: "Обязанности полностью 5",
+                fullTasks: "Задачи полностью 5",
+                fullResult: "Результаты полностью 5",
+                recommendations: [
+                    { id: 1, name: "Имя 5.1", role: "Должность 5.1", phone: "+70000000051", review: "Отзыв 5.1", fullReview: "Полностью отзыв 5.1" },
+                    { id: 2, name: "Имя 5.2", role: "Должность 5.2", phone: "+70000000052", review: "Отзыв 5.2", fullReview: "Полностью отзыв 5.2" },
+                    { id: 3, name: "Имя 5.3", role: "Должность 5.3", phone: "+70000000053", review: "Отзыв 5.3", fullReview: "Полностью отзыв 5.3" },
+                    { id: 4, name: "Имя 5.4", role: "Должность 5.4", phone: "+70000000054", review: "Отзыв 5.4", fullReview: "Полностью отзыв 5.4" }
+                ]
+            },
+            {
+                id: 6,
+                period: "Кол-во времени 6",
+                company: "Название организации 6",
+                companySite: "#",
+                role: "Название должности 6",
+                fullCompanyName: "Название полное организации 6",
+                orgDescription: "Описание организации 6",
+                address: "Адрес 6",
+                addressLink: "#",
+                previewFocus: "Обязанности и задачи кратко 6",
+                previewResult: "Результаты 6 кратко",
+                fullFocus: "Обязанности полностью 6",
+                fullTasks: "Задачи полностью 6",
+                fullResult: "Результаты полностью 6",
+                recommendations: [
+                    { id: 1, name: "Имя 6.1", role: "Должность 6.1", phone: "+70000000061", review: "Отзыв 6.1", fullReview: "Полностью отзыв 6.1" },
+                    { id: 2, name: "Имя 6.2", role: "Должность 6.2", phone: "+70000000062", review: "Отзыв 6.2", fullReview: "Полностью отзыв 6.2" },
+                    { id: 3, name: "Имя 6.3", role: "Должность 6.3", phone: "+70000000063", review: "Отзыв 6.3", fullReview: "Полностью отзыв 6.3" },
+                    { id: 4, name: "Имя 6.4", role: "Должность 6.4", phone: "+70000000064", review: "Отзыв 6.4", fullReview: "Полностью отзыв 6.4" }
+                ]
+            },
+            {
+                id: 7,
+                period: "Кол-во времени 7",
+                company: "Название организации 7",
+                companySite: "#",
+                role: "Название должности 7",
+                fullCompanyName: "Название полное организации 7",
+                orgDescription: "Описание организации 7",
+                address: "Адрес 7",
+                addressLink: "#",
+                previewFocus: "Обязанности и задачи кратко 7",
+                previewResult: "Результаты 7 кратко",
+                fullFocus: "Обязанности полностью 7",
+                fullTasks: "Задачи полностью 7",
+                fullResult: "Результаты полностью 7",
+                recommendations: [
+                    { id: 1, name: "Имя 7.1", role: "Должность 7.1", phone: "+70000000071", review: "Отзыв 7.1", fullReview: "Полностью отзыв 7.1" },
+                    { id: 2, name: "Имя 7.2", role: "Должность 7.2", phone: "+70000000072", review: "Отзыв 7.2", fullReview: "Полностью отзыв 7.2" },
+                    { id: 3, name: "Имя 7.3", role: "Должность 7.3", phone: "+70000000073", review: "Отзыв 7.3", fullReview: "Полностью отзыв 7.3" },
+                    { id: 4, name: "Имя 7.4", role: "Должность 7.4", phone: "+70000000074", review: "Отзыв 7.4", fullReview: "Полностью отзыв 7.4" }
+                ]
+            },
+            {
+                id: 8,
+                period: "Кол-во времени 8",
+                company: "Название организации 8",
+                companySite: "#",
+                role: "Название должности 8",
+                fullCompanyName: "Название полное организации 8",
+                orgDescription: "Описание организации 8",
+                address: "Адрес 8",
+                addressLink: "#",
+                previewFocus: "Обязанности и задачи кратко 8",
+                previewResult: "Результаты 8 кратко",
+                fullFocus: "Обязанности полностью 8",
+                fullTasks: "Задачи полностью 8",
+                fullResult: "Результаты полностью 8",
+                recommendations: [
+                    { id: 1, name: "Имя 8.1", role: "Должность 8.1", phone: "+70000000081", review: "Отзыв 8.1", fullReview: "Полностью отзыв 8.1" },
+                    { id: 2, name: "Имя 8.2", role: "Должность 8.2", phone: "+70000000082", review: "Отзыв 8.2", fullReview: "Полностью отзыв 8.2" },
+                    { id: 3, name: "Имя 8.3", role: "Должность 8.3", phone: "+70000000083", review: "Отзыв 8.3", fullReview: "Полностью отзыв 8.3" },
+                    { id: 4, name: "Имя 8.4", role: "Должность 8.4", phone: "+70000000084", review: "Отзыв 8.4", fullReview: "Полностью отзыв 8.4" }
+                ]
+            },
+            {
+                id: 9,
+                period: "Кол-во времени 9",
+                company: "Название организации 9",
+                companySite: "#",
+                role: "Название должности 9",
+                fullCompanyName: "Название полное организации 9",
+                orgDescription: "Описание организации 9",
+                address: "Адрес 9",
+                addressLink: "#",
+                previewFocus: "Обязанности и задачи кратко 9",
+                previewResult: "Результаты 9 кратко",
+                fullFocus: "Обязанности полностью 9",
+                fullTasks: "Задачи полностью 9",
+                fullResult: "Результаты полностью 9",
+                recommendations: [
+                    { id: 1, name: "Имя 9.1", role: "Должность 9.1", phone: "+70000000091", review: "Отзыв 9.1", fullReview: "Полностью отзыв 9.1" },
+                    { id: 2, name: "Имя 9.2", role: "Должность 9.2", phone: "+70000000092", review: "Отзыв 9.2", fullReview: "Полностью отзыв 9.2" },
+                    { id: 3, name: "Имя 9.3", role: "Должность 9.3", phone: "+70000000093", review: "Отзыв 9.3", fullReview: "Полностью отзыв 9.3" },
+                    { id: 4, name: "Имя 9.4", role: "Должность 9.4", phone: "+70000000094", review: "Отзыв 9.4", fullReview: "Полностью отзыв 9.4" }
+                ]
+            },
+            {
+                id: 10,
+                period: "Кол-во времени 10",
+                company: "Название организации 10",
+                companySite: "#",
+                role: "Название должности 10",
+                fullCompanyName: "Название полное организации 10",
+                orgDescription: "Описание организации 10",
+                address: "Адрес 10",
+                addressLink: "#",
+                previewFocus: "Обязанности и задачи кратко 10",
+                previewResult: "Результаты 10 кратко",
+                fullFocus: "Обязанности полностью 10",
+                fullTasks: "Задачи полностью 10",
+                fullResult: "Результаты полностью 10",
+                recommendations: [
+                    { id: 1, name: "Имя 10.1", role: "Должность 10.1", phone: "+700000000101", review: "Отзыв 10.1", fullReview: "Полностью отзыв 10.1" },
+                    { id: 2, name: "Имя 10.2", role: "Должность 10.2", phone: "+700000000102", review: "Отзыв 10.2", fullReview: "Полностью отзыв 10.2" },
+                    { id: 3, name: "Имя 10.3", role: "Должность 10.3", phone: "+700000000103", review: "Отзыв 10.3", fullReview: "Полностью отзыв 10.3" },
+                    { id: 4, name: "Имя 10.4", role: "Должность 10.4", phone: "+700000000104", review: "Отзыв 10.4", fullReview: "Полностью отзыв 10.4" }
+                ]
+            },
+            {
+                id: 11,
+                period: "Кол-во времени 11",
+                company: "Название организации 11",
+                companySite: "#",
+                role: "Название должности 11",
+                fullCompanyName: "Название полное организации 11",
+                orgDescription: "Описание организации 11",
+                address: "Адрес 11",
+                addressLink: "#",
+                previewFocus: "Обязанности и задачи кратко 11",
+                previewResult: "Результаты 11 кратко",
+                fullFocus: "Обязанности полностью 11",
+                fullTasks: "Задачи полностью 11",
+                fullResult: "Результаты полностью 11",
+                recommendations: [
+                    { id: 1, name: "Имя 11.1", role: "Должность 11.1", phone: "+700000000111", review: "Отзыв 11.1", fullReview: "Полностью отзыв 11.1" },
+                    { id: 2, name: "Имя 11.2", role: "Должность 11.2", phone: "+700000000112", review: "Отзыв 11.2", fullReview: "Полностью отзыв 11.2" },
+                    { id: 3, name: "Имя 11.3", role: "Должность 11.3", phone: "+700000000113", review: "Отзыв 11.3", fullReview: "Полностью отзыв 11.3" },
+                    { id: 4, name: "Имя 11.4", role: "Должность 11.4", phone: "+700000000114", review: "Отзыв 11.4", fullReview: "Полностью отзыв 11.4" }
+                ]
+            },
+            {
+                id: 12,
+                period: "Кол-во времени 12",
+                company: "Название организации 12",
+                companySite: "#",
+                role: "Название должности 12",
+                fullCompanyName: "Название полное организации 12",
+                orgDescription: "Описание организации 12",
+                address: "Адрес 12",
+                addressLink: "#",
+                previewFocus: "Обязанности и задачи кратко 12",
+                previewResult: "Результаты 12 кратко",
+                fullFocus: "Обязанности полностью 12",
+                fullTasks: "Задачи полностью 12",
+                fullResult: "Результаты полностью 12",
+                recommendations: [
+                    { id: 1, name: "Имя 12.1", role: "Должность 12.1", phone: "+700000000121", review: "Отзыв 12.1", fullReview: "Полностью отзыв 12.1" },
+                    { id: 2, name: "Имя 12.2", role: "Должность 12.2", phone: "+700000000122", review: "Отзыв 12.2", fullReview: "Полностью отзыв 12.2" },
+                    { id: 3, name: "Имя 12.3", role: "Должность 12.3", phone: "+700000000123", review: "Отзыв 12.3", fullReview: "Полностью отзыв 12.3" },
+                    { id: 4, name: "Имя 12.4", role: "Должность 12.4", phone: "+700000000124", review: "Отзыв 12.4", fullReview: "Полностью отзыв 12.4" }
+                ]
+            },
+            {
+                id: 13,
+                period: "Кол-во времени 13",
+                company: "Название организации 13",
+                companySite: "#",
+                role: "Название должности 13",
+                fullCompanyName: "Название полное организации 13",
+                orgDescription: "Описание организации 13",
+                address: "Адрес 13",
+                addressLink: "#",
+                previewFocus: "Обязанности и задачи кратко 13",
+                previewResult: "Результаты 13 кратко",
+                fullFocus: "Обязанности полностью 13",
+                fullTasks: "Задачи полностью 13",
+                fullResult: "Результаты полностью 13",
+                recommendations: [
+                    { id: 1, name: "Имя 13.1", role: "Должность 13.1", phone: "+700000000131", review: "Отзыв 13.1", fullReview: "Полностью отзыв 13.1" },
+                    { id: 2, name: "Имя 13.2", role: "Должность 13.2", phone: "+700000000132", review: "Отзыв 13.2", fullReview: "Полностью отзыв 13.2" },
+                    { id: 3, name: "Имя 13.3", role: "Должность 13.3", phone: "+700000000133", review: "Отзыв 13.3", fullReview: "Полностью отзыв 13.3" },
+                    { id: 4, name: "Имя 13.4", role: "Должность 13.4", phone: "+700000000134", review: "Отзыв 13.4", fullReview: "Полностью отзыв 13.4" }
+                ]
+            }
+        ];
 
         const Counter = ({ endValue, suffix = "" }) => {
             const [count, setCount] = useState(0);
