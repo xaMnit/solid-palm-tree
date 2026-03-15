@@ -58,16 +58,11 @@
         .experience-timeline-dot {
             position: absolute;
             left: 6px;
+            top: 12px;
             width: 9px;
             height: 9px;
             border-radius: 9999px;
             background: #2563eb;
-        }
-        .experience-timeline-dot.top {
-            top: 12px;
-        }
-        .experience-timeline-dot.bottom {
-            bottom: 28px;
         }
 
         html:not(.dark) .experience-card-light {
@@ -80,13 +75,23 @@
                 0 2px 10px rgba(0,0,0,0.03),
                 0 0 0 1px rgba(0,0,0,0.05);
         }
+
+        .timeline-reveal {
+            opacity: 0;
+            transform: translateY(18px);
+            transition: opacity 0.55s ease, transform 0.55s ease;
+        }
+        .timeline-reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
     </style>
 </head>
 <body class="bg-white text-[#1d1d1f] dark:bg-black dark:text-[#f5f5f7]">
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useEffect } = React;
+        const { useState, useEffect, useRef } = React;
 
         const ExperienceData = Array.from({ length: 13 }, (_, i) => {
             const num = i + 1;
@@ -96,9 +101,10 @@
                 company: `Название организации ${num}`,
                 companySite: `#`,
                 role: `Название должности ${num}`,
+                fullCompanyName: `Название полное организации ${num}`,
+                orgDescription: `Описание организации ${num}`,
                 address: `Адрес ${num}`,
                 addressLink: `#`,
-                legalEntity: `Название ЮР ${num}`,
                 previewFocus: `Обязанности и задачи кратко ${num}`,
                 previewResult: `Результаты ${num} кратко`,
                 fullFocus: `Обязанности полностью ${num}`,
@@ -197,12 +203,34 @@
         const ExperienceCard = ({ item, onOpenFull }) => {
             const [isOpen, setIsOpen] = useState(false);
             const [activeTab, setActiveTab] = useState('preview');
+            const [isVisible, setIsVisible] = useState(false);
+            const cardRef = useRef(null);
+
+            useEffect(() => {
+                const node = cardRef.current;
+                if (!node) return;
+
+                const observer = new IntersectionObserver(
+                    (entries) => {
+                        entries.forEach((entry) => {
+                            if (entry.isIntersecting) {
+                                setIsVisible(true);
+                                observer.unobserve(entry.target);
+                            }
+                        });
+                    },
+                    { threshold: 0.12 }
+                );
+
+                observer.observe(node);
+
+                return () => observer.disconnect();
+            }, []);
 
             return (
-                <div className="relative pl-7">
+                <div ref={cardRef} className={`relative pl-7 timeline-reveal ${isVisible ? 'visible' : ''}`}>
                     <div className="experience-timeline-line"></div>
-                    <div className="experience-timeline-dot top"></div>
-                    <div className="experience-timeline-dot bottom"></div>
+                    <div className="experience-timeline-dot"></div>
 
                     <div className="bg-[#f5f5f7] dark:bg-[#1c1c1e] rounded-[2rem] border border-transparent dark:border-gray-800 overflow-hidden mb-4 transition-all duration-300 apple-shadow experience-card-light mx-auto">
                         <div className="flex flex-col">
@@ -274,30 +302,41 @@
                                         {activeTab === 'detailed' && (
                                             <div className="space-y-4">
                                                 <div className="p-4 bg-white dark:bg-black rounded-[1.5rem] border border-gray-100 dark:border-gray-800 apple-shadow experience-box-light">
+                                                    <div className="text-sm font-bold mb-2">{item.fullCompanyName}</div>
+                                                    <div className="text-sm text-gray-600 dark:text-gray-300 mb-3">{item.orgDescription}</div>
                                                     <a
                                                         href={item.addressLink}
                                                         onClick={(e) => e.stopPropagation()}
-                                                        className="text-sm flex items-center gap-2 text-blue-600 hover:underline underline-offset-4"
+                                                        className="text-sm flex items-center gap-2 text-blue-600 group"
                                                     >
                                                         <i className="fa-solid fa-location-dot text-[12px] text-blue-600"></i>
-                                                        <span>{item.address}</span>
+                                                        <span className="hover:underline underline-offset-4">{item.address}</span>
                                                     </a>
                                                 </div>
 
                                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                                                     <div className="p-4 bg-white dark:bg-black rounded-[1.5rem] border border-gray-100 dark:border-gray-800 apple-shadow experience-box-light">
                                                         <h4 className="text-[10px] font-bold uppercase text-gray-400 mb-2">Обязанности</h4>
-                                                        <p className="text-sm">{item.fullFocus}</p>
+                                                        <div className="text-sm flex items-start gap-2">
+                                                            <i className="fa-solid fa-briefcase text-[12px] text-gray-400 mt-[3px]"></i>
+                                                            <span>{item.fullFocus}</span>
+                                                        </div>
                                                     </div>
 
                                                     <div className="p-4 bg-white dark:bg-black rounded-[1.5rem] border border-gray-100 dark:border-gray-800 apple-shadow experience-box-light">
                                                         <h4 className="text-[10px] font-bold uppercase text-gray-400 mb-2">Задачи</h4>
-                                                        <p className="text-sm">{item.fullTasks}</p>
+                                                        <div className="text-sm flex items-start gap-2">
+                                                            <i className="fa-solid fa-list-check text-[12px] text-gray-400 mt-[3px]"></i>
+                                                            <span>{item.fullTasks}</span>
+                                                        </div>
                                                     </div>
 
                                                     <div className="p-4 bg-white dark:bg-black rounded-[1.5rem] border border-gray-100 dark:border-gray-800 apple-shadow experience-box-light">
                                                         <h4 className="text-[10px] font-bold uppercase text-gray-400 mb-2">Ключевые результаты</h4>
-                                                        <p className="text-sm">{item.fullResult}</p>
+                                                        <div className="text-sm flex items-start gap-2">
+                                                            <i className="fa-solid fa-check text-[12px] text-gray-400 mt-[3px]"></i>
+                                                            <span>{item.fullResult}</span>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
