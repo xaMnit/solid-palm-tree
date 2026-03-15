@@ -4,15 +4,12 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Max Safrutin | Digital Dossier</title>
-
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -25,7 +22,6 @@
             }
         };
     </script>
-
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -89,7 +85,6 @@
 </head>
 <body class="bg-white text-[#1d1d1f] dark:bg-black dark:text-[#f5f5f7]">
     <div id="root"></div>
-
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
 
@@ -107,27 +102,17 @@
                 previewFocus: "Быстро квалифицирую заявки → подбираю подходящее авто → закрываю сделку с предоплатой в CRM → довожу клиента до получения машины + активно развиваю партнёров и повторные обращения.",
                 previewResult: "В первый месяц закрою от 2 сделок и втянусь в процессы. К третьему - выше среднего. А к полугоду - один из топ-3 менеджеров по отделу — или достойно уйду на любом из этапов, если не дотяну.",
                 fullFocus: `• Буду обрабатывать входящие заявки (звонки, мессенджеры, сайт), быстро выходить на контакт и квалифицировать запрос.
-
 • Буду подбирать автомобиль под клиента: бюджет, год, пробег, комплектация, сроки и условия оплаты.
-
 • Буду презентовать условия покупки и импорта, формировать коммерческие предложения и вести переговоры.
-
 • Буду доводить клиента до результата: контракт + предоплата, корректно вести сделки в CRM.
-
 • Буду сопровождать клиента до выдачи автомобиля совместно с отделом закупа и логистики (статусы, сроки, документы).
-
 • Буду развивать партнёрские и агентские каналы (включая лизинг), усиливать рекомендации и повторные обращения.`,
                 fullTasks: `• Понимаю, что в этой роли нужен не просто человек “на телефоне”, а менеджер, который умеет быстро подхватить заявку, выстроить доверие и довести клиента до оплаты.
-
 • Даже если смотреть шире автобизнеса, моя ценность — в сильной коммуникации, нормальном темпе работы и умении закрывать сделки, а не затягивать разговоры без результата.
-
 • Я спокойно отношусь к дисциплине в работе: скорость реакции, выполнение договорённостей, порядок в CRM и контроль по клиенту для меня — базовая часть профессии.
-
 • Со своей стороны даю адекватность, включённость, ответственность и рабочий настрой на результат, а не на формальное “сопровождение”.`,
                 fullResult: `• Через 1 месяц — полностью в процессах, реакция на заявки ≤ 5–10 минут, закрываю 4–6 сделок с предоплатой, веду 100% сделок в CRM.
-
 • Через 3 месяца — стабильно закрываю 12–16+ сделок в месяц (выше среднего по отделу), растёт средний чек и формируется партнёрская база.
-
 • Через 6 месяцев — выхожу в топ-3 менеджеров компании, закрываю 20–28+ автомобилей в месяц, рекомендации и повторные клиенты дают до 35–50% потока.`,
                 recommendations: [
                     { id: 1, name: "Станислав Махин", role: "Наставник", phone: "+79179689477", review: "Знал, что не прогодаю...", fullReview: "Ваще нормальный парень, как планировал, так и сделал" },
@@ -402,12 +387,10 @@
 
         const Counter = ({ endValue, suffix = "" }) => {
             const [count, setCount] = useState(0);
-
             useEffect(() => {
                 let start = 0;
                 const duration = 1000;
                 const increment = Math.ceil(endValue / (duration / 20));
-
                 const timer = setInterval(() => {
                     start += increment;
                     if (start >= endValue) {
@@ -417,16 +400,13 @@
                         setCount(start);
                     }
                 }, 20);
-
                 return () => clearInterval(timer);
             }, [endValue]);
-
             return <span>{count}{suffix}</span>;
         };
 
         const Modal = ({ isOpen, onClose, title, children }) => {
             if (!isOpen) return null;
-
             return (
                 <div
                     className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
@@ -462,7 +442,6 @@
             useEffect(() => {
                 const node = cardRef.current;
                 if (!node) return;
-
                 const observer = new IntersectionObserver(
                     (entries) => {
                         entries.forEach((entry) => {
@@ -474,9 +453,7 @@
                     },
                     { threshold: 0.12 }
                 );
-
                 observer.observe(node);
-
                 return () => observer.disconnect();
             }, []);
 
@@ -484,7 +461,6 @@
                 <div ref={cardRef} className={`relative pl-7 timeline-reveal ${isVisible ? 'visible' : ''}`}>
                     <div className="experience-timeline-line"></div>
                     <div className="experience-timeline-dot"></div>
-
                     <div className="bg-[#f5f5f7] dark:bg-[#1c1c1e] rounded-[2rem] border border-transparent dark:border-gray-800 overflow-hidden mb-4 transition-all duration-300 apple-shadow experience-card-light mx-auto">
                         <div className="flex flex-col">
                             <div
@@ -493,7 +469,6 @@
                             >
                                 <div className="space-y-1">
                                     <span className="text-blue-600 font-bold text-[10px] uppercase">{item.period}</span>
-
                                     <div className="flex items-center gap-3">
                                         <a
                                             href={item.companySite}
@@ -506,10 +481,8 @@
                                         </a>
                                         <h3 className="text-xl font-bold">{item.company}</h3>
                                     </div>
-
                                     <div className="text-sm font-semibold text-gray-600 dark:text-gray-300 mt-2">{item.role}</div>
                                 </div>
-
                                 <div className={`w-8 h-8 rounded-full bg-white dark:bg-black flex items-center justify-center transition-transform shrink-0 ${isOpen ? 'rotate-180' : ''}`}>
                                     <i className="fa-solid fa-chevron-down text-[10px]"></i>
                                 </div>
@@ -544,7 +517,6 @@
                                                     <h4 className="text-[10px] font-bold uppercase text-gray-400 mb-2">Обязанности и задачи</h4>
                                                     <p className="text-sm">{item.previewFocus}</p>
                                                 </div>
-
                                                 <div className="p-4 bg-white dark:bg-black rounded-[1.5rem] border border-gray-100 dark:border-gray-800 apple-shadow experience-box-light">
                                                     <h4 className="text-[10px] font-bold uppercase text-gray-400 mb-2">Ключевые результаты</h4>
                                                     <p className="text-sm">{item.previewResult}</p>
@@ -566,7 +538,6 @@
                                                         <span className="hover:underline underline-offset-4">{item.address}</span>
                                                     </a>
                                                 </div>
-
                                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                                                     <div className="p-4 bg-white dark:bg-black rounded-[1.5rem] border border-gray-100 dark:border-gray-800 apple-shadow experience-box-light">
                                                         <h4 className="text-[10px] font-bold uppercase text-gray-400 mb-2 flex items-center gap-2">
@@ -577,7 +548,6 @@
                                                             <span>{item.fullFocus}</span>
                                                         </div>
                                                     </div>
-
                                                     <div className="p-4 bg-white dark:bg-black rounded-[1.5rem] border border-gray-100 dark:border-gray-800 apple-shadow experience-box-light">
                                                         <h4 className="text-[10px] font-bold uppercase text-gray-400 mb-2 flex items-center gap-2">
                                                             <i className="fa-solid fa-list-check text-[12px] text-gray-400"></i>
@@ -587,7 +557,6 @@
                                                             <span>{item.fullTasks}</span>
                                                         </div>
                                                     </div>
-
                                                     <div className="p-4 bg-white dark:bg-black rounded-[1.5rem] border border-gray-100 dark:border-gray-800 apple-shadow experience-box-light">
                                                         <h4 className="text-[10px] font-bold uppercase text-gray-400 mb-2 flex items-center gap-2">
                                                             <i className="fa-solid fa-check text-[12px] text-gray-400"></i>
@@ -620,9 +589,7 @@
                                                                 Позвонить
                                                             </a>
                                                         </div>
-
                                                         <p className="text-xs italic opacity-80 mb-4 line-clamp-2">«{rec.review}»</p>
-
                                                         <div className="mt-auto">
                                                             <button
                                                                 onClick={() => onOpenFull(`Отзыв от ${rec.name}`, rec.fullReview)}
@@ -709,29 +676,34 @@
                     <span className="text-xs md:text-sm text-gray-500 dark:text-gray-400">{desc}</span>
                 </div>
                 <div className="flex gap-1.5 shrink-0 bg-white dark:bg-black px-4 py-2 rounded-full border border-gray-100 dark:border-gray-900 apple-shadow">
-                    {[1, 2, 3, 4, 5].map(star => (
-                        <i key={star} className={`fa-solid fa-star text-sm ${star <= rating ? 'text-blue-500' : 'text-gray-200 dark:text-gray-800'}`}></i>
+                    {[1, 2, 3, 4, 5].map((star) => (
+                        <i
+                            key={star}
+                            className={`fa-solid fa-star text-sm ${star <= rating ? 'text-blue-500' : 'text-gray-200 dark:text-gray-800'}`}
+                        ></i>
                     ))}
                 </div>
             </div>
         );
 
-        const SkillsSectionAccordion = ({ title, icon, children, defaultOpen = false }) => {
+        const PersonalAccordion = ({ title, icon, children, defaultOpen = false }) => {
             const [isOpen, setIsOpen] = useState(defaultOpen);
-
             return (
-                <div className="space-y-6">
-                    <div className="flex justify-between items-center cursor-pointer px-2" onClick={() => setIsOpen(!isOpen)}>
-                        <h3 className="text-xl font-bold tracking-tight flex items-center gap-3">
-                            <i className={`fa-solid ${icon} text-blue-600`}></i> {title}
-                        </h3>
-                        <div className={`w-8 h-8 rounded-full bg-white dark:bg-black flex items-center justify-center transition-transform duration-300 shrink-0 apple-shadow ${isOpen ? 'rotate-180' : ''}`}>
+                <div className="bg-[#f5f5f7] dark:bg-[#1c1c1e] rounded-[2rem] border border-transparent dark:border-gray-800 apple-shadow overflow-hidden">
+                    <button
+                        onClick={() => setIsOpen(!isOpen)}
+                        className="w-full p-6 flex items-center justify-between text-left"
+                    >
+                        <div className="flex items-center gap-3">
+                            <i className={`fa-solid ${icon} text-blue-600`}></i>
+                            <span className="text-lg font-bold tracking-tight">{title}</span>
+                        </div>
+                        <div className={`w-8 h-8 rounded-full bg-white dark:bg-black flex items-center justify-center transition-transform duration-300 shrink-0 ${isOpen ? 'rotate-180' : ''}`}>
                             <i className="fa-solid fa-chevron-down text-[10px]"></i>
                         </div>
-                    </div>
-
+                    </button>
                     {isOpen && (
-                        <div className="animate-fade-up">
+                        <div className="px-6 pb-6 animate-fade-up">
                             {children}
                         </div>
                     )}
@@ -744,6 +716,7 @@
             const [darkMode, setDarkMode] = useState(true);
             const [isAboutOpen, setIsAboutOpen] = useState(false);
             const [fullModal, setFullModal] = useState({ open: false, title: '', content: '' });
+            const [personalModal, setPersonalModal] = useState({ open: false, title: '', content: null });
 
             const toggleDarkMode = () => {
                 setDarkMode((prev) => !prev);
@@ -863,7 +836,10 @@
                                     </div>
                                 </div>
 
-                                <SkillsSectionAccordion title="Ключевые показатели" icon="fa-chart-simple" defaultOpen={true}>
+                                <div className="space-y-6">
+                                    <h3 className="text-xl font-bold tracking-tight px-2 flex items-center gap-3">
+                                        <i className="fa-solid fa-chart-simple text-blue-600"></i> Ключевые показатели
+                                    </h3>
                                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                                         <div className="bg-[#f5f5f7] dark:bg-[#1c1c1e] p-6 rounded-[2rem] border border-transparent dark:border-gray-800 apple-shadow flex flex-col justify-center items-center text-center">
                                             <div className="text-2xl md:text-3xl font-extrabold text-blue-600 mb-2">12+ лет</div>
@@ -886,9 +862,12 @@
                                             <div className="text-xs font-medium text-gray-500 dark:text-gray-400">Преподавания и работы с аудиторией</div>
                                         </div>
                                     </div>
-                                </SkillsSectionAccordion>
+                                </div>
 
-                                <SkillsSectionAccordion title="Технический стек" icon="fa-laptop-code">
+                                <div className="space-y-6">
+                                    <h3 className="text-xl font-bold tracking-tight px-2 flex items-center gap-3">
+                                        <i className="fa-solid fa-laptop-code text-blue-600"></i> Технический стек
+                                    </h3>
                                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                                         <TechCard title="CRM-системы" subtitle="ведение сделок, воронки" tools={["Bitrix24", "AmoCRM", "Salesforce", "1С CRM"]} icon="fa-users" />
                                         <TechCard title="Аналитика данных" subtitle="прогнозирование продаж" tools={["Excel", "Google Sheets", "Сводные таблицы"]} icon="fa-chart-pie" />
@@ -901,10 +880,13 @@
                                         <TechCard title="Автоматизация" subtitle="ускорение процессов" tools={["Notion", "ChatGPT", "ИИ ассистенты"]} icon="fa-robot" />
                                         <TechCard title="Управление задачами" subtitle="контроль сроков" tools={["Notion", "Trello", "Todoist", "Obsidian"]} icon="fa-list-check" />
                                     </div>
-                                </SkillsSectionAccordion>
+                                </div>
 
-                                <SkillsSectionAccordion title="Интеллектуальные компетенции" icon="fa-brain">
-                                    <div className="px-2 mb-4">
+                                <div className="space-y-6">
+                                    <div className="px-2">
+                                        <h3 className="text-xl font-bold tracking-tight mb-2 flex items-center gap-3">
+                                            <i className="fa-solid fa-brain text-blue-600"></i> Интеллектуальные компетенции
+                                        </h3>
                                         <p className="text-sm text-gray-500 dark:text-gray-400">
                                             Уровень профессиональных компетенций (самооценка по 10-балльной шкале), обеспечившие текущие навыки.
                                         </p>
@@ -927,9 +909,12 @@
                                             <AccordionItem title="Долгосрочные отношения" score="4.1" description="Поддержание связи после сделки и превращение клиентов в адвокатов бренда." bullets={["Сбор рекомендаций и отзывов", "Мотивация клиента запускать «сарафанное радио»"]} />
                                         </div>
                                     </div>
-                                </SkillsSectionAccordion>
+                                </div>
 
-                                <SkillsSectionAccordion title="Профессиональные качества" icon="fa-star">
+                                <div className="space-y-6">
+                                    <h3 className="text-xl font-bold tracking-tight px-2 flex items-center gap-3">
+                                        <i className="fa-regular fa-star text-blue-600"></i> Профессиональные качества
+                                    </h3>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <StarRating label="Коммуникабельность" desc="умение быстро выстраивать контакт и доверие" rating={3} />
                                         <StarRating label="Ответственность" desc="довожу задачи и сделки до результата" rating={4} />
@@ -940,27 +925,245 @@
                                         <StarRating label="Убедительность" desc="аргументация и ведение переговоров" rating={3} />
                                         <StarRating label="Инициативность" desc="не жду указаний, предлагаю решения" rating={2} />
                                     </div>
-                                </SkillsSectionAccordion>
+                                </div>
                             </div>
                         )}
 
                         {activeSection === 'personal' && (
                             <div className="space-y-6 animate-fade-up max-w-3xl mx-auto">
-                                <h2 className="text-2xl font-bold tracking-tight mb-4 text-center">Личное и Увлечения</h2>
                                 <div className="bg-[#1d1d1f] text-white p-8 rounded-[2rem]">
-                                    <h3 className="text-xl font-bold mb-4">Девиз</h3>
-                                    <p className="text-lg opacity-70 italic mb-4">«Система всегда побеждает хаос».</p>
-                                    <p className="text-base leading-relaxed opacity-90 font-light">Увлекаюсь яхтингом и марафонским бегом. Считаю, что дисциплина в спорте напрямую переносится в бизнес.</p>
+                                    <h3 className="text-xl font-bold mb-4">🧭 Девиз по жизни</h3>
+                                    <p className="text-lg opacity-70 italic mb-6">«Завтра ты должен быть лучше, чем сегодня!»</p>
+                                    <h3 className="text-xl font-bold mb-4">💬 Любимая цитата</h3>
+                                    <p className="text-base leading-relaxed opacity-90 font-light">«Самая главная формула успеха — знать, как общаться с людьми».</p>
+                                    <p className="text-sm opacity-70 mt-2">- Теодор Рузвельт</p>
                                 </div>
-                                <div className="bg-[#f5f5f7] dark:bg-[#1c1c1e] p-8 rounded-[2rem] border border-transparent dark:border-gray-800">
-                                    <h3 className="text-xl font-bold mb-4">Путешествия</h3>
-                                    <p className="text-base leading-relaxed text-gray-600 dark:text-gray-400">35 стран, от Исландии до Японии. Люблю изучать локальные бизнес-культуры и находить новые подходы в коммуникациях.</p>
-                                    <div className="text-4xl mt-6 flex gap-4 text-blue-600">
-                                        <i className="fa-solid fa-earth-americas"></i>
-                                        <i className="fa-solid fa-mountain"></i>
-                                        <i className="fa-solid fa-car"></i>
+
+                                <PersonalAccordion title="📚 Образование" icon="fa-graduation-cap" defaultOpen={true}>
+                                    <div className="space-y-3">
+                                        <div className="bg-white dark:bg-black rounded-[1.5rem] border border-gray-100 dark:border-gray-800 apple-shadow p-5">
+                                            <div className="text-sm font-bold mb-2">🧩 Основное образование</div>
+                                            <div className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
+                                                МОУ СОШ №38<br />
+                                                1998 г. – 2008 г.<br /><br />
+                                                Поволжская государственная социально-гуманитарная академия (ПГСГА)<br />
+                                                2008 г. – 2013 г.
+                                            </div>
+                                        </div>
+
+                                        <div className="flex gap-3 flex-wrap">
+                                            <button
+                                                onClick={() => setPersonalModal({
+                                                    open: true,
+                                                    title: "🧩 Основное образование",
+                                                    content: (
+                                                        <div className="space-y-6 text-sm">
+                                                            <div>
+                                                                <div className="font-semibold">МОУ СОШ №38</div>
+                                                                <div className="text-sm text-gray-500 dark:text-gray-400">1998 г. – 2008 г.</div>
+                                                                <div className="text-sm mt-2">Среднее общее образование, 11 классов.</div>
+                                                            </div>
+                                                            <div>
+                                                                <div className="font-semibold">Поволжская государственная социально-гуманитарная академия (ПГСГА)</div>
+                                                                <div className="text-sm text-gray-500 dark:text-gray-400">2008 г. – 2013 г.</div>
+                                                                <div className="text-sm mt-2">Естественно-географический факультет — специалист очной формы обучения.</div>
+                                                                <div className="text-sm mt-1">Специальность: география с дополнительной специальностью биология.</div>
+                                                            </div>
+                                                        </div>
+                                                    )
+                                                })}
+                                                className="bg-white dark:bg-black px-4 py-2 rounded-2xl text-xs font-medium border border-gray-100 dark:border-gray-900 apple-shadow text-blue-600"
+                                            >
+                                                Основное
+                                            </button>
+
+                                            <button
+                                                onClick={() => setPersonalModal({
+                                                    open: true,
+                                                    title: "🧩 Доп. образование",
+                                                    content: (
+                                                        <ul className="space-y-4 text-sm">
+                                                            <li className="flex items-start gap-3">
+                                                                <i className="fa-solid fa-check text-blue-600 mt-1"></i>
+                                                                <div>
+                                                                    <span className="font-medium">ФФАИСАСО — Фитнес-инструктор</span><br />
+                                                                    <span className="text-xs text-gray-500">01–02 / 2011</span>
+                                                                </div>
+                                                            </li>
+                                                            <li className="flex items-start gap-3">
+                                                                <i className="fa-solid fa-check text-blue-600 mt-1"></i>
+                                                                <div>
+                                                                    <span className="font-medium">Водительское удостоверение категории B</span><br />
+                                                                    <span className="text-xs text-gray-500">с 2012 года</span>
+                                                                </div>
+                                                            </li>
+                                                            <li className="flex items-start gap-3">
+                                                                <i className="fa-solid fa-check text-blue-600 mt-1"></i>
+                                                                <div>
+                                                                    <span className="font-medium">Санкт-Петербургская школа телевидения — Курс ведущего мероприятий</span><br />
+                                                                    <span className="text-xs text-gray-500">02–04 / 2014</span>
+                                                                </div>
+                                                            </li>
+                                                            <li className="flex items-start gap-3">
+                                                                <i className="fa-solid fa-check text-blue-600 mt-1"></i>
+                                                                <div>
+                                                                    <span className="font-medium">Насретдинов Р.К., ИП — Управление бизнес-аккаунтами</span><br />
+                                                                    <span className="text-xs text-gray-500">12 / 2021 – 03 / 2022</span>
+                                                                </div>
+                                                            </li>
+                                                            <li className="flex items-start gap-3">
+                                                                <i className="fa-solid fa-check text-blue-600 mt-1"></i>
+                                                                <div>
+                                                                    <span className="font-medium">Бойлерная, ООО — Инструменты продаж</span><br />
+                                                                    <span className="text-xs text-gray-500">03 – 05 / 2022</span>
+                                                                </div>
+                                                            </li>
+                                                            <li className="flex items-start gap-3">
+                                                                <i className="fa-solid fa-check text-blue-600 mt-1"></i>
+                                                                <div>
+                                                                    <span className="font-medium">АВТОВАЗ, АО — Сертификация по стандартам МОП Lada</span><br />
+                                                                    <span className="text-xs text-gray-500">07 / 2023 – 06 / 2024</span>
+                                                                </div>
+                                                            </li>
+                                                            <li className="flex items-start gap-3">
+                                                                <i className="fa-solid fa-check text-blue-600 mt-1"></i>
+                                                                <div>
+                                                                    <span className="font-medium">АВТОВАЗ, АО — Сертификация по стандартам КМП Lada</span><br />
+                                                                    <span className="text-xs text-gray-500">07 / 2024</span>
+                                                                </div>
+                                                            </li>
+                                                        </ul>
+                                                    )
+                                                })}
+                                                className="bg-white dark:bg-black px-4 py-2 rounded-2xl text-xs font-medium border border-gray-100 dark:border-gray-900 apple-shadow text-blue-600"
+                                            >
+                                                Доп. образование
+                                            </button>
+                                        </div>
                                     </div>
-                                </div>
+                                </PersonalAccordion>
+
+                                <PersonalAccordion title="🌐 Языки" icon="fa-language">
+                                    <div className="grid grid-cols-1 gap-3">
+                                        <StarRating label="Русский" desc="родной" rating={4} />
+                                        <StarRating label="Английский" desc="уровень 3 класса" rating={2} />
+                                        <StarRating label="Французский" desc="просто нравится" rating={0} />
+                                    </div>
+                                </PersonalAccordion>
+
+                                <PersonalAccordion title="🤝 Личные качества" icon="fa-heart">
+                                    <div className="grid grid-cols-1 gap-3">
+                                        <StarRating label="Эмоциональная устойчивость и уравновешенность" desc="" rating={2} />
+                                        <StarRating label="Харизматичный стиль общения с клиентами" desc="" rating={4} />
+                                        <StarRating label="Высокая личная дисциплина и самоорганизация" desc="" rating={3} />
+                                        <StarRating label="Доброжелательность и умение выстраивать доверие" desc="" rating={4} />
+                                    </div>
+                                </PersonalAccordion>
+
+                                <PersonalAccordion title="📎 Доп. информация" icon="fa-paperclip">
+                                    <div className="space-y-3">
+                                        <div className="bg-white dark:bg-black rounded-[1.5rem] border border-gray-100 dark:border-gray-800 apple-shadow p-5">
+                                            <div className="font-bold mb-3 text-blue-600">⭐ Самое главное</div>
+                                            <div className="space-y-3 text-sm">
+                                                <div className="flex gap-3"><span className="text-blue-600 w-5">▶</span><div>Родился <span className="font-semibold">1990</span></div></div>
+                                                <div className="flex gap-3"><span className="text-blue-600 w-5">💍</span><div>Женился <span className="font-semibold">09 / 2013</span></div></div>
+                                                <div className="flex gap-3"><span className="text-blue-600 w-5">👶</span><div>Родился 1-ый сын <span className="font-semibold">2018</span></div></div>
+                                            </div>
+                                        </div>
+                                        <button
+                                            onClick={() => setPersonalModal({
+                                                open: true,
+                                                title: "⭐ Самое главное",
+                                                content: (
+                                                    <div className="space-y-4 text-sm">
+                                                        <div className="flex gap-3"><span className="text-blue-600 w-5">▶</span><div>Родился <span className="font-semibold">1990</span></div></div>
+                                                        <div className="flex gap-3"><span className="text-blue-600 w-5">💍</span><div>Женился <span className="font-semibold">09 / 2013</span></div></div>
+                                                        <div className="flex gap-3"><span className="text-blue-600 w-5">👶</span><div>Родился 1-ый сын <span className="font-semibold">2018</span></div></div>
+                                                        <div className="flex gap-3"><span className="text-blue-600 w-5">👶</span><div>Родился 2-ой сын <span className="font-semibold">2021</span></div></div>
+                                                        <div className="flex gap-3"><span className="text-blue-600 w-5">👶</span><div>Родилась дочь <span className="font-semibold">2025</span></div></div>
+                                                        <div className="flex gap-3"><span className="text-blue-600 w-5">🏡</span><div>В планах — купить / построить дом.</div></div>
+                                                    </div>
+                                                )
+                                            })}
+                                            className="bg-white dark:bg-black px-4 py-2 rounded-2xl text-xs font-medium border border-gray-100 dark:border-gray-900 apple-shadow text-blue-600"
+                                        >
+                                            Открыть полностью
+                                        </button>
+                                    </div>
+                                </PersonalAccordion>
+
+                                <PersonalAccordion title="🌍 Мои путешествия" icon="fa-earth-americas">
+                                    <div className="space-y-3">
+                                        <div className="bg-white dark:bg-black rounded-[1.5rem] border border-gray-100 dark:border-gray-800 apple-shadow p-5">
+                                            <div className="grid grid-cols-1 gap-4 text-sm">
+                                                <div className="flex gap-3"><i className="fa-solid fa-city text-blue-600 mt-1"></i><div><span className="font-semibold">Москва</span><br />пол года проживания</div></div>
+                                                <div className="flex gap-3"><i className="fa-solid fa-plane text-blue-600 mt-1"></i><div><span className="font-semibold">Прага</span><br />серебро на чемпионате Европы</div></div>
+                                            </div>
+                                        </div>
+                                        <button
+                                            onClick={() => setPersonalModal({
+                                                open: true,
+                                                title: "🌍 Мои путешествия",
+                                                content: (
+                                                    <div className="grid grid-cols-1 gap-5 text-sm">
+                                                        <div className="flex gap-3"><i className="fa-solid fa-city text-blue-600 mt-1"></i><div><span className="font-semibold">Москва</span><br />пол года проживания</div></div>
+                                                        <div className="flex gap-3"><i className="fa-solid fa-plane text-blue-600 mt-1"></i><div><span className="font-semibold">Прага</span><br />серебро на чемпионате Европы</div></div>
+                                                        <div className="flex gap-3"><i className="fa-solid fa-plane text-blue-600 mt-1"></i><div><span className="font-semibold">Шарджа</span><br />отпуск в ОАЭ</div></div>
+                                                        <div className="flex gap-3"><i className="fa-solid fa-plane text-blue-600 mt-1"></i><div><span className="font-semibold">Париж</span><br />с командой в Диснейленде</div></div>
+                                                    </div>
+                                                )
+                                            })}
+                                            className="bg-white dark:bg-black px-4 py-2 rounded-2xl text-xs font-medium border border-gray-100 dark:border-gray-900 apple-shadow text-blue-600"
+                                        >
+                                            Открыть полностью
+                                        </button>
+                                    </div>
+                                </PersonalAccordion>
+
+                                <PersonalAccordion title="🎨 Увлечения" icon="fa-palette">
+                                    <div className="bg-white dark:bg-black rounded-[1.5rem] border border-gray-100 dark:border-gray-800 apple-shadow p-5">
+                                        <div className="flex flex-wrap gap-2">
+                                            {["IT технологии","Умный дом","Контент к саморазвитию","Графический дизайн","Ведение мероприятий","Уличные танцы","Джазовая музыка"].map((item,i) => (
+                                                <span key={i} className="bg-[#f5f5f7] dark:bg-[#1c1c1e] px-4 py-2 rounded-2xl text-xs font-medium border border-gray-100 dark:border-gray-900 apple-shadow">
+                                                    {item}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </PersonalAccordion>
+
+                                <PersonalAccordion title="🏆 Личные достижения" icon="fa-trophy">
+                                    <div className="space-y-3">
+                                        <div className="bg-white dark:bg-black rounded-[1.5rem] border border-gray-100 dark:border-gray-800 apple-shadow p-5">
+                                            <ul className="space-y-3 text-sm">
+                                                <li className="flex items-start gap-3"><i className="fa-solid fa-trophy text-blue-600 mt-1"></i><span>Продано более 667+ автомобилей за всё время</span></li>
+                                                <li className="flex items-start gap-3"><i className="fa-solid fa-trophy text-blue-600 mt-1"></i><span>587+ довольных заказчиков проведёнными и организованными мероприятиями</span></li>
+                                                <li className="flex items-start gap-3"><i className="fa-solid fa-trophy text-blue-600 mt-1"></i><span>Лауреат вузовских и областных студенческих весен в номинации хореография (2009–2013)</span></li>
+                                            </ul>
+                                        </div>
+                                        <button
+                                            onClick={() => setPersonalModal({
+                                                open: true,
+                                                title: "🏆 Личные достижения",
+                                                content: (
+                                                    <ul className="space-y-4 text-sm">
+                                                        <li className="flex items-start gap-3"><i className="fa-solid fa-trophy text-blue-600 mt-1"></i><span>Продано более 667+ автомобилей за всё время</span></li>
+                                                        <li className="flex items-start gap-3"><i className="fa-solid fa-trophy text-blue-600 mt-1"></i><span>587+ довольных заказчиков проведёнными и организованными мероприятиями</span></li>
+                                                        <li className="flex items-start gap-3"><i className="fa-solid fa-trophy text-blue-600 mt-1"></i><span>Лауреат вузовских и областных студенческих весен в номинации хореография (2009–2013)</span></li>
+                                                        <li className="flex items-start gap-3"><i className="fa-solid fa-trophy text-blue-600 mt-1"></i><span>Победитель олимпиады по психологии среди факультетов ВУЗа</span></li>
+                                                        <li className="flex items-start gap-3"><i className="fa-solid fa-trophy text-blue-600 mt-1"></i><span>Участник сборной СГАУ, команды «Just Black», хип-хоп аэробика — серебряные призёры Европы</span></li>
+                                                        <li className="flex items-start gap-3"><i className="fa-solid fa-trophy text-blue-600 mt-1"></i><span>Участник сборной ПГСГА, команды «Sky», хип-хоп аэробика — серебряные призёры областных соревнований, финалисты ПФО</span></li>
+                                                        <li className="flex items-start gap-3"><i className="fa-solid fa-trophy text-blue-600 mt-1"></i><span>Судья областных соревнований по фитнес-аэробике (хип-хоп аэробика)</span></li>
+                                                        <li className="flex items-start gap-3"><i className="fa-solid fa-trophy text-blue-600 mt-1"></i><span>Организация, проведение и участие в мероприятиях школьного, районного, городского и развлекательного уровня</span></li>
+                                                    </ul>
+                                                )
+                                            })}
+                                            className="bg-white dark:bg-black px-4 py-2 rounded-2xl text-xs font-medium border border-gray-100 dark:border-gray-900 apple-shadow text-blue-600"
+                                        >
+                                            Открыть полностью
+                                        </button>
+                                    </div>
+                                </PersonalAccordion>
                             </div>
                         )}
 
@@ -1028,7 +1231,6 @@
                             <p>Более 12 лет в управлении продажами. Решения принимаю на основе аналитики и цифр. Архитектуру процессов веду к прогнозируемым и масштабируемым результатам. Увеличиваю прибыль компании через доверие клиента и решение его задачи, то есть конвертирую запрос в сделку.</p>
                             <p className="pt-2">Родился Козерогом в год Лошади 30 декабря 1990 года, женат, трое детей, в планах — купить / построить дом</p>
                         </div>
-
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 py-6">
                             {[
                                 { val: 1340, icon: "fa-car", txt: "Опыт продаж в автобизнесе.", suffix: " дн." },
@@ -1047,11 +1249,9 @@
                                 </div>
                             ))}
                         </div>
-
                         <p className="text-xs text-gray-500 dark:text-gray-400 border-l-2 border-blue-500 pl-4 italic leading-relaxed">
                             Убеждён, что эффективная работа строится не только на договорах и регламентах, но прежде всего на живых человеческих отношениях и взаимном доверии.
                         </p>
-
                         <button
                             onClick={() => {
                                 setIsAboutOpen(false);
@@ -1069,6 +1269,14 @@
                         title={fullModal.title}
                     >
                         <div className="whitespace-pre-wrap">{fullModal.content}</div>
+                    </Modal>
+
+                    <Modal
+                        isOpen={personalModal.open}
+                        onClose={() => setPersonalModal({ open: false, title: '', content: null })}
+                        title={personalModal.title}
+                    >
+                        <div>{personalModal.content}</div>
                     </Modal>
                 </div>
             );
