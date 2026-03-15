@@ -42,6 +42,44 @@
             to { opacity: 1; transform: translateY(0); }
         }
         .rotate-180 { transform: rotate(180deg); }
+
+        /* Только для раздела "Опыт" */
+        .experience-timeline-line {
+            position: absolute;
+            left: 10px;
+            top: 0;
+            bottom: 0;
+            width: 1px;
+            background: rgba(156, 163, 175, 0.35);
+        }
+        .dark .experience-timeline-line {
+            background: rgba(75, 85, 99, 0.65);
+        }
+        .experience-timeline-dot {
+            position: absolute;
+            left: 6px;
+            width: 9px;
+            height: 9px;
+            border-radius: 9999px;
+            background: #2563eb;
+        }
+        .experience-timeline-dot.top {
+            top: 12px;
+        }
+        .experience-timeline-dot.bottom {
+            bottom: 28px;
+        }
+
+        html:not(.dark) .experience-card-light {
+            box-shadow:
+                0 2px 12px rgba(0,0,0,0.04),
+                0 0 0 1px rgba(0,0,0,0.05);
+        }
+        html:not(.dark) .experience-box-light {
+            box-shadow:
+                0 2px 10px rgba(0,0,0,0.03),
+                0 0 0 1px rgba(0,0,0,0.05);
+        }
     </style>
 </head>
 <body class="bg-white text-[#1d1d1f] dark:bg-black dark:text-[#f5f5f7]">
@@ -50,7 +88,7 @@
     <script type="text/babel">
         const { useState, useEffect } = React;
 
-        const ExperienceData = Array.from({ length: 10 }, (_, i) => {
+        const ExperienceData = Array.from({ length: 13 }, (_, i) => {
             const num = i + 1;
             return {
                 id: num,
@@ -59,6 +97,7 @@
                 companySite: `#`,
                 role: `Название должности ${num}`,
                 address: `Адрес ${num}`,
+                addressLink: `#`,
                 legalEntity: `Название ЮР ${num}`,
                 previewFocus: `Обязанности и задачи кратко ${num}`,
                 previewResult: `Результаты ${num} кратко`,
@@ -160,10 +199,12 @@
             const [activeTab, setActiveTab] = useState('preview');
 
             return (
-                <div className="relative pl-6">
-                    <div className="absolute left-2 top-0 bottom-0 w-[2px] bg-gray-200 dark:bg-gray-800 rounded-full"></div>
+                <div className="relative pl-7">
+                    <div className="experience-timeline-line"></div>
+                    <div className="experience-timeline-dot top"></div>
+                    <div className="experience-timeline-dot bottom"></div>
 
-                    <div className="bg-[#f5f5f7] dark:bg-[#1c1c1e] rounded-[2rem] border border-transparent dark:border-gray-800 overflow-hidden mb-4 transition-all duration-300 apple-shadow mx-auto">
+                    <div className="bg-[#f5f5f7] dark:bg-[#1c1c1e] rounded-[2rem] border border-transparent dark:border-gray-800 overflow-hidden mb-4 transition-all duration-300 apple-shadow experience-card-light mx-auto">
                         <div className="flex flex-col">
                             <div
                                 className="p-6 cursor-pointer flex justify-between items-start transition-all duration-300 w-full"
@@ -218,19 +259,12 @@
                                     <div className="flex-1">
                                         {activeTab === 'preview' && (
                                             <div className="space-y-4">
-                                                <div>
-                                                    <p className="text-sm flex items-center gap-2">
-                                                        <i className="fa-solid fa-location-dot text-gray-400 text-xs"></i>
-                                                        <span>{item.address}</span>
-                                                    </p>
-                                                </div>
-
-                                                <div className="p-4 bg-white dark:bg-black rounded-[1.5rem] border border-gray-100 dark:border-gray-800 apple-shadow">
+                                                <div className="p-4 bg-white dark:bg-black rounded-[1.5rem] border border-gray-100 dark:border-gray-800 apple-shadow experience-box-light">
                                                     <h4 className="text-[10px] font-bold uppercase text-gray-400 mb-2">Обязанности и задачи</h4>
                                                     <p className="text-sm">{item.previewFocus}</p>
                                                 </div>
 
-                                                <div className="p-4 bg-white dark:bg-black rounded-[1.5rem] border border-gray-100 dark:border-gray-800 apple-shadow">
+                                                <div className="p-4 bg-white dark:bg-black rounded-[1.5rem] border border-gray-100 dark:border-gray-800 apple-shadow experience-box-light">
                                                     <h4 className="text-[10px] font-bold uppercase text-gray-400 mb-2">Ключевые результаты</h4>
                                                     <p className="text-sm">{item.previewResult}</p>
                                                 </div>
@@ -239,23 +273,29 @@
 
                                         {activeTab === 'detailed' && (
                                             <div className="space-y-4">
-                                                <div className="p-4 bg-white dark:bg-black rounded-[1.5rem] border border-gray-100 dark:border-gray-800 apple-shadow">
-                                                    <h4 className="text-[10px] font-bold uppercase text-gray-400 mb-1">Юридическое лицо</h4>
-                                                    <p className="text-sm">{item.legalEntity}</p>
+                                                <div className="p-4 bg-white dark:bg-black rounded-[1.5rem] border border-gray-100 dark:border-gray-800 apple-shadow experience-box-light">
+                                                    <a
+                                                        href={item.addressLink}
+                                                        onClick={(e) => e.stopPropagation()}
+                                                        className="text-sm flex items-center gap-2 text-blue-600 hover:underline underline-offset-4"
+                                                    >
+                                                        <i className="fa-solid fa-location-dot text-[12px] text-blue-600"></i>
+                                                        <span>{item.address}</span>
+                                                    </a>
                                                 </div>
 
                                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                                                    <div className="p-4 bg-white dark:bg-black rounded-[1.5rem] border border-gray-100 dark:border-gray-800 apple-shadow">
+                                                    <div className="p-4 bg-white dark:bg-black rounded-[1.5rem] border border-gray-100 dark:border-gray-800 apple-shadow experience-box-light">
                                                         <h4 className="text-[10px] font-bold uppercase text-gray-400 mb-2">Обязанности</h4>
                                                         <p className="text-sm">{item.fullFocus}</p>
                                                     </div>
 
-                                                    <div className="p-4 bg-white dark:bg-black rounded-[1.5rem] border border-gray-100 dark:border-gray-800 apple-shadow">
+                                                    <div className="p-4 bg-white dark:bg-black rounded-[1.5rem] border border-gray-100 dark:border-gray-800 apple-shadow experience-box-light">
                                                         <h4 className="text-[10px] font-bold uppercase text-gray-400 mb-2">Задачи</h4>
                                                         <p className="text-sm">{item.fullTasks}</p>
                                                     </div>
 
-                                                    <div className="p-4 bg-white dark:bg-black rounded-[1.5rem] border border-gray-100 dark:border-gray-800 apple-shadow">
+                                                    <div className="p-4 bg-white dark:bg-black rounded-[1.5rem] border border-gray-100 dark:border-gray-800 apple-shadow experience-box-light">
                                                         <h4 className="text-[10px] font-bold uppercase text-gray-400 mb-2">Ключевые результаты</h4>
                                                         <p className="text-sm">{item.fullResult}</p>
                                                     </div>
@@ -268,7 +308,7 @@
                                                 {item.recommendations.map((rec) => (
                                                     <div
                                                         key={rec.id}
-                                                        className="p-4 bg-white dark:bg-black rounded-[1.5rem] border border-gray-100 dark:border-gray-800 apple-shadow flex flex-col h-full"
+                                                        className="p-4 bg-white dark:bg-black rounded-[1.5rem] border border-gray-100 dark:border-gray-800 apple-shadow experience-box-light flex flex-col h-full"
                                                     >
                                                         <div className="flex items-start justify-between gap-3 mb-2">
                                                             <div>
