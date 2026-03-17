@@ -4,6 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Max Safrutin | Digital Dossier</title>
+    <meta name="theme-color" content="#000000" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -22,6 +26,31 @@
             }
         };
     </script>
+
+    <script>
+        const appManifest = {
+            name: "Max Safrutin | Digital Dossier",
+            short_name: "Max Safrutin",
+            start_url: "./",
+            display: "standalone",
+            background_color: "#000000",
+            theme_color: "#000000",
+            icons: [
+                {
+                    src: "./assets/avatar/avatar_safrutin_pro.png",
+                    sizes: "192x192",
+                    type: "image/png"
+                }
+            ]
+        };
+        const manifestBlob = new Blob([JSON.stringify(appManifest)], { type: 'application/json' });
+        const manifestURL = URL.createObjectURL(manifestBlob);
+        const manifestLink = document.createElement('link');
+        manifestLink.rel = 'manifest';
+        manifestLink.href = manifestURL;
+        document.head.appendChild(manifestLink);
+    </script>
+
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -620,24 +649,72 @@
             }
         ];
 
-        const Counter = ({ endValue, suffix = "" }) => {
-            const [count, setCount] = useState(0);
+        const Counter = ({ endValue, suffix = "", duration = 1000, decimals = 0, start = 0, trigger = true }) => {
+            const [count, setCount] = useState(start);
+
             useEffect(() => {
-                let start = 0;
-                const duration = 1000;
-                const increment = Math.ceil(endValue / (duration / 20));
-                const timer = setInterval(() => {
-                    start += increment;
-                    if (start >= endValue) {
-                        setCount(endValue);
-                        clearInterval(timer);
+                if (!trigger) {
+                    setCount(start);
+                    return;
+                }
+
+                let animationFrame;
+                let startTime;
+
+                const animate = (timestamp) => {
+                    if (!startTime) startTime = timestamp;
+                    const progress = Math.min((timestamp - startTime) / duration, 1);
+                    const eased = 1 - Math.pow(1 - progress, 3);
+                    const nextValue = start + (endValue - start) * eased;
+                    setCount(nextValue);
+
+                    if (progress < 1) {
+                        animationFrame = requestAnimationFrame(animate);
                     } else {
-                        setCount(start);
+                        setCount(endValue);
                     }
-                }, 20);
-                return () => clearInterval(timer);
-            }, [endValue]);
-            return <span>{count}{suffix}</span>;
+                };
+
+                animationFrame = requestAnimationFrame(animate);
+                return () => cancelAnimationFrame(animationFrame);
+            }, [endValue, duration, decimals, start, trigger]);
+
+            const formatted = decimals > 0 ? count.toFixed(decimals) : Math.round(count);
+            return <span>{formatted}{suffix}</span>;
+        };
+
+        const CountUpCard = ({ endValue, suffix = "", duration = 1000, decimals = 0, className = "", label }) => {
+            const [isVisible, setIsVisible] = useState(false);
+            const cardRef = useRef(null);
+
+            useEffect(() => {
+                const node = cardRef.current;
+                if (!node) return;
+
+                const observer = new IntersectionObserver(
+                    (entries) => {
+                        entries.forEach((entry) => {
+                            if (entry.isIntersecting) {
+                                setIsVisible(true);
+                                observer.unobserve(entry.target);
+                            }
+                        });
+                    },
+                    { threshold: 0.25 }
+                );
+
+                observer.observe(node);
+                return () => observer.disconnect();
+            }, []);
+
+            return (
+                <div ref={cardRef} className={className}>
+                    <div className="text-2xl md:text-3xl font-extrabold text-blue-600 mb-2">
+                        <Counter endValue={endValue} suffix={suffix} duration={duration} decimals={decimals} trigger={isVisible} />
+                    </div>
+                    <div className="text-xs font-medium text-gray-500 dark:text-gray-400">{label}</div>
+                </div>
+            );
         };
 
         const Modal = ({ isOpen, onClose, title, children }) => {
@@ -846,18 +923,52 @@
             );
         };
 
-        const AccordionItem = ({ title, score, description, bullets }) => {
+        const AccordionItem = ({ title, score, description, bullets, icon }) => {
             const [isOpen, setIsOpen] = useState(false);
+            const [isVisible, setIsVisible] = useState(false);
+            const itemRef = useRef(null);
+            const numericScore = parseFloat(score);
+
+            useEffect(() => {
+                const node = itemRef.current;
+                if (!node) return;
+
+                const observer = new IntersectionObserver(
+                    (entries) => {
+                        entries.forEach((entry) => {
+                            if (entry.isIntersecting) {
+                                setIsVisible(true);
+                                observer.unobserve(entry.target);
+                            }
+                        });
+                    },
+                    { threshold: 0.2 }
+                );
+
+                observer.observe(node);
+                return () => observer.disconnect();
+            }, []);
+
             return (
-                <div className="bg-[#f5f5f7] dark:bg-[#1c1c1e] rounded-[1.5rem] p-5 mb-3 border border-transparent dark:border-gray-800 transition-all apple-shadow">
+                <div ref={itemRef} className="bg-[#f5f5f7] dark:bg-[#1c1c1e] rounded-[1.5rem] p-5 mb-3 border border-transparent dark:border-gray-800 transition-all apple-shadow">
                     <div className="flex justify-between items-center cursor-pointer" onClick={() => setIsOpen(!isOpen)}>
                         <div className="flex flex-col gap-2 w-full pr-6">
-                            <div className="flex justify-between w-full items-center">
-                                <span className="font-bold text-sm md:text-base">{title}</span>
-                                <span className="text-blue-600 font-bold text-sm">{score}/10</span>
+                            <div className="flex justify-between w-full items-center gap-3">
+                                <div className="flex items-center gap-3 min-w-0">
+                                    <div className="w-9 h-9 rounded-[0.9rem] bg-white dark:bg-black flex items-center justify-center text-blue-600 shrink-0 apple-shadow border border-gray-50 dark:border-gray-800">
+                                        <i className={`fa-solid ${icon} text-[13px]`}></i>
+                                    </div>
+                                    <span className="font-bold text-sm md:text-base leading-tight">{title}</span>
+                                </div>
+                                <span className="text-blue-600 font-bold text-sm shrink-0">
+                                    <Counter endValue={numericScore} duration={1650} decimals={1} trigger={isVisible} />
+                                </span>
                             </div>
-                            <div className="w-full bg-gray-200 dark:bg-gray-800 rounded-full h-1.5 overflow-hidden">
-                                <div className="bg-blue-600 h-1.5 rounded-full" style={{ width: `${parseFloat(score) * 10}%` }}></div>
+                            <div className="w-full bg-gray-200 dark:bg-gray-800 rounded-full h-[3px] overflow-hidden">
+                                <div
+                                    className="bg-blue-600 h-[3px] rounded-full transition-all duration-[1800]"
+                                    style={{ width: isVisible ? `${numericScore * 10}%` : '0%' }}
+                                ></div>
                             </div>
                         </div>
                         <div className={`w-8 h-8 rounded-full bg-white dark:bg-black flex items-center justify-center transition-transform duration-300 shrink-0 ${isOpen ? 'rotate-180' : ''}`}>
@@ -904,11 +1015,16 @@
             </div>
         );
 
-        const StarRating = ({ label, desc, rating }) => (
+        const StarRating = ({ label, desc, rating, icon = "fa-star" }) => (
             <div className="flex flex-col sm:flex-row sm:items-center justify-between p-5 bg-[#f5f5f7] dark:bg-[#1c1c1e] rounded-[1.5rem] border border-transparent dark:border-gray-800 apple-shadow gap-4">
-                <div>
+                <div className="flex items-start gap-3">
+                    <div className="w-9 h-9 rounded-[0.9rem] bg-white dark:bg-black flex items-center justify-center text-blue-600 shrink-0 apple-shadow border border-gray-50 dark:border-gray-800">
+                        <i className={`fa-solid ${icon} text-[13px]`}></i>
+                    </div>
+                    <div>
                     <span className="font-bold text-sm md:text-base block mb-1">{label}</span>
                     <span className="text-xs md:text-sm text-gray-500 dark:text-gray-400">{desc}</span>
+                    </div>
                 </div>
                 <div className="flex gap-1.5 shrink-0 bg-white dark:bg-black px-4 py-2 rounded-full border border-gray-100 dark:border-gray-900 apple-shadow">
                     {[1, 2, 3, 4, 5].map((star) => (
@@ -921,14 +1037,88 @@
             </div>
         );
 
+
+
+        const SimpleAccordionCard = ({ icon, title, children, defaultOpen = false }) => {
+            const [isOpen, setIsOpen] = useState(defaultOpen);
+
+            return (
+                <div className="bg-[#f5f5f7] dark:bg-[#1c1c1e] p-6 rounded-[2rem] border border-transparent dark:border-gray-800 apple-shadow">
+                    <div className="flex items-center justify-between cursor-pointer" onClick={() => setIsOpen(!isOpen)}>
+                        <div className="flex items-center gap-3 text-blue-600">
+                            <div className="w-11 h-11 rounded-[1rem] bg-white dark:bg-black flex items-center justify-center apple-shadow border border-gray-50 dark:border-gray-800">
+                                <i className={`fa-solid ${icon} text-base`}></i>
+                            </div>
+                            <span className="font-bold text-base">{title}</span>
+                        </div>
+                        <div className={`w-8 h-8 rounded-full bg-white dark:bg-black flex items-center justify-center transition-transform duration-300 shrink-0 ${isOpen ? 'rotate-180' : ''}`}>
+                            <i className="fa-solid fa-chevron-down text-[10px]"></i>
+                        </div>
+                    </div>
+                    {isOpen && (
+                        <div className="mt-5 animate-fade-up">
+                            {children}
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
         const App = () => {
             const [activeSection, setActiveSection] = useState('profile');
             const [darkMode, setDarkMode] = useState(true);
             const [isAboutOpen, setIsAboutOpen] = useState(false);
             const [fullModal, setFullModal] = useState({ open: false, title: '', content: '' });
+            const [deferredPrompt, setDeferredPrompt] = useState(null);
+            const [showInstallPrompt, setShowInstallPrompt] = useState(false);
+            const [isIosInstallHint, setIsIosInstallHint] = useState(false);
 
             const [activeSkillTab, setActiveSkillTab] = useState('metrics');
             const [activePersonalTab, setActivePersonalTab] = useState('achievements');
+
+
+            useEffect(() => {
+                const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+                const isMobile = window.innerWidth <= 768;
+                const isIOS = /iphone|ipad|ipod/i.test(window.navigator.userAgent);
+
+                if (isStandalone || !isMobile) return;
+
+                const handleBeforeInstallPrompt = (e) => {
+                    e.preventDefault();
+                    setDeferredPrompt(e);
+                    setShowInstallPrompt(true);
+                };
+
+                window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+
+                if (isIOS) {
+                    const dismissed = window.localStorage.getItem('ios-install-dismissed');
+                    if (!dismissed) {
+                        setIsIosInstallHint(true);
+                        setShowInstallPrompt(true);
+                    }
+                }
+
+                return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+            }, []);
+
+            const handleInstallApp = async () => {
+                if (!deferredPrompt) return;
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome) {
+                    setShowInstallPrompt(false);
+                    setDeferredPrompt(null);
+                }
+            };
+
+            const closeInstallPrompt = () => {
+                if (isIosInstallHint) {
+                    window.localStorage.setItem('ios-install-dismissed', '1');
+                }
+                setShowInstallPrompt(false);
+            };
 
             const toggleDarkMode = () => {
                 setDarkMode((prev) => !prev);
@@ -1076,26 +1266,41 @@
                                                 <i className="fa-solid fa-chart-simple text-blue-600"></i> Ключевые показатели
                                             </h3>
                                             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                                                <div className="bg-[#f5f5f7] dark:bg-[#1c1c1e] p-6 rounded-[2rem] border border-transparent dark:border-gray-800 apple-shadow flex flex-col justify-center items-center text-center">
-                                                    <div className="text-2xl md:text-3xl font-extrabold text-blue-600 mb-2">12+ лет</div>
-                                                    <div className="text-xs font-medium text-gray-500 dark:text-gray-400">В сфере продаж и работы с клиентами</div>
-                                                </div>
-                                                <div className="bg-[#f5f5f7] dark:bg-[#1c1c1e] p-6 rounded-[2rem] border border-transparent dark:border-gray-800 apple-shadow flex flex-col justify-center items-center text-center">
-                                                    <div className="text-2xl md:text-3xl font-extrabold text-blue-600 mb-2">1340+</div>
-                                                    <div className="text-xs font-medium text-gray-500 dark:text-gray-400">Дней опыта в автобизнесе</div>
-                                                </div>
-                                                <div className="bg-[#f5f5f7] dark:bg-[#1c1c1e] p-6 rounded-[2rem] border border-transparent dark:border-gray-800 apple-shadow flex flex-col justify-center items-center text-center">
-                                                    <div className="text-2xl md:text-3xl font-extrabold text-blue-600 mb-2">1198+</div>
-                                                    <div className="text-xs font-medium text-gray-500 dark:text-gray-400">Положительных отзывов</div>
-                                                </div>
-                                                <div className="bg-[#f5f5f7] dark:bg-[#1c1c1e] p-6 rounded-[2rem] border border-transparent dark:border-gray-800 apple-shadow flex flex-col justify-center items-center text-center">
-                                                    <div className="text-2xl md:text-3xl font-extrabold text-blue-600 mb-2">876+</div>
-                                                    <div className="text-xs font-medium text-gray-500 dark:text-gray-400">Фриланс-проектов</div>
-                                                </div>
-                                                <div className="bg-[#f5f5f7] dark:bg-[#1c1c1e] p-6 rounded-[2rem] border border-transparent dark:border-gray-800 apple-shadow flex flex-col justify-center items-center text-center md:col-span-2">
-                                                    <div className="text-2xl md:text-3xl font-extrabold text-blue-600 mb-2">192+ нед.</div>
-                                                    <div className="text-xs font-medium text-gray-500 dark:text-gray-400">Преподавания и работы с аудиторией</div>
-                                                </div>
+                                                <CountUpCard
+                                                    endValue={12}
+                                                    suffix="+ лет"
+                                                    duration={1350}
+                                                    className="bg-[#f5f5f7] dark:bg-[#1c1c1e] p-6 rounded-[2rem] border border-transparent dark:border-gray-800 apple-shadow flex flex-col justify-center items-center text-center"
+                                                    label="В сфере продаж и работы с клиентами"
+                                                />
+                                                <CountUpCard
+                                                    endValue={1340}
+                                                    suffix="+"
+                                                    duration={1450}
+                                                    className="bg-[#f5f5f7] dark:bg-[#1c1c1e] p-6 rounded-[2rem] border border-transparent dark:border-gray-800 apple-shadow flex flex-col justify-center items-center text-center"
+                                                    label="Дней опыта в автобизнесе"
+                                                />
+                                                <CountUpCard
+                                                    endValue={1198}
+                                                    suffix="+"
+                                                    duration={1500}
+                                                    className="bg-[#f5f5f7] dark:bg-[#1c1c1e] p-6 rounded-[2rem] border border-transparent dark:border-gray-800 apple-shadow flex flex-col justify-center items-center text-center"
+                                                    label="Положительных отзывов"
+                                                />
+                                                <CountUpCard
+                                                    endValue={876}
+                                                    suffix="+"
+                                                    duration={1550}
+                                                    className="bg-[#f5f5f7] dark:bg-[#1c1c1e] p-6 rounded-[2rem] border border-transparent dark:border-gray-800 apple-shadow flex flex-col justify-center items-center text-center"
+                                                    label="Фриланс-проектов"
+                                                />
+                                                <CountUpCard
+                                                    endValue={192}
+                                                    suffix="+ нед."
+                                                    duration={1600}
+                                                    className="bg-[#f5f5f7] dark:bg-[#1c1c1e] p-6 rounded-[2rem] border border-transparent dark:border-gray-800 apple-shadow flex flex-col justify-center items-center text-center md:col-span-2"
+                                                    label="Преподавания и работы с аудиторией"
+                                                />
                                             </div>
                                         </div>
                                     )}
@@ -1132,20 +1337,20 @@
                                             </div>
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1">
                                                 <div className="space-y-1">
-                                                    <AccordionItem title="Самоорганизация" score="7.6" description="Эффективное планирование времени, задач и процессов без потери продуктивности." bullets={["Notion, Яндекс.Календарь, Google Calendar и Spark", "Применение приёмов тайм-менеджмента (Eisenhower, Pomodoro, блокировка времени)"]} />
-                                                    <AccordionItem title="Эмоциональный настрой" score="6.8" description="Способность сохранять позитивный и продуктивный настрой даже в стрессовых ситуациях продаж." bullets={["Создано «место силы» — личный сайт", "Техника «в массы» для эмоциональной разгрузки", "Развитое межличностное деловое общение"]} />
-                                                    <AccordionItem title="Быстрое внедрение" score="7.1" description="Быстрое освоение и интеграция новых цифровых инструментов в ежедневную работу." bullets={["Notion", "Obsidian", "Figma"]} />
-                                                    <AccordionItem title="Формирование доверия" score="7.4" description="Создание атмосферы, в которой клиент чувствует безопасность и уверенность в эксперте." bullets={["Эмпатия", "Демонстрация экспертности", "Абсолютная честность"]} />
-                                                    <AccordionItem title="Презентация решения" score="7.8" description="Умение ясно и убедительно презентовать продукт/решение так, чтобы клиент увидел ценность." bullets={["Технология DISC", "Усилители презентации (визуалы, кейсы, сравнения)"]} />
-                                                    <AccordionItem title="Закрытие сделки" score="6.7" description="Навык уверенного доведения переговоров до подписания договора." bullets={["Опыт ведения деловых переговоров", "Техники закрытия сделки", "Распознавание сигналов готовности клиента"]} />
+                                                    <AccordionItem title="Самоорганизация" score="7.6" icon="fa-calendar-check" description="Эффективное планирование времени, задач и процессов без потери продуктивности." bullets={["Notion, Яндекс.Календарь, Google Calendar и Spark", "Применение приёмов тайм-менеджмента (Eisenhower, Pomodoro, блокировка времени)"]} />
+                                                    <AccordionItem title="Эмоциональный настрой" score="6.8" icon="fa-face-smile" description="Способность сохранять позитивный и продуктивный настрой даже в стрессовых ситуациях продаж." bullets={["Создано «место силы» — личный сайт", "Техника «в массы» для эмоциональной разгрузки", "Развитое межличностное деловое общение"]} />
+                                                    <AccordionItem title="Быстрое внедрение" score="7.1" icon="fa-rocket" description="Быстрое освоение и интеграция новых цифровых инструментов в ежедневную работу." bullets={["Notion", "Obsidian", "Figma"]} />
+                                                    <AccordionItem title="Формирование доверия" score="7.4" icon="fa-handshake" description="Создание атмосферы, в которой клиент чувствует безопасность и уверенность в эксперте." bullets={["Эмпатия", "Демонстрация экспертности", "Абсолютная честность"]} />
+                                                    <AccordionItem title="Презентация решения" score="7.8" icon="fa-chalkboard-user" description="Умение ясно и убедительно презентовать продукт/решение так, чтобы клиент увидел ценность." bullets={["Технология DISC", "Усилители презентации (визуалы, кейсы, сравнения)"]} />
+                                                    <AccordionItem title="Закрытие сделки" score="6.7" icon="fa-file-signature" description="Навык уверенного доведения переговоров до подписания договора." bullets={["Опыт ведения деловых переговоров", "Техники закрытия сделки", "Распознавание сигналов готовности клиента"]} />
                                                 </div>
                                                 <div className="space-y-1">
-                                                    <AccordionItem title="Отработка возражений" score="6.9" description="Быстрое и профессиональное снятие сомнений и возражений клиента." bullets={["Накопленный банк из 50+ готовых ответов", "Усилители презентации для профилактики возражений"]} />
-                                                    <AccordionItem title="Анализ и самоанализ" score="6.2" description="Регулярная рефлексия результатов и корректировка подхода." bullets={["Умеренная рефлексия после каждой сделки", "Ведение отчёта продаж в Notion"]} />
-                                                    <AccordionItem title="Прояснение ситуации" score="5.2" description="Глубокое выявление реальных потребностей и болей клиента." bullets={["Техники выявления потребностей (SPIN, 5 почему)", "Повышенное внимание к деталям и скрытым сигналам"]} />
-                                                    <AccordionItem title="Кросс-продажи" score="5.7" description="Увеличение среднего чека через дополнительные предложения." bullets={["Upsell (продажа более дорогой версии)", "Downsell (альтернатива при отказе)", "Cross-sell (смежные продукты/услуги)"]} />
-                                                    <AccordionItem title="Поиск клиентов" score="4.3" description="Генерация входящих и исходящих лидов через бесплатные каналы." bullets={["Знаю и использую 7 бесплатных источников трафика", "Холодные телефонные звонки", "Электронная рассылка"]} />
-                                                    <AccordionItem title="Долгосрочные отношения" score="4.1" description="Поддержание связи после сделки и превращение клиентов в адвокатов бренда." bullets={["Сбор рекомендаций и отзывов", "Мотивация клиента запускать «сарафанное радио»"]} />
+                                                    <AccordionItem title="Отработка возражений" score="6.9" icon="fa-shield-halved" description="Быстрое и профессиональное снятие сомнений и возражений клиента." bullets={["Накопленный банк из 50+ готовых ответов", "Усилители презентации для профилактики возражений"]} />
+                                                    <AccordionItem title="Анализ и самоанализ" score="6.2" icon="fa-chart-line" description="Регулярная рефлексия результатов и корректировка подхода." bullets={["Умеренная рефлексия после каждой сделки", "Ведение отчёта продаж в Notion"]} />
+                                                    <AccordionItem title="Прояснение ситуации" score="5.2" icon="fa-magnifying-glass" description="Глубокое выявление реальных потребностей и болей клиента." bullets={["Техники выявления потребностей (SPIN, 5 почему)", "Повышенное внимание к деталям и скрытым сигналам"]} />
+                                                    <AccordionItem title="Кросс-продажи" score="5.7" icon="fa-layer-group" description="Увеличение среднего чека через дополнительные предложения." bullets={["Upsell (продажа более дорогой версии)", "Downsell (альтернатива при отказе)", "Cross-sell (смежные продукты/услуги)"]} />
+                                                    <AccordionItem title="Поиск клиентов" score="4.3" icon="fa-bullseye" description="Генерация входящих и исходящих лидов через бесплатные каналы." bullets={["Знаю и использую 7 бесплатных источников трафика", "Холодные телефонные звонки", "Электронная рассылка"]} />
+                                                    <AccordionItem title="Долгосрочные отношения" score="4.1" icon="fa-people-arrows" description="Поддержание связи после сделки и превращение клиентов в адвокатов бренда." bullets={["Сбор рекомендаций и отзывов", "Мотивация клиента запускать «сарафанное радио»"]} />
                                                 </div>
                                             </div>
                                         </div>
@@ -1210,17 +1415,40 @@
                                             <h3 className="text-xl font-bold tracking-tight px-2 flex items-center gap-3">
                                                 <i className="fa-solid fa-trophy text-blue-600"></i> Достижения
                                             </h3>
-                                            <div className="bg-[#f5f5f7] dark:bg-[#1c1c1e] p-8 rounded-[2rem] border border-transparent dark:border-gray-800">
-                                                <ul className="space-y-4 text-sm">
-                                                    <li className="flex items-start gap-3"><i className="fa-solid fa-trophy text-blue-600 mt-1"></i><span>Продано более 667+ автомобилей за всё время к февралю 2026 года</span></li>
-                                                    <li className="flex items-start gap-3"><i className="fa-solid fa-trophy text-blue-600 mt-1"></i><span>587+ довольных заказчиков проведёнными и организованными мероприятиями</span></li>
-                                                    <li className="flex items-start gap-3"><i className="fa-solid fa-trophy text-blue-600 mt-1"></i><span>Лауреат вузовских и областных студенческих весен в номинации хореография (2009–2013)</span></li>
-                                                    <li className="flex items-start gap-3"><i className="fa-solid fa-trophy text-blue-600 mt-1"></i><span>Победитель олимпиады по психологии среди факультетов ВУЗа</span></li>
-                                                    <li className="flex items-start gap-3"><i className="fa-solid fa-trophy text-blue-600 mt-1"></i><span>Участник сборной СГАУ, команды «Just Black», хип-хоп аэробика — серебряные призёры Европы</span></li>
-                                                    <li className="flex items-start gap-3"><i className="fa-solid fa-trophy text-blue-600 mt-1"></i><span>Участник сборной ПГСГА, команды «Sky», хип-хоп аэробика — серебряные призёры областных соревнований, финалисты ПФО</span></li>
-                                                    <li className="flex items-start gap-3"><i className="fa-solid fa-trophy text-blue-600 mt-1"></i><span>Судья областных соревнований по фитнес-аэробике (хип-хоп аэробика)</span></li>
-                                                    <li className="flex items-start gap-3"><i className="fa-solid fa-trophy text-blue-600 mt-1"></i><span>Организация, проведение и участие в мероприятиях школьного, районного, городского и развлекательного уровня</span></li>
-                                                </ul>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <div className="bg-[#f5f5f7] dark:bg-[#1c1c1e] p-6 rounded-[2rem] border border-transparent dark:border-gray-800 apple-shadow">
+                                                    <div className="flex items-center gap-3 mb-5">
+                                                        <div className="w-11 h-11 rounded-[1rem] bg-white dark:bg-black flex items-center justify-center text-blue-600 apple-shadow border border-gray-50 dark:border-gray-800">
+                                                            <i className="fa-solid fa-car-side"></i>
+                                                        </div>
+                                                        <div>
+                                                            <div className="text-sm font-bold">Автобизнес и клиенты</div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="space-y-4 text-sm">
+                                                        <div className="flex items-start gap-3"><i className="fa-solid fa-trophy text-blue-600 mt-1"></i><span>Продано более 667+ автомобилей за всё время к февралю 2026 года</span></div>
+                                                        <div className="flex items-start gap-3"><i className="fa-solid fa-trophy text-blue-600 mt-1"></i><span>587+ довольных заказчиков проведёнными и организованными мероприятиями</span></div>
+                                                        <div className="flex items-start gap-3"><i className="fa-solid fa-trophy text-blue-600 mt-1"></i><span>Организация, проведение и участие в мероприятиях школьного, районного, городского и развлекательного уровня</span></div>
+                                                    </div>
+                                                </div>
+
+                                                <div className="bg-[#f5f5f7] dark:bg-[#1c1c1e] p-6 rounded-[2rem] border border-transparent dark:border-gray-800 apple-shadow">
+                                                    <div className="flex items-center gap-3 mb-5">
+                                                        <div className="w-11 h-11 rounded-[1rem] bg-white dark:bg-black flex items-center justify-center text-blue-600 apple-shadow border border-gray-50 dark:border-gray-800">
+                                                            <i className="fa-solid fa-medal"></i>
+                                                        </div>
+                                                        <div>
+                                                            <div className="text-sm font-bold">Сцена и соревнования</div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="space-y-4 text-sm">
+                                                        <div className="flex items-start gap-3"><i className="fa-solid fa-trophy text-blue-600 mt-1"></i><span>Лауреат вузовских и областных студенческих весен в номинации хореография (2009–2013)</span></div>
+                                                        <div className="flex items-start gap-3"><i className="fa-solid fa-trophy text-blue-600 mt-1"></i><span>Участник сборной СГАУ, команды «Just Black», хип-хоп аэробика — серебряные призёры Европы</span></div>
+                                                        <div className="flex items-start gap-3"><i className="fa-solid fa-trophy text-blue-600 mt-1"></i><span>Участник сборной ПГСГА, команды «Sky», хип-хоп аэробика — серебряные призёры областных соревнований, финалисты ПФО</span></div>
+                                                        <div className="flex items-start gap-3"><i className="fa-solid fa-trophy text-blue-600 mt-1"></i><span>Судья областных соревнований по фитнес-аэробике (хип-хоп аэробика)</span></div>
+                                                        <div className="flex items-start gap-3"><i className="fa-solid fa-trophy text-blue-600 mt-1"></i><span>Победитель олимпиады по психологии среди факультетов ВУЗа</span></div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     )}
@@ -1230,96 +1458,74 @@
                                             <h3 className="text-xl font-bold tracking-tight px-2 flex items-center gap-3">
                                                 <i className="fa-solid fa-graduation-cap text-blue-600"></i> Образование
                                             </h3>
-                                            <div className="bg-[#f5f5f7] dark:bg-[#1c1c1e] p-8 rounded-[2rem] border border-transparent dark:border-gray-800 space-y-10">
-                                                <div>
-                                                    <div className="flex items-center gap-3 text-blue-600 mb-4">
-                                                        <i className="fa-solid fa-book text-xl"></i>
-                                                        <span className="font-bold text-base">Основное образование</span>
-                                                    </div>
-                                                    <div className="pl-8 border-l border-gray-300 dark:border-gray-700 space-y-6">
-                                                        <div>
-                                                            <div className="font-semibold">МОУ СОШ №38</div>
-                                                            <div className="text-sm text-gray-500 dark:text-gray-400">1998 г. – 2008 г.</div>
-                                                            <div className="text-sm mt-2">Среднее общее образование, 11 классов.</div>
+                                            <div className="space-y-4">
+                                                <SimpleAccordionCard icon="fa-book" title="Основное образование" defaultOpen={true}>
+                                                    <div className="space-y-5">
+                                                        <div className="relative pl-8">
+                                                            <div className="experience-timeline-line"></div>
+                                                            <div className="experience-timeline-dot"></div>
+                                                            <div className="bg-white dark:bg-black rounded-[1.5rem] p-4 border border-gray-100 dark:border-gray-900 apple-shadow">
+                                                                <div className="text-sm font-bold">Поволжская государственная социально-гуманитарная академия (ПГСГА)</div>
+                                                                <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">2008 г. – 2013 г.</div>
+                                                                <div className="text-sm mt-3">Естественно-географический факультет — специалист очной формы обучения.</div>
+                                                                <div className="text-sm mt-1">Специальность: география с дополнительной специальностью биология.</div>
+                                                            </div>
                                                         </div>
-                                                        <div>
-                                                            <div className="font-semibold">Поволжская государственная социально-гуманитарная академия (ПГСГА)</div>
-                                                            <div className="text-sm text-gray-500 dark:text-gray-400">2008 г. – 2013 г.</div>
-                                                            <div className="text-sm mt-2">Естественно-географический факультет — специалист очной формы обучения.</div>
-                                                            <div className="text-sm mt-1">Специальность: география с дополнительной специальностью биология.</div>
+                                                        <div className="relative pl-8">
+                                                            <div className="experience-timeline-line"></div>
+                                                            <div className="experience-timeline-dot"></div>
+                                                            <div className="bg-white dark:bg-black rounded-[1.5rem] p-4 border border-gray-100 dark:border-gray-900 apple-shadow">
+                                                                <div className="text-sm font-bold">МОУ СОШ №38</div>
+                                                                <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">1998 г. – 2008 г.</div>
+                                                                <div className="text-sm mt-3">Среднее общее образование, 11 классов.</div>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
+                                                </SimpleAccordionCard>
 
-                                                <div>
-                                                    <div className="flex items-center gap-3 text-blue-600 mb-4">
-                                                        <i className="fa-solid fa-certificate text-xl"></i>
-                                                        <span className="font-bold text-base">Доп. образование</span>
+                                                <SimpleAccordionCard icon="fa-certificate" title="Доп. образование">
+                                                    <div className="space-y-4">
+                                                        <div className="relative pl-8"><div className="experience-timeline-line"></div><div className="experience-timeline-dot"></div><div className="bg-white dark:bg-black rounded-[1.5rem] p-4 border border-gray-100 dark:border-gray-900 apple-shadow"><div className="text-sm font-bold">Сертификация по стандартам КМП Lada</div><div className="text-xs text-gray-500 dark:text-gray-400 mt-1">АВТОВАЗ, АО</div><div className="text-xs text-gray-500 dark:text-gray-400 mt-1">07 / 2024</div></div></div>
+                                                        <div className="relative pl-8"><div className="experience-timeline-line"></div><div className="experience-timeline-dot"></div><div className="bg-white dark:bg-black rounded-[1.5rem] p-4 border border-gray-100 dark:border-gray-900 apple-shadow"><div className="text-sm font-bold">Сертификация по стандартам МОП Lada</div><div className="text-xs text-gray-500 dark:text-gray-400 mt-1">АВТОВАЗ, АО</div><div className="text-xs text-gray-500 dark:text-gray-400 mt-1">07 / 2023 – 06 / 2024</div></div></div>
+                                                        <div className="relative pl-8"><div className="experience-timeline-line"></div><div className="experience-timeline-dot"></div><div className="bg-white dark:bg-black rounded-[1.5rem] p-4 border border-gray-100 dark:border-gray-900 apple-shadow"><div className="text-sm font-bold">Бойлерная, ООО — Инструменты продаж</div><div className="text-xs text-gray-500 dark:text-gray-400 mt-1">03 – 05 / 2022</div></div></div>
+                                                        <div className="relative pl-8"><div className="experience-timeline-line"></div><div className="experience-timeline-dot"></div><div className="bg-white dark:bg-black rounded-[1.5rem] p-4 border border-gray-100 dark:border-gray-900 apple-shadow"><div className="text-sm font-bold">Насретдинов Р.К., ИП — Управление бизнес-аккаунтами</div><div className="text-xs text-gray-500 dark:text-gray-400 mt-1">12 / 2021 – 03 / 2022</div></div></div>
+                                                        <div className="relative pl-8"><div className="experience-timeline-line"></div><div className="experience-timeline-dot"></div><div className="bg-white dark:bg-black rounded-[1.5rem] p-4 border border-gray-100 dark:border-gray-900 apple-shadow"><div className="text-sm font-bold">Санкт-Петербургская школа телевидения — Курс ведущего мероприятий</div><div className="text-xs text-gray-500 dark:text-gray-400 mt-1">02–04 / 2014</div></div></div>
+                                                        <div className="relative pl-8"><div className="experience-timeline-line"></div><div className="experience-timeline-dot"></div><div className="bg-white dark:bg-black rounded-[1.5rem] p-4 border border-gray-100 dark:border-gray-900 apple-shadow"><div className="text-sm font-bold">Водительское удостоверение категории B</div><div className="text-xs text-gray-500 dark:text-gray-400 mt-1">с 2012 года</div></div></div>
+                                                        <div className="relative pl-8"><div className="experience-timeline-line"></div><div className="experience-timeline-dot"></div><div className="bg-white dark:bg-black rounded-[1.5rem] p-4 border border-gray-100 dark:border-gray-900 apple-shadow"><div className="text-sm font-bold">ФФАИСАСО — Фитнес-инструктор</div><div className="text-xs text-gray-500 dark:text-gray-400 mt-1">01–02 / 2011</div></div></div>
                                                     </div>
-                                                    <ul className="space-y-4 text-sm pl-8">
-                                                        <li className="flex items-start gap-3">
-                                                            <i className="fa-solid fa-check text-blue-600 mt-1"></i>
-                                                            <div>
-                                                                <span className="font-medium">ФФАИСАСО — Фитнес-инструктор</span><br />
-                                                                <span className="text-xs text-gray-500">01–02 / 2011</span>
-                                                            </div>
-                                                        </li>
-                                                        <li className="flex items-start gap-3">
-                                                            <i className="fa-solid fa-check text-blue-600 mt-1"></i>
-                                                            <div>
-                                                                <span className="font-medium">Водительское удостоверение категории B</span><br />
-                                                                <span className="text-xs text-gray-500">с 2012 года</span>
-                                                            </div>
-                                                        </li>
-                                                        <li className="flex items-start gap-3">
-                                                            <i className="fa-solid fa-check text-blue-600 mt-1"></i>
-                                                            <div>
-                                                                <span className="font-medium">Санкт-Петербургская школа телевидения — Курс ведущего мероприятий</span><br />
-                                                                <span className="text-xs text-gray-500">02–04 / 2014</span>
-                                                            </div>
-                                                        </li>
-                                                        <li className="flex items-start gap-3">
-                                                            <i className="fa-solid fa-check text-blue-600 mt-1"></i>
-                                                            <div>
-                                                                <span className="font-medium">Насретдинов Р.К., ИП — Управление бизнес-аккаунтами</span><br />
-                                                                <span className="text-xs text-gray-500">12 / 2021 – 03 / 2022</span>
-                                                            </div>
-                                                        </li>
-                                                        <li className="flex items-start gap-3">
-                                                            <i className="fa-solid fa-check text-blue-600 mt-1"></i>
-                                                            <div>
-                                                                <span className="font-medium">Бойлерная, ООО — Инструменты продаж</span><br />
-                                                                <span className="text-xs text-gray-500">03 – 05 / 2022</span>
-                                                            </div>
-                                                        </li>
-                                                        <li className="flex items-start gap-3">
-                                                            <i className="fa-solid fa-check text-blue-600 mt-1"></i>
-                                                            <div>
-                                                                <span className="font-medium">АВТОВАЗ, АО — Сертификация по стандартам МОП Lada</span><br />
-                                                                <span className="text-xs text-gray-500">07 / 2023 – 06 / 2024</span>
-                                                            </div>
-                                                        </li>
-                                                        <li className="flex items-start gap-3">
-                                                            <i className="fa-solid fa-check text-blue-600 mt-1"></i>
-                                                            <div>
-                                                                <span className="font-medium">АВТОВАЗ, АО — Сертификация по стандартам КМП Lada</span><br />
-                                                                <span className="text-xs text-gray-500">07 / 2024</span>
-                                                            </div>
-                                                        </li>
-                                                    </ul>
-                                                </div>
+                                                </SimpleAccordionCard>
 
-                                                <div>
-                                                    <div className="flex items-center gap-3 text-blue-600 mb-4">
-                                                        <i className="fa-solid fa-language text-xl"></i>
-                                                        <span className="font-bold text-base">Языки</span>
-                                                    </div>
+                                                <SimpleAccordionCard icon="fa-language" title="Языки">
                                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                                        <StarRating label="Русский" desc="родной" rating={4} />
-                                                        <StarRating label="Английский" desc="уровень 3 класса" rating={2} />
-                                                        <StarRating label="Французский" desc="просто нравится" rating={0} />
+                                                        <div className="bg-white dark:bg-black rounded-[1.5rem] p-5 border border-gray-100 dark:border-gray-900 apple-shadow">
+                                                            <div className="font-bold text-sm md:text-base block mb-1">Русский</div>
+                                                            <div className="text-xs md:text-sm text-gray-500 dark:text-gray-400 mb-4">родной</div>
+                                                            <div className="flex gap-1.5 flex-wrap">
+                                                                {[1, 2, 3, 4, 5].map((star) => (
+                                                                    <i key={star} className={`fa-solid fa-star text-sm ${star <= 4 ? 'text-blue-500' : 'text-gray-200 dark:text-gray-800'}`}></i>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                        <div className="bg-white dark:bg-black rounded-[1.5rem] p-5 border border-gray-100 dark:border-gray-900 apple-shadow">
+                                                            <div className="font-bold text-sm md:text-base block mb-1">Английский</div>
+                                                            <div className="text-xs md:text-sm text-gray-500 dark:text-gray-400 mb-4">уровень 3 класса</div>
+                                                            <div className="flex gap-1.5 flex-wrap">
+                                                                {[1, 2, 3, 4, 5].map((star) => (
+                                                                    <i key={star} className={`fa-solid fa-star text-sm ${star <= 2 ? 'text-blue-500' : 'text-gray-200 dark:text-gray-800'}`}></i>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                        <div className="bg-white dark:bg-black rounded-[1.5rem] p-5 border border-gray-100 dark:border-gray-900 apple-shadow">
+                                                            <div className="font-bold text-sm md:text-base block mb-1">Французский</div>
+                                                            <div className="text-xs md:text-sm text-gray-500 dark:text-gray-400 mb-4">просто нравится</div>
+                                                            <div className="flex gap-1.5 flex-wrap">
+                                                                {[1, 2, 3, 4, 5].map((star) => (
+                                                                    <i key={star} className={`fa-solid fa-star text-sm ${star <= 0 ? 'text-blue-500' : 'text-gray-200 dark:text-gray-800'}`}></i>
+                                                                ))}
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                </div>
+                                                </SimpleAccordionCard>
                                             </div>
                                         </div>
                                     )}
@@ -1329,20 +1535,25 @@
                                             <h3 className="text-xl font-bold tracking-tight px-2 flex items-center gap-3">
                                                 <i className="fa-solid fa-heart text-blue-600"></i> Качества
                                             </h3>
-                                            
-                                            <div className="bg-[#1d1d1f] text-white p-8 rounded-[2rem]">
-                                                <h3 className="text-xl font-bold mb-4">Девиз по жизни</h3>
-                                                <p className="text-lg opacity-70 italic mb-6">«Завтра ты должен быть лучше, чем сегодня!»</p>
-                                                <h3 className="text-xl font-bold mb-4">Любимая цитата</h3>
-                                                <p className="text-base leading-relaxed opacity-90 font-light">«Самая главная формула успеха — знать, как общаться с людьми».</p>
-                                                <p className="text-sm opacity-70 mt-2">- Теодор Рузвельт</p>
+
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <div className="bg-[#1d1d1f] text-white p-6 rounded-[2rem]">
+                                                    <div className="flex items-center gap-3 mb-3"><i className="fa-solid fa-bolt text-blue-400"></i><div className="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Девиз по жизни</div></div>
+                                                    <p className="text-sm md:text-base leading-relaxed opacity-90 italic">«Завтра ты должен быть лучше, чем сегодня!»</p>
+                                                    <p className="text-xs md:text-sm opacity-70 mt-3 italic">- Максим Сафрутин</p>
+                                                </div>
+                                                <div className="bg-[#1d1d1f] text-white p-6 rounded-[2rem]">
+                                                    <div className="flex items-center gap-3 mb-3"><i className="fa-solid fa-quote-left text-blue-400"></i><div className="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Любимая цитата</div></div>
+                                                    <p className="text-sm md:text-base leading-relaxed opacity-90 italic">«Самая главная формула успеха — знать, как общаться с людьми».</p>
+                                                    <p className="text-xs md:text-sm opacity-70 mt-3 italic">- Теодор Рузвельт</p>
+                                                </div>
                                             </div>
 
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                <StarRating label="Эмоциональная устойчивость и уравновешенность" desc="" rating={2} />
-                                                <StarRating label="Харизматичный стиль общения с клиентами" desc="" rating={4} />
-                                                <StarRating label="Высокая личная дисциплина и самоорганизация" desc="" rating={3} />
-                                                <StarRating label="Доброжелательность и умение выстраивать доверие" desc="" rating={4} />
+                                                <StarRating label="Эмоциональная устойчивость и уравновешенность" desc="" rating={2} icon="fa-scale-balanced" />
+                                                <StarRating label="Харизматичный стиль общения с клиентами" desc="" rating={4} icon="fa-comments" />
+                                                <StarRating label="Высокая личная дисциплина и самоорганизация" desc="" rating={3} icon="fa-list-check" />
+                                                <StarRating label="Доброжелательность и умение выстраивать доверие" desc="" rating={4} icon="fa-handshake" />
                                             </div>
                                         </div>
                                     )}
@@ -1353,24 +1564,38 @@
                                                 <i className="fa-solid fa-paperclip text-blue-600"></i> Доп. информация
                                             </h3>
 
-                                            <div className="bg-[#f5f5f7] dark:bg-[#1c1c1e] p-8 rounded-[2rem] border border-transparent dark:border-gray-800">
-                                                <div className="font-bold mb-4 text-blue-600 flex items-center gap-2">
-                                                    <i className="fa-solid fa-star"></i> Самое главное
+                                            <SimpleAccordionCard icon="fa-star" title="Самое главное" defaultOpen={true}>
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    <div className="bg-white dark:bg-black rounded-[1.5rem] p-5 border border-gray-100 dark:border-gray-900 apple-shadow">
+                                                        <div className="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-4">Линия жизни</div>
+                                                        <div className="space-y-4 text-sm">
+                                                            <div className="flex gap-3"><i className="fa-solid fa-caret-right text-blue-600 mt-0.5 w-4 text-center"></i><div>Родился <span className="font-semibold">1990</span></div></div>
+                                                            <div className="flex gap-3"><i className="fa-solid fa-ring text-blue-600 mt-0.5 w-4 text-center"></i><div>Женился <span className="font-semibold">09 / 2013</span></div></div>
+                                                            <div className="flex gap-3"><i className="fa-solid fa-house text-blue-600 mt-0.5 w-4 text-center"></i><div>В планах — купить / построить дом.</div></div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="bg-white dark:bg-black rounded-[1.5rem] p-5 border border-gray-100 dark:border-gray-900 apple-shadow">
+                                                        <div className="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-4">Семья</div>
+                                                        <div className="space-y-4 text-sm">
+                                                            <div className="flex gap-3"><i className="fa-solid fa-child-reaching text-blue-600 mt-0.5 w-4 text-center"></i><div>Родился 1-ый сын <span className="font-semibold">2018</span></div></div>
+                                                            <div className="flex gap-3"><i className="fa-solid fa-child-reaching text-blue-600 mt-0.5 w-4 text-center"></i><div>Родился 2-ой сын <span className="font-semibold">2021</span></div></div>
+                                                            <div className="flex gap-3"><i className="fa-solid fa-child-reaching text-blue-600 mt-0.5 w-4 text-center"></i><div>Родилась дочь <span className="font-semibold">2025</span></div></div>
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                                <div className="space-y-4 text-sm">
-                                                    <div className="flex gap-3"><i className="fa-solid fa-caret-right text-blue-600 mt-0.5 w-4 text-center"></i><div>Родился <span className="font-semibold">1990</span></div></div>
-                                                    <div className="flex gap-3"><i className="fa-solid fa-ring text-blue-600 mt-0.5 w-4 text-center"></i><div>Женился <span className="font-semibold">09 / 2013</span></div></div>
-                                                    <div className="flex gap-3"><i className="fa-solid fa-child-reaching text-blue-600 mt-0.5 w-4 text-center"></i><div>Родился 1-ый сын <span className="font-semibold">2018</span></div></div>
-                                                    <div className="flex gap-3"><i className="fa-solid fa-child-reaching text-blue-600 mt-0.5 w-4 text-center"></i><div>Родился 2-ой сын <span className="font-semibold">2021</span></div></div>
-                                                    <div className="flex gap-3"><i className="fa-solid fa-child-reaching text-blue-600 mt-0.5 w-4 text-center"></i><div>Родилась дочь <span className="font-semibold">2025</span></div></div>
-                                                    <div className="flex gap-3"><i className="fa-solid fa-house text-blue-600 mt-0.5 w-4 text-center"></i><div>В планах — купить / построить дом.</div></div>
+                                                <div className="mt-6">
+                                                    <a
+                                                        href="https://padlet.com/maxsafrutin/padlet-6gzlnd33qfq4vvnw"
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="inline-block bg-white dark:bg-black px-4 py-2 rounded-2xl text-xs font-medium border border-gray-100 dark:border-gray-900 apple-shadow text-blue-600 hover:opacity-80 transition-opacity"
+                                                    >
+                                                        Вся хронология в кратце
+                                                    </a>
                                                 </div>
-                                            </div>
+                                            </SimpleAccordionCard>
 
-                                            <div className="bg-[#f5f5f7] dark:bg-[#1c1c1e] p-8 rounded-[2rem] border border-transparent dark:border-gray-800">
-                                                <div className="font-bold mb-4 text-blue-600 flex items-center gap-2">
-                                                    <i className="fa-solid fa-earth-americas"></i> Мои путешествия
-                                                </div>
+                                            <SimpleAccordionCard icon="fa-earth-americas" title="Мои путешествия">
                                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-sm">
                                                     <div className="flex gap-3"><i className="fa-solid fa-city text-blue-600 mt-1"></i><div><span className="font-semibold">Москва</span><br />пол года проживания</div></div>
                                                     <div className="flex gap-3"><i className="fa-solid fa-plane text-blue-600 mt-1"></i><div><span className="font-semibold">Прага</span><br />серебро на чемпионате Европы</div></div>
@@ -1387,12 +1612,9 @@
                                                         Посмотреть путешествия
                                                     </a>
                                                 </div>
-                                            </div>
+                                            </SimpleAccordionCard>
 
-                                            <div className="bg-[#f5f5f7] dark:bg-[#1c1c1e] p-8 rounded-[2rem] border border-transparent dark:border-gray-800">
-                                                <div className="font-bold mb-4 text-blue-600 flex items-center gap-2">
-                                                    <i className="fa-solid fa-palette"></i> Увлечения
-                                                </div>
+                                            <SimpleAccordionCard icon="fa-palette" title="Увлечения">
                                                 <div className="flex flex-wrap gap-2">
                                                     {["IT технологии","Умный дом","Контент к саморазвитию","Графический дизайн","Ведение мероприятий","Уличные танцы","Джазовая музыка"].map((item,i) => (
                                                         <span key={i} className="bg-white dark:bg-black px-4 py-2 rounded-2xl text-xs font-medium border border-gray-100 dark:border-gray-900 apple-shadow">
@@ -1400,7 +1622,7 @@
                                                         </span>
                                                     ))}
                                                 </div>
-                                            </div>
+                                            </SimpleAccordionCard>
                                         </div>
                                     )}
                                 </div>
@@ -1502,6 +1724,38 @@
                             ))}
                         </div>
                     </nav>
+
+
+                    {showInstallPrompt && (
+                        <div className="fixed left-1/2 -translate-x-1/2 bottom-28 w-[92%] max-w-md z-50 animate-fade-up">
+                            <div className="bg-[#f5f5f7] dark:bg-[#1c1c1e] rounded-[2rem] border border-transparent dark:border-gray-800 apple-shadow p-5">
+                                <div className="flex items-start justify-between gap-4">
+                                    <div>
+                                        <div className="text-sm font-bold mb-1">Добавить на экран</div>
+                                        <div className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+                                            {isIosInstallHint
+                                                ? 'Откройте меню «Поделиться» в браузере и выберите «На экран Домой», чтобы страница работала как приложение.'
+                                                : 'Установите ярлык сайта на рабочий стол, чтобы открывать его как приложение.'}
+                                        </div>
+                                    </div>
+                                    <button
+                                        onClick={closeInstallPrompt}
+                                        className="w-8 h-8 rounded-full bg-white dark:bg-black flex items-center justify-center shrink-0"
+                                    >
+                                        <i className="fa-solid fa-xmark text-[11px]"></i>
+                                    </button>
+                                </div>
+                                {!isIosInstallHint && deferredPrompt && (
+                                    <button
+                                        onClick={handleInstallApp}
+                                        className="mt-4 w-full bg-black dark:bg-white text-white dark:text-black py-3 rounded-2xl font-bold text-sm"
+                                    >
+                                        Установить ярлык
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+                    )}
 
                     <Modal isOpen={isAboutOpen} onClose={() => setIsAboutOpen(false)} title="О специалисте">
                         <div className="space-y-4 text-sm leading-relaxed text-gray-800 dark:text-gray-200">
