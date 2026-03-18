@@ -114,6 +114,35 @@
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
+
+        .micro-card-opening {
+            transform-origin: top center;
+            animation: microCardOpening 320ms cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        @keyframes microCardOpening {
+            from { opacity: 0.72; transform: translateY(6px) scale(0.992); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .first-wow-glow {
+            position: relative;
+            overflow: hidden;
+        }
+        .first-wow-glow::after {
+            content: '';
+            position: absolute;
+            inset: -20%;
+            background: linear-gradient(115deg, transparent 30%, rgba(255,255,255,0.22) 48%, transparent 66%);
+            transform: translateX(-130%);
+            pointer-events: none;
+            animation: firstGlowSweep 1100ms ease-out 180ms 1;
+        }
+        .dark .first-wow-glow::after {
+            background: linear-gradient(115deg, transparent 30%, rgba(255,255,255,0.08) 48%, transparent 66%);
+        }
+        @keyframes firstGlowSweep {
+            from { transform: translateX(-130%); }
+            to { transform: translateX(130%); }
+        }
     </style>
 </head>
 <body class="bg-white text-[#1d1d1f] dark:bg-black dark:text-[#f5f5f7]">
@@ -129,6 +158,34 @@ const smoothScrollToNode = (node, extraOffset = SCROLL_TOP_OFFSET) => {
         const targetTop = Math.max(window.scrollY + rect.top - extraOffset, 0);
         window.scrollTo({ top: targetTop, behavior: 'smooth' });
     });
+};
+
+const AnimatedCollapse = ({ isOpen, children, className = "", contentClassName = "", style = {} }) => {
+    const innerRef = useRef(null);
+    const [height, setHeight] = useState(isOpen ? 'auto' : 0);
+    useEffect(() => {
+        const node = innerRef.current;
+        if (!node)
+            return;
+        if (isOpen) {
+            const fullHeight = node.scrollHeight;
+            setHeight(fullHeight);
+            const timer = window.setTimeout(() => setHeight('auto'), 340);
+            return () => window.clearTimeout(timer);
+        }
+        const fullHeight = node.scrollHeight;
+        setHeight(fullHeight);
+        const raf = window.requestAnimationFrame(() => setHeight(0));
+        return () => window.cancelAnimationFrame(raf);
+    }, [isOpen, children]);
+    return React.createElement("div", { className: className, style: Object.assign({
+            overflow: 'hidden',
+            maxHeight: typeof height === 'number' ? `${height}px` : height,
+            opacity: isOpen ? 1 : 0,
+            transform: isOpen ? 'translateY(0)' : 'translateY(-4px)',
+            transition: 'max-height 340ms cubic-bezier(0.22, 1, 0.36, 1), opacity 220ms ease, transform 340ms cubic-bezier(0.22, 1, 0.36, 1)'
+        }, style) },
+        React.createElement("div", { ref: innerRef, className: `${contentClassName}${isOpen ? ' micro-card-opening' : ''}` }, children));
 };
 const ExperienceData = [
     {
@@ -724,10 +781,10 @@ const Modal = ({ isOpen, onClose, title, children }) => {
 };
 const ExperienceCard = ({ item, isOpen, activeTab, onToggle, onTabChange, onOpenFull }) => {
     const [isVisible, setIsVisible] = useState(false);
-    const [openDetailSection, setOpenDetailSection] = useState(null);
+    const [activeDetailTab, setActiveDetailTab] = useState('focus');
     const cardRef = useRef(null);
     const tabsRef = useRef(null);
-    const detailSectionRefs = useRef({});
+    const detailTabsRef = useRef(null);
     useEffect(() => {
         const node = cardRef.current;
         if (!node)
@@ -745,7 +802,7 @@ const ExperienceCard = ({ item, isOpen, activeTab, onToggle, onTabChange, onOpen
     }, []);
     useEffect(() => {
         if (!isOpen || activeTab !== 'detailed') {
-            setOpenDetailSection(null);
+            setActiveDetailTab('focus');
         }
     }, [isOpen, activeTab, item.id]);
     const handleCardToggle = () => {
@@ -754,18 +811,21 @@ const ExperienceCard = ({ item, isOpen, activeTab, onToggle, onTabChange, onOpen
     const handleTabToggle = (tabId) => {
         onTabChange(item.id, tabId, tabsRef.current);
     };
-    const handleDetailToggle = (sectionId) => {
-        const nextSection = openDetailSection === sectionId ? null : sectionId;
-        setOpenDetailSection(nextSection);
-        if (nextSection) {
-            smoothScrollToNode(detailSectionRefs.current[sectionId]);
-        }
+    const handleDetailTabToggle = (sectionId) => {
+        setActiveDetailTab(sectionId);
+        smoothScrollToNode(detailTabsRef.current);
     };
+    const outerTabs = [
+        { id: 'preview', label: 'Кратко', icon: 'fa-bolt' },
+        { id: 'detailed', label: 'Детально', icon: 'fa-file-lines' },
+        { id: 'recommendations', label: 'Отзывы', icon: 'fa-comments' }
+    ];
     const detailSections = [
         { id: 'focus', title: 'Обязанности', icon: 'fa-briefcase', content: item.fullFocus },
         { id: 'tasks', title: 'Задачи', icon: 'fa-list-check', content: item.fullTasks },
-        { id: 'result', title: 'Ключевые результаты', icon: 'fa-check', content: item.fullResult }
+        { id: 'result', title: 'Ключевые результаты', icon: 'fa-chart-line', content: item.fullResult }
     ];
+    const activeDetailSection = detailSections.find((section) => section.id === activeDetailTab) || detailSections[0];
     const previewContent = React.createElement("div", { className: "space-y-4" },
         React.createElement("div", { className: "p-4 bg-white dark:bg-black rounded-[1.5rem] border border-gray-100 dark:border-gray-800 apple-shadow experience-box-light" },
             React.createElement("h4", { className: "text-[10px] font-bold uppercase text-gray-400 mb-2" }, "Обязанности и задачи"),
@@ -780,16 +840,16 @@ const ExperienceCard = ({ item, isOpen, activeTab, onToggle, onTabChange, onOpen
             React.createElement("a", { href: item.addressLink, onClick: (e) => e.stopPropagation(), className: "text-sm flex items-center gap-2 text-blue-600 group" },
                 React.createElement("i", { className: "fa-solid fa-location-dot text-[12px] text-blue-600" }),
                 React.createElement("span", { className: "hover:underline underline-offset-4" }, item.address))),
-        React.createElement("div", { className: "grid grid-cols-1 md:grid-cols-3 gap-3" },
-            detailSections.map((section) => React.createElement("div", { key: section.id, ref: (node) => detailSectionRefs.current[section.id] = node, className: "p-4 bg-white dark:bg-black rounded-[1.5rem] border border-gray-100 dark:border-gray-800 apple-shadow experience-box-light" },
-                React.createElement("div", { className: "flex items-center justify-between gap-3 cursor-pointer", onClick: () => handleDetailToggle(section.id) },
-                    React.createElement("h4", { className: "text-[10px] font-bold uppercase text-gray-400 flex items-center gap-2" },
-                        React.createElement("i", { className: `fa-solid ${section.icon} text-[12px] text-gray-400` }),
-                        React.createElement("span", null, section.title)),
-                    React.createElement("div", { className: `w-7 h-7 rounded-full bg-[#f5f5f7] dark:bg-[#1c1c1e] flex items-center justify-center transition-transform shrink-0 ${openDetailSection === section.id ? 'rotate-180' : ''}` },
-                        React.createElement("i", { className: "fa-solid fa-chevron-down text-[9px] text-gray-400" }))),
-                openDetailSection === section.id && React.createElement("div", { className: "text-sm mt-3 animate-fade-up", style: { whiteSpace: 'pre-line' } },
-                    React.createElement("span", null, section.content))))));
+        React.createElement("div", { ref: detailTabsRef, className: "space-y-4" },
+            React.createElement("div", { className: "flex gap-2 bg-gray-200/50 dark:bg-black/50 p-1.5 rounded-2xl" },
+                detailSections.map((section) => React.createElement("button", { key: section.id, onClick: () => handleDetailTabToggle(section.id), className: `flex-1 py-2 text-xs font-bold rounded-xl transition-all ${activeDetailTab === section.id
+                        ? 'bg-white dark:bg-[#1c1c1e] text-blue-600 apple-shadow'
+                        : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}` },
+                    React.createElement("span", { className: "inline-flex items-center gap-2" },
+                        React.createElement("i", { className: `fa-solid ${section.icon} text-[11px]` }),
+                        React.createElement("span", null, section.title))))),
+            React.createElement("div", { className: "p-4 bg-white dark:bg-black rounded-[1.5rem] border border-gray-100 dark:border-gray-800 apple-shadow experience-box-light text-sm micro-card-opening", style: { whiteSpace: 'pre-line' } },
+                React.createElement("span", null, activeDetailSection.content))));
     const recommendationsContent = React.createElement("div", { className: "grid grid-cols-1 sm:grid-cols-2 gap-3" },
         item.recommendations.map((rec) => React.createElement("div", { key: rec.id, className: "p-4 bg-white dark:bg-black rounded-[1.5rem] border border-gray-100 dark:border-gray-800 apple-shadow experience-box-light flex flex-col h-full" },
             React.createElement("div", { className: "flex items-start justify-between gap-3 mb-2" },
@@ -815,19 +875,18 @@ const ExperienceCard = ({ item, isOpen, activeTab, onToggle, onTabChange, onOpen
                         React.createElement("div", { className: "text-sm font-semibold text-gray-600 dark:text-gray-300 mt-2" }, item.role)),
                     React.createElement("div", { className: `w-8 h-8 rounded-full bg-white dark:bg-black flex items-center justify-center transition-transform shrink-0 ${isOpen ? 'rotate-180' : ''}` },
                         React.createElement("i", { className: "fa-solid fa-chevron-down text-[10px]" }))),
-                isOpen && React.createElement("div", { className: "px-6 pb-6 flex flex-col" },
+                React.createElement(AnimatedCollapse, { isOpen: isOpen, className: "px-6 pb-6 flex flex-col" },
                     React.createElement("div", { ref: tabsRef, className: "flex gap-2 mb-6 bg-gray-200/50 dark:bg-black/50 p-1.5 rounded-2xl" },
-                        [
-                            { id: 'preview', label: 'Кратко' },
-                            { id: 'detailed', label: 'Детально' },
-                            { id: 'recommendations', label: 'Рекомендации' }
-                        ].map((tab) => React.createElement("button", { key: tab.id, onClick: () => handleTabToggle(tab.id), className: `flex-1 py-2 text-xs font-bold rounded-xl transition-all ${activeTab === tab.id
+                        outerTabs.map((tab) => React.createElement("button", { key: tab.id, onClick: () => handleTabToggle(tab.id), className: `flex-1 py-2 text-xs font-bold rounded-xl transition-all ${activeTab === tab.id
                                 ? 'bg-white dark:bg-[#1c1c1e] text-blue-600 apple-shadow'
-                                : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}` }, tab.label))),
+                                : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}` },
+                            React.createElement("span", { className: "inline-flex items-center gap-2" },
+                                React.createElement("i", { className: `fa-solid ${tab.icon} text-[11px]` }),
+                                React.createElement("span", null, tab.label))))),
                     React.createElement("div", { className: "flex-1" },
-                        activeTab === 'preview' && previewContent,
-                        activeTab === 'detailed' && detailedContent,
-                        activeTab === 'recommendations' && recommendationsContent)))));
+                        activeTab === 'preview' && React.createElement("div", { className: "micro-card-opening" }, previewContent),
+                        activeTab === 'detailed' && React.createElement("div", { className: "micro-card-opening" }, detailedContent),
+                        activeTab === 'recommendations' && React.createElement("div", { className: "micro-card-opening" }, recommendationsContent))))));
 };const AccordionItem = ({ title, score, description, bullets, icon }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [isVisible, setIsVisible] = useState(false);
@@ -869,12 +928,12 @@ const ExperienceCard = ({ item, isOpen, activeTab, onToggle, onTabChange, onOpen
                     React.createElement("div", { className: "bg-blue-600 h-[3px] rounded-full transition-all duration-[1800]", style: { width: isVisible ? `${numericScore * 10}%` : '0%' } }))),
             React.createElement("div", { className: `w-8 h-8 rounded-full bg-white dark:bg-black flex items-center justify-center transition-transform duration-300 shrink-0 ${isOpen ? 'rotate-180' : ''}` },
                 React.createElement("i", { className: "fa-solid fa-chevron-down text-[10px]" }))),
-        isOpen && (React.createElement("div", { className: "mt-5 pt-4 border-t border-gray-200 dark:border-gray-800 animate-fade-up" },
+        React.createElement(AnimatedCollapse, { isOpen: isOpen, className: "mt-5 pt-4 border-t border-gray-200 dark:border-gray-800" },
             React.createElement("p", { className: "text-sm text-gray-700 dark:text-gray-300 mb-4 leading-relaxed" }, description),
             React.createElement("ul", { className: "space-y-2" }, bullets.map((b, i) => (React.createElement("li", { key: i, className: "text-sm flex items-start gap-3 text-gray-600 dark:text-gray-400" },
                 React.createElement("div", { className: "w-4 h-4 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center shrink-0 mt-0.5" },
                     React.createElement("i", { className: "fa-solid fa-check text-blue-600 text-[8px]" })),
-                React.createElement("span", { className: "leading-snug" }, b)))))))));
+                React.createElement("span", { className: "leading-snug" }, b))))))));
 };
 const TechCard = ({ title, subtitle, tools, icon }) => (React.createElement("div", { className: "bg-[#f5f5f7] dark:bg-[#1c1c1e] p-5 rounded-[2rem] border border-transparent dark:border-gray-800 apple-shadow flex flex-col h-full hover:scale-[1.02] transition-transform" },
     React.createElement("div", { className: "flex items-center gap-4 mb-4" },
@@ -910,7 +969,7 @@ const SimpleAccordionCard = ({ icon, title, children, defaultOpen = false }) => 
                 React.createElement("span", { className: "font-bold text-base" }, title)),
             React.createElement("div", { className: `w-8 h-8 rounded-full bg-white dark:bg-black flex items-center justify-center transition-transform duration-300 shrink-0 ${isOpen ? 'rotate-180' : ''}` },
                 React.createElement("i", { className: "fa-solid fa-chevron-down text-[10px]" }))),
-        isOpen && (React.createElement("div", { className: "mt-5 animate-fade-up" }, children))));
+        React.createElement(AnimatedCollapse, { isOpen: isOpen, className: "mt-5" }, children)));
 };
 
 const DarkQuoteAccordionCard = ({ icon, eyebrow, children }) => {
@@ -930,7 +989,7 @@ const DarkQuoteAccordionCard = ({ icon, eyebrow, children }) => {
                 React.createElement("div", { className: "text-[10px] uppercase tracking-widest text-gray-400 font-bold" }, eyebrow)),
             React.createElement("div", { className: `w-8 h-8 rounded-full bg-white/10 flex items-center justify-center transition-transform duration-300 shrink-0 ${isOpen ? 'rotate-180' : ''}` },
                 React.createElement("i", { className: "fa-solid fa-chevron-down text-[10px]" }))),
-        isOpen && (React.createElement("div", { className: "mt-5 animate-fade-up" }, children))));
+        React.createElement(AnimatedCollapse, { isOpen: isOpen, className: "mt-5" }, children)));
 };
 const App = () => {
     const [activeSection, setActiveSection] = useState('profile');
@@ -944,6 +1003,9 @@ const App = () => {
     const [openExperienceId, setOpenExperienceId] = useState(null);
     const [activeExperienceTab, setActiveExperienceTab] = useState('preview');
     const personalTabsRef = useRef(null);
+    const heroHeaderRef = useRef(null);
+    const heroStatsRef = useRef(null);
+    const heroAboutRef = useRef(null);
     useEffect(() => {
         if (window.innerWidth > 768)
             return;
@@ -998,6 +1060,38 @@ const App = () => {
             smoothScrollToNode(node);
         }
     };
+
+    useEffect(() => {
+        if (activeSection !== 'profile')
+            return;
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (reduceMotion)
+            return;
+        const sequence = [
+            [heroHeaderRef.current, 0],
+            [heroStatsRef.current, 90],
+            [heroAboutRef.current, 170]
+        ];
+        sequence.forEach(([node, delay], index) => {
+            if (!node)
+                return;
+            if (index === 0) {
+                node.classList.remove('first-wow-glow');
+                void node.offsetWidth;
+                node.classList.add('first-wow-glow');
+            }
+            node.animate([
+                { opacity: 0.01, transform: 'translateY(12px) scale(0.992)', filter: 'blur(6px)' },
+                { opacity: 1, transform: 'translateY(0) scale(1)', filter: 'blur(0px)' }
+            ], {
+                duration: 520,
+                delay,
+                easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
+                fill: 'both'
+            });
+        });
+    }, [activeSection]);
+
     const handlePersonalTabChange = (tabId) => {
         setActivePersonalTab(tabId);
         smoothScrollToNode(personalTabsRef.current);
@@ -1013,7 +1107,7 @@ const App = () => {
                     : React.createElement("i", { className: "fa-solid fa-moon text-sm" })))),
         React.createElement("main", { className: "max-w-4xl mx-auto px-6 pt-20" },
             activeSection === 'profile' && (React.createElement("div", { className: "space-y-10 animate-fade-up" },
-                React.createElement("header", { className: "flex flex-col items-center text-center py-6 space-y-4" },
+                React.createElement("header", { ref: heroHeaderRef, className: "flex flex-col items-center text-center py-6 space-y-4" },
                     React.createElement("div", { className: "w-32 h-32 md:w-40 md:h-40 rounded-[2.5rem] overflow-hidden apple-shadow ring-1 ring-black/5" },
                         React.createElement("img", { src: "./assets/avatar/avatar_safrutin_pro.png", alt: "Maxim", className: "w-full h-full object-cover", decoding: "async" })),
                     React.createElement("div", { className: "space-y-2" },
@@ -1027,7 +1121,7 @@ const App = () => {
                     React.createElement("div", { className: "flex gap-3" },
                         React.createElement("button", { onClick: () => setActiveSection('contacts'), className: "bg-[#0071e3] text-white px-6 py-2.5 rounded-full font-semibold text-sm hover:bg-[#0077ed] transition-all" }, "\u0421\u0432\u044F\u0437\u0430\u0442\u044C\u0441\u044F"),
                         React.createElement("button", { onClick: () => setActiveSection('experience'), className: "bg-gray-100 dark:bg-gray-800 text-[#1d1d1f] dark:text-white px-6 py-2.5 rounded-full font-semibold text-sm hover:opacity-80 transition-all" }, "\u041E\u0442\u043A\u0440\u044B\u0442\u044C \u043E\u043F\u044B\u0442"))),
-                React.createElement("div", { className: "grid grid-cols-1 md:grid-cols-3 gap-4" },
+                React.createElement("div", { ref: heroStatsRef, className: "grid grid-cols-1 md:grid-cols-3 gap-4" },
                     React.createElement("div", { className: "bg-[#f5f5f7] dark:bg-[#1c1c1e] p-6 rounded-[1.5rem] text-center border border-transparent dark:border-gray-800" },
                         React.createElement("div", { className: "text-3xl font-bold mb-1" },
                             React.createElement(Counter, { endValue: 667, suffix: "+" })),
@@ -1040,7 +1134,7 @@ const App = () => {
                         React.createElement("div", { className: "text-3xl font-bold mb-1" },
                             React.createElement(Counter, { endValue: 22, suffix: "+" })),
                         React.createElement("div", { className: "text-[10px] uppercase tracking-widest text-gray-400 font-bold" }, "\u041C\u043B\u043D \u20BD \u043F\u0440\u0438\u0431\u044B\u043B\u044C"))),
-                React.createElement("section", { className: "max-w-2xl mx-auto text-center space-y-6" },
+                React.createElement("section", { ref: heroAboutRef, className: "max-w-2xl mx-auto text-center space-y-6" },
                     React.createElement("div", { className: "text-lg md:text-xl leading-relaxed font-medium text-gray-800 dark:text-gray-200" },
                         React.createElement("p", null, "\u0421 1993 \u0433\u043E\u0434\u0430 \u2014 \u0432 \u043F\u0435\u0440\u0435\u0433\u043E\u0432\u043E\u0440\u0430\u0445, \u0441 2020 \u2014 \u0432 \u0430\u0432\u0442\u043E\u043C\u043E\u0431\u0438\u043B\u044C\u043D\u044B\u0445. \u0420\u0430\u0431\u043E\u0442\u0430\u044E \u0441\u0438\u0441\u0442\u0435\u043C\u043D\u043E \u0438 \u0433\u0438\u0431\u043A\u043E \u0438\u0441\u043F\u043E\u043B\u044C\u0437\u0443\u044F \u0432 \u0442\u043E\u043C \u0447\u0438\u0441\u043B\u0435 AI-\u0438\u043D\u0441\u0442\u0440\u0443\u043C\u0435\u043D\u0442\u044B \u0434\u043B\u044F \u043F\u043E\u0432\u044B\u0448\u0435\u043D\u0438\u044F \u043A\u043E\u043D\u0432\u0435\u0440\u0441\u0438\u0438 \u043F\u0440\u043E\u0434\u0430\u0436.")),
                     React.createElement("button", { onClick: () => setIsAboutOpen(true), className: "text-[#0066cc] text-base font-semibold hover:underline underline-offset-4" }, "\u041F\u043E\u0434\u0440\u043E\u0431\u043D\u0435\u0435 \u043E\u0431 \u044D\u043A\u0441\u043F\u0435\u0440\u0442\u0438\u0437\u0435 \u2192")))),
