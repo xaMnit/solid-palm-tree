@@ -11,6 +11,8 @@
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <script>
@@ -118,6 +120,13 @@
     <div id="root"></div>
     <script>
 const { useState, useEffect, useRef } = React;
+const safeScrollIntoView = (node, block = 'start') => {
+    if (!node)
+        return;
+    window.requestAnimationFrame(() => {
+        node.scrollIntoView({ behavior: 'smooth', block });
+    });
+};
 const ExperienceData = [
     {
         id: 1,
@@ -710,11 +719,10 @@ const Modal = ({ isOpen, onClose, title, children }) => {
                 React.createElement("button", { onClick: onClose, className: "w-8 h-8 flex items-center justify-center bg-gray-100 dark:bg-gray-800 rounded-full hover:bg-gray-200 transition-colors" }, "\u2715")),
             React.createElement("div", { className: "text-base leading-relaxed space-y-4 text-gray-700 dark:text-gray-300" }, children))));
 };
-const ExperienceCard = ({ item, onOpenFull }) => {
-    const [isOpen, setIsOpen] = useState(false);
-    const [activeTab, setActiveTab] = useState('preview');
+const ExperienceCard = ({ item, isOpen, activeTab, onToggle, onTabChange, onOpenFull }) => {
     const [isVisible, setIsVisible] = useState(false);
     const cardRef = useRef(null);
+    const tabsRef = useRef(null);
     useEffect(() => {
         const node = cardRef.current;
         if (!node)
@@ -730,36 +738,42 @@ const ExperienceCard = ({ item, onOpenFull }) => {
         observer.observe(node);
         return () => observer.disconnect();
     }, []);
+    const handleCardToggle = () => {
+        onToggle(item.id, cardRef.current);
+    };
+    const handleTabToggle = (tabId) => {
+        onTabChange(item.id, tabId, tabsRef.current);
+    };
     return (React.createElement("div", { ref: cardRef, className: `relative pl-7 timeline-reveal ${isVisible ? 'visible' : ''}` },
         React.createElement("div", { className: "experience-timeline-line" }),
         React.createElement("div", { className: "experience-timeline-dot" }),
         React.createElement("div", { className: "bg-[#f5f5f7] dark:bg-[#1c1c1e] rounded-[2rem] border border-transparent dark:border-gray-800 overflow-hidden mb-4 transition-all duration-300 apple-shadow experience-card-light mx-auto" },
             React.createElement("div", { className: "flex flex-col" },
-                React.createElement("div", { className: "p-6 cursor-pointer flex justify-between items-start transition-all duration-300 w-full", onClick: () => setIsOpen(!isOpen) },
+                React.createElement("div", { className: "p-6 cursor-pointer flex justify-between items-start transition-all duration-300 w-full", onClick: handleCardToggle },
                     React.createElement("div", { className: "space-y-1" },
                         React.createElement("span", { className: "text-blue-600 font-bold text-[10px] uppercase" }, item.period),
                         React.createElement("div", { className: "flex items-center gap-3" },
-                            React.createElement("a", { href: item.companySite, onClick: (e) => e.stopPropagation(), className: "w-8 h-8 rounded-full bg-white dark:bg-black flex items-center justify-center shrink-0", "aria-label": `Сайт компании ${item.company}`, title: "\u0421\u0430\u0439\u0442 \u043A\u043E\u043C\u043F\u0430\u043D\u0438\u0438" },
+                            React.createElement("a", { href: item.companySite, onClick: (e) => e.stopPropagation(), className: "w-8 h-8 rounded-full bg-white dark:bg-black flex items-center justify-center shrink-0", "aria-label": `Сайт компании ${item.company}`, title: "Сайт компании" },
                                 React.createElement("i", { className: "fa-solid fa-globe text-[12px] text-blue-600" })),
                             React.createElement("h3", { className: "text-xl font-bold" }, item.company)),
                         React.createElement("div", { className: "text-sm font-semibold text-gray-600 dark:text-gray-300 mt-2" }, item.role)),
                     React.createElement("div", { className: `w-8 h-8 rounded-full bg-white dark:bg-black flex items-center justify-center transition-transform shrink-0 ${isOpen ? 'rotate-180' : ''}` },
                         React.createElement("i", { className: "fa-solid fa-chevron-down text-[10px]" }))),
                 isOpen && (React.createElement("div", { className: "px-6 pb-6 flex flex-col" },
-                    React.createElement("div", { className: "flex gap-2 mb-6 bg-gray-200/50 dark:bg-black/50 p-1.5 rounded-2xl" }, [
+                    React.createElement("div", { ref: tabsRef, className: "flex gap-2 mb-6 bg-gray-200/50 dark:bg-black/50 p-1.5 rounded-2xl" }, [
                         { id: 'preview', label: 'Кратко' },
                         { id: 'detailed', label: 'Детально' },
                         { id: 'recommendations', label: 'Рекомендации' }
-                    ].map((tab) => (React.createElement("button", { key: tab.id, onClick: () => setActiveTab(tab.id), className: `flex-1 py-2 text-xs font-bold rounded-xl transition-all ${activeTab === tab.id
+                    ].map((tab) => (React.createElement("button", { key: tab.id, onClick: () => handleTabToggle(tab.id), className: `flex-1 py-2 text-xs font-bold rounded-xl transition-all ${activeTab === tab.id
                             ? 'bg-white dark:bg-[#1c1c1e] text-blue-600 apple-shadow'
                             : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}` }, tab.label)))),
                     React.createElement("div", { className: "flex-1" },
                         activeTab === 'preview' && (React.createElement("div", { className: "space-y-4" },
                             React.createElement("div", { className: "p-4 bg-white dark:bg-black rounded-[1.5rem] border border-gray-100 dark:border-gray-800 apple-shadow experience-box-light" },
-                                React.createElement("h4", { className: "text-[10px] font-bold uppercase text-gray-400 mb-2" }, "\u041E\u0431\u044F\u0437\u0430\u043D\u043D\u043E\u0441\u0442\u0438 \u0438 \u0437\u0430\u0434\u0430\u0447\u0438"),
+                                React.createElement("h4", { className: "text-[10px] font-bold uppercase text-gray-400 mb-2" }, "Обязанности и задачи"),
                                 React.createElement("p", { className: "text-sm" }, item.previewFocus)),
                             React.createElement("div", { className: "p-4 bg-white dark:bg-black rounded-[1.5rem] border border-gray-100 dark:border-gray-800 apple-shadow experience-box-light" },
-                                React.createElement("h4", { className: "text-[10px] font-bold uppercase text-gray-400 mb-2" }, "\u041A\u043B\u044E\u0447\u0435\u0432\u044B\u0435 \u0440\u0435\u0437\u0443\u043B\u044C\u0442\u0430\u0442\u044B"),
+                                React.createElement("h4", { className: "text-[10px] font-bold uppercase text-gray-400 mb-2" }, "Ключевые результаты"),
                                 React.createElement("p", { className: "text-sm" }, item.previewResult)))),
                         activeTab === 'detailed' && (React.createElement("div", { className: "space-y-4" },
                             React.createElement("div", { className: "p-4 bg-white dark:bg-black rounded-[1.5rem] border border-gray-100 dark:border-gray-800 apple-shadow experience-box-light" },
@@ -772,19 +786,19 @@ const ExperienceCard = ({ item, onOpenFull }) => {
                                 React.createElement("div", { className: "p-4 bg-white dark:bg-black rounded-[1.5rem] border border-gray-100 dark:border-gray-800 apple-shadow experience-box-light" },
                                     React.createElement("h4", { className: "text-[10px] font-bold uppercase text-gray-400 mb-2 flex items-center gap-2" },
                                         React.createElement("i", { className: "fa-solid fa-briefcase text-[12px] text-gray-400" }),
-                                        React.createElement("span", null, "\u041E\u0431\u044F\u0437\u0430\u043D\u043D\u043E\u0441\u0442\u0438")),
+                                        React.createElement("span", null, "Обязанности")),
                                     React.createElement("div", { className: "text-sm", style: { whiteSpace: 'pre-line' } },
                                         React.createElement("span", null, item.fullFocus))),
                                 React.createElement("div", { className: "p-4 bg-white dark:bg-black rounded-[1.5rem] border border-gray-100 dark:border-gray-800 apple-shadow experience-box-light" },
                                     React.createElement("h4", { className: "text-[10px] font-bold uppercase text-gray-400 mb-2 flex items-center gap-2" },
                                         React.createElement("i", { className: "fa-solid fa-list-check text-[12px] text-gray-400" }),
-                                        React.createElement("span", null, "\u0417\u0430\u0434\u0430\u0447\u0438")),
+                                        React.createElement("span", null, "Задачи")),
                                     React.createElement("div", { className: "text-sm", style: { whiteSpace: 'pre-line' } },
                                         React.createElement("span", null, item.fullTasks))),
                                 React.createElement("div", { className: "p-4 bg-white dark:bg-black rounded-[1.5rem] border border-gray-100 dark:border-gray-800 apple-shadow experience-box-light" },
                                     React.createElement("h4", { className: "text-[10px] font-bold uppercase text-gray-400 mb-2 flex items-center gap-2" },
                                         React.createElement("i", { className: "fa-solid fa-check text-[12px] text-gray-400" }),
-                                        React.createElement("span", null, "\u041A\u043B\u044E\u0447\u0435\u0432\u044B\u0435 \u0440\u0435\u0437\u0443\u043B\u044C\u0442\u0430\u0442\u044B")),
+                                        React.createElement("span", null, "Ключевые результаты")),
                                     React.createElement("div", { className: "text-sm", style: { whiteSpace: 'pre-line' } },
                                         React.createElement("span", null, item.fullResult)))))),
                         activeTab === 'recommendations' && (React.createElement("div", { className: "grid grid-cols-1 sm:grid-cols-2 gap-3" }, item.recommendations.map((rec) => (React.createElement("div", { key: rec.id, className: "p-4 bg-white dark:bg-black rounded-[1.5rem] border border-gray-100 dark:border-gray-800 apple-shadow experience-box-light flex flex-col h-full" },
@@ -792,18 +806,25 @@ const ExperienceCard = ({ item, onOpenFull }) => {
                                 React.createElement("div", null,
                                     React.createElement("div", { className: "text-sm font-bold" }, rec.name),
                                     React.createElement("div", { className: "text-[10px] text-gray-400 mb-2 uppercase tracking-tight" }, rec.role)),
-                                React.createElement("a", { href: `tel:${rec.phone}`, className: "text-center bg-blue-500/10 text-blue-600 py-2 px-3 rounded-xl text-[10px] font-bold hover:bg-blue-500/20 transition-colors shrink-0" }, "\u041F\u043E\u0437\u0432\u043E\u043D\u0438\u0442\u044C")),
+                                React.createElement("a", { href: `tel:${rec.phone}`, className: "text-center bg-blue-500/10 text-blue-600 py-2 px-3 rounded-xl text-[10px] font-bold hover:bg-blue-500/20 transition-colors shrink-0" }, "Позвонить")),
                             React.createElement("p", { className: "text-xs italic opacity-80 mb-4 line-clamp-2" },
-                                "\u00AB",
+                                "«",
                                 rec.review,
-                                "\u00BB"),
+                                "»"),
                             React.createElement("div", { className: "mt-auto" },
-                                React.createElement("button", { onClick: () => onOpenFull(`Отзыв от ${rec.name}`, rec.fullReview), className: "text-[10px] font-bold text-blue-600 hover:text-blue-700 transition-colors" }, "\u0447\u0438\u0442\u0430\u0442\u044C \u043F\u043E\u043B\u043D\u043E\u0441\u0442\u044C\u044E"))))))))))))));
+                                React.createElement("button", { onClick: () => onOpenFull(`Отзыв от ${rec.name}`, rec.fullReview), className: "text-[10px] font-bold text-blue-600 hover:text-blue-700 transition-colors" }, "читать полностью"))))))))))))));
 };
 const AccordionItem = ({ title, score, description, bullets, icon }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [isVisible, setIsVisible] = useState(false);
     const itemRef = useRef(null);
+    const handleToggle = () => {
+        const nextOpen = !isOpen;
+        setIsOpen(nextOpen);
+        if (nextOpen) {
+            safeScrollIntoView(itemRef.current);
+        }
+    };
     const numericScore = parseFloat(score);
     useEffect(() => {
         const node = itemRef.current;
@@ -821,7 +842,7 @@ const AccordionItem = ({ title, score, description, bullets, icon }) => {
         return () => observer.disconnect();
     }, []);
     return (React.createElement("div", { ref: itemRef, className: "bg-[#f5f5f7] dark:bg-[#1c1c1e] rounded-[1.5rem] p-5 mb-3 border border-transparent dark:border-gray-800 transition-all apple-shadow" },
-        React.createElement("div", { className: "flex justify-between items-center cursor-pointer", onClick: () => setIsOpen(!isOpen) },
+        React.createElement("div", { className: "flex justify-between items-center cursor-pointer", onClick: handleToggle },
             React.createElement("div", { className: "flex flex-col gap-2 w-full pr-6" },
                 React.createElement("div", { className: "flex justify-between w-full items-center gap-3" },
                     React.createElement("div", { className: "flex items-center gap-3 min-w-0" },
@@ -859,8 +880,16 @@ const StarRating = ({ label, desc, rating, icon = "fa-star" }) => (React.createE
     React.createElement("div", { className: "flex gap-1.5 shrink-0 bg-white dark:bg-black px-4 py-2 rounded-full border border-gray-100 dark:border-gray-900 apple-shadow" }, [1, 2, 3, 4, 5].map((star) => (React.createElement("i", { key: star, className: `fa-solid fa-star text-sm ${star <= rating ? 'text-blue-500' : 'text-gray-200 dark:text-gray-800'}` }))))));
 const SimpleAccordionCard = ({ icon, title, children, defaultOpen = false }) => {
     const [isOpen, setIsOpen] = useState(defaultOpen);
-    return (React.createElement("div", { className: "bg-[#f5f5f7] dark:bg-[#1c1c1e] p-6 rounded-[2rem] border border-transparent dark:border-gray-800 apple-shadow" },
-        React.createElement("div", { className: "flex items-center justify-between cursor-pointer", onClick: () => setIsOpen(!isOpen) },
+    const cardRef = useRef(null);
+    const handleToggle = () => {
+        const nextOpen = !isOpen;
+        setIsOpen(nextOpen);
+        if (nextOpen) {
+            safeScrollIntoView(cardRef.current);
+        }
+    };
+    return (React.createElement("div", { ref: cardRef, className: "bg-[#f5f5f7] dark:bg-[#1c1c1e] p-6 rounded-[2rem] border border-transparent dark:border-gray-800 apple-shadow" },
+        React.createElement("div", { className: "flex items-center justify-between cursor-pointer", onClick: handleToggle },
             React.createElement("div", { className: "flex items-center gap-3 text-blue-600" },
                 React.createElement("div", { className: "w-11 h-11 rounded-[1rem] bg-white dark:bg-black flex items-center justify-center apple-shadow border border-gray-50 dark:border-gray-800" },
                     React.createElement("i", { className: `fa-solid ${icon} text-base` })),
@@ -878,6 +907,8 @@ const App = () => {
     const [showInstallPrompt, setShowInstallPrompt] = useState(false);
     const [activeSkillTab, setActiveSkillTab] = useState('metrics');
     const [activePersonalTab, setActivePersonalTab] = useState('achievements');
+    const [openExperienceId, setOpenExperienceId] = useState(null);
+    const [activeExperienceTab, setActiveExperienceTab] = useState('preview');
     useEffect(() => {
         if (window.innerWidth > 768)
             return;
@@ -911,6 +942,27 @@ const App = () => {
         setDarkMode((prev) => !prev);
         document.documentElement.classList.toggle('dark');
     };
+    const handleExperienceToggle = (id, node) => {
+        const nextOpen = openExperienceId !== id;
+        setOpenExperienceId(nextOpen ? id : null);
+        setActiveExperienceTab('preview');
+        if (nextOpen) {
+            safeScrollIntoView(node);
+        }
+    };
+    const handleExperienceTabChange = (id, tabId, node) => {
+        if (openExperienceId !== id) {
+            setOpenExperienceId(id);
+            setActiveExperienceTab(tabId);
+            safeScrollIntoView(node);
+            return;
+        }
+        const nextTab = activeExperienceTab === tabId ? null : tabId;
+        setActiveExperienceTab(nextTab);
+        if (nextTab) {
+            safeScrollIntoView(node);
+        }
+    };
     return (React.createElement("div", { className: "min-h-screen pb-28" },
         React.createElement("nav", { className: "fixed top-0 w-full nav-blur z-50 border-b border-gray-100 dark:border-gray-900" },
             React.createElement("div", { className: "max-w-4xl mx-auto px-6 h-14 flex items-center justify-between" },
@@ -924,7 +976,7 @@ const App = () => {
             activeSection === 'profile' && (React.createElement("div", { className: "space-y-10 animate-fade-up" },
                 React.createElement("header", { className: "flex flex-col items-center text-center py-6 space-y-4" },
                     React.createElement("div", { className: "w-32 h-32 md:w-40 md:h-40 rounded-[2.5rem] overflow-hidden apple-shadow ring-1 ring-black/5" },
-                        React.createElement("img", { src: "./assets/avatar/avatar_safrutin_pro.png", alt: "Maxim", className: "w-full h-full object-cover" })),
+                        React.createElement("img", { src: "./assets/avatar/avatar_safrutin_pro.png", alt: "Maxim", className: "w-full h-full object-cover", decoding: "async" })),
                     React.createElement("div", { className: "space-y-2" },
                         React.createElement("h1", { className: "text-3xl md:text-5xl font-extrabold tracking-tight" }, "\u041C\u0430\u043A\u0441\u0438\u043C \u0421\u0430\u0444\u0440\u0443\u0442\u0438\u043D"),
                         React.createElement("div", { className: "text-base md:text-lg text-gray-500 dark:text-gray-400 font-medium max-w-md mx-auto leading-tight" },
@@ -955,7 +1007,7 @@ const App = () => {
                     React.createElement("button", { onClick: () => setIsAboutOpen(true), className: "text-[#0066cc] text-base font-semibold hover:underline underline-offset-4" }, "\u041F\u043E\u0434\u0440\u043E\u0431\u043D\u0435\u0435 \u043E\u0431 \u044D\u043A\u0441\u043F\u0435\u0440\u0442\u0438\u0437\u0435 \u2192")))),
             activeSection === 'experience' && (React.createElement("div", { className: "space-y-6 animate-fade-up max-w-4xl mx-auto pb-10" },
                 React.createElement("h2", { className: "text-2xl font-bold tracking-tight mb-6 text-center" }, "\u041E\u043F\u044B\u0442 \u0440\u0430\u0431\u043E\u0442\u044B"),
-                ExperienceData.map((item) => (React.createElement(ExperienceCard, { key: item.id, item: item, onOpenFull: (title, content) => setFullModal({ open: true, title, content }) }))))),
+                ExperienceData.map((item) => (React.createElement(ExperienceCard, { key: item.id, item: item, isOpen: openExperienceId === item.id, activeTab: openExperienceId === item.id ? activeExperienceTab : null, onToggle: handleExperienceToggle, onTabChange: handleExperienceTabChange, onOpenFull: (title, content) => setFullModal({ open: true, title, content }) }))))),
             activeSection === 'skills' && (React.createElement("div", { className: "space-y-8 animate-fade-up max-w-4xl mx-auto pb-10" },
                 React.createElement("div", { className: "bg-gradient-to-br from-[#f5f5f7] to-white dark:from-[#1c1c1e] dark:to-[#121214] p-8 md:p-10 rounded-[2.5rem] border border-gray-100 dark:border-gray-800 apple-shadow text-center relative overflow-hidden" },
                     React.createElement("div", { className: "relative z-10 space-y-4" },
@@ -988,7 +1040,7 @@ const App = () => {
                             React.createElement(CountUpCard, { endValue: 1340, suffix: "+", duration: 1450, className: "bg-[#f5f5f7] dark:bg-[#1c1c1e] p-6 rounded-[2rem] border border-transparent dark:border-gray-800 apple-shadow flex flex-col justify-center items-center text-center", label: "\u0414\u043D\u0435\u0439 \u043E\u043F\u044B\u0442\u0430 \u0432 \u0430\u0432\u0442\u043E\u0431\u0438\u0437\u043D\u0435\u0441\u0435" }),
                             React.createElement(CountUpCard, { endValue: 1198, suffix: "+", duration: 1500, className: "bg-[#f5f5f7] dark:bg-[#1c1c1e] p-6 rounded-[2rem] border border-transparent dark:border-gray-800 apple-shadow flex flex-col justify-center items-center text-center", label: "\u041F\u043E\u043B\u043E\u0436\u0438\u0442\u0435\u043B\u044C\u043D\u044B\u0445 \u043E\u0442\u0437\u044B\u0432\u043E\u0432" }),
                             React.createElement(CountUpCard, { endValue: 876, suffix: "+", duration: 1550, className: "bg-[#f5f5f7] dark:bg-[#1c1c1e] p-6 rounded-[2rem] border border-transparent dark:border-gray-800 apple-shadow flex flex-col justify-center items-center text-center", label: "\u0424\u0440\u0438\u043B\u0430\u043D\u0441-\u043F\u0440\u043E\u0435\u043A\u0442\u043E\u0432" }),
-                            React.createElement(CountUpCard, { endValue: 192, suffix: "+ \u043D\u0435\u0434.", duration: 1600, className: "bg-[#f5f5f7] dark:bg-[#1c1c1e] p-6 rounded-[2rem] border border-transparent dark:border-gray-800 apple-shadow flex flex-col justify-center items-center text-center md:col-span-2", label: "\u041F\u0440\u0435\u043F\u043E\u0434\u0430\u0432\u0430\u043D\u0438\u044F \u0438 \u0440\u0430\u0431\u043E\u0442\u044B \u0441 \u0430\u0443\u0434\u0438\u0442\u043E\u0440\u0438\u0435\u0439" })))),
+                            React.createElement(CountUpCard, { endValue: 192, suffix: "+", duration: 1600, className: "bg-[#f5f5f7] dark:bg-[#1c1c1e] p-6 rounded-[2rem] border border-transparent dark:border-gray-800 apple-shadow flex flex-col justify-center items-center text-center md:col-span-2", label: "\u041D\u0435\u0434\u0435\u043B\u044C \u043F\u0440\u0435\u043F\u043E\u0434\u0430\u0432\u0430\u043D\u0438\u044F \u0438 \u0440\u0430\u0431\u043E\u0442\u044B \u0441 \u0430\u0443\u0434\u0438\u0442\u043E\u0440\u0438\u0435\u0439" })))),
                     activeSkillTab === 'tech' && (React.createElement("div", { className: "space-y-6" },
                         React.createElement("h3", { className: "text-xl font-bold tracking-tight px-2 flex items-center gap-3" },
                             React.createElement("i", { className: "fa-solid fa-laptop-code text-blue-600" }),
@@ -1030,14 +1082,14 @@ const App = () => {
                             React.createElement("i", { className: "fa-regular fa-star text-blue-600" }),
                             " \u041F\u0440\u043E\u0444\u0435\u0441\u0441\u0438\u043E\u043D\u0430\u043B\u044C\u043D\u044B\u0435 \u043A\u0430\u0447\u0435\u0441\u0442\u0432\u0430"),
                         React.createElement("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-4" },
-                            React.createElement(StarRating, { label: "\u041A\u043E\u043C\u043C\u0443\u043D\u0438\u043A\u0430\u0431\u0435\u043B\u044C\u043D\u043E\u0441\u0442\u044C", desc: "\u0443\u043C\u0435\u043D\u0438\u0435 \u0431\u044B\u0441\u0442\u0440\u043E \u0432\u044B\u0441\u0442\u0440\u0430\u0438\u0432\u0430\u0442\u044C \u043A\u043E\u043D\u0442\u0430\u043A\u0442 \u0438 \u0434\u043E\u0432\u0435\u0440\u0438\u0435", rating: 3 }),
-                            React.createElement(StarRating, { label: "\u041E\u0442\u0432\u0435\u0442\u0441\u0442\u0432\u0435\u043D\u043D\u043E\u0441\u0442\u044C", desc: "\u0434\u043E\u0432\u043E\u0436\u0443 \u0437\u0430\u0434\u0430\u0447\u0438 \u0438 \u0441\u0434\u0435\u043B\u043A\u0438 \u0434\u043E \u0440\u0435\u0437\u0443\u043B\u044C\u0442\u0430\u0442\u0430", rating: 4 }),
-                            React.createElement(StarRating, { label: "\u041F\u0443\u043D\u043A\u0442\u0443\u0430\u043B\u044C\u043D\u043E\u0441\u0442\u044C", desc: "\u0442\u043E\u0447\u043D\u043E\u0441\u0442\u044C \u0432\u043E \u0432\u0440\u0435\u043C\u0435\u043D\u0438 \u0438 \u043E\u0431\u044F\u0437\u0430\u0442\u0435\u043B\u044C\u0441\u0442\u0432\u0430\u0445", rating: 5 }),
-                            React.createElement(StarRating, { label: "\u0413\u0438\u0431\u043A\u043E\u0441\u0442\u044C", desc: "\u0431\u044B\u0441\u0442\u0440\u043E \u0430\u0434\u0430\u043F\u0442\u0438\u0440\u0443\u044E\u0441\u044C \u043A \u043E\u0431\u0441\u0442\u043E\u044F\u0442\u0435\u043B\u044C\u0441\u0442\u0432\u0430\u043C", rating: 3 }),
-                            React.createElement(StarRating, { label: "\u041E\u043F\u0440\u044F\u0442\u043D\u043E\u0441\u0442\u044C", desc: "\u0430\u043A\u043A\u0443\u0440\u0430\u0442\u043D\u043E\u0441\u0442\u044C \u0432\u043E \u0432\u043D\u0435\u0448\u043D\u0435\u043C \u0432\u0438\u0434\u0435 \u0438 \u0440\u0430\u0431\u043E\u0442\u0435", rating: 3 }),
-                            React.createElement(StarRating, { label: "\u0421\u043E\u0431\u0440\u0430\u043D\u043D\u043E\u0441\u0442\u044C", desc: "\u043A\u043E\u043D\u0446\u0435\u043D\u0442\u0440\u0430\u0446\u0438\u044F \u043D\u0430 \u0440\u0435\u0437\u0443\u043B\u044C\u0442\u0430\u0442\u0435 \u0438 \u0437\u0430\u0434\u0430\u0447\u0430\u0445", rating: 3 }),
-                            React.createElement(StarRating, { label: "\u0423\u0431\u0435\u0434\u0438\u0442\u0435\u043B\u044C\u043D\u043E\u0441\u0442\u044C", desc: "\u0430\u0440\u0433\u0443\u043C\u0435\u043D\u0442\u0430\u0446\u0438\u044F \u0438 \u0432\u0435\u0434\u0435\u043D\u0438\u0435 \u043F\u0435\u0440\u0435\u0433\u043E\u0432\u043E\u0440\u043E\u0432", rating: 3 }),
-                            React.createElement(StarRating, { label: "\u0418\u043D\u0438\u0446\u0438\u0430\u0442\u0438\u0432\u043D\u043E\u0441\u0442\u044C", desc: "\u043D\u0435 \u0436\u0434\u0443 \u0443\u043A\u0430\u0437\u0430\u043D\u0438\u0439, \u043F\u0440\u0435\u0434\u043B\u0430\u0433\u0430\u044E \u0440\u0435\u0448\u0435\u043D\u0438\u044F", rating: 2 }))))))),
+                            React.createElement(StarRating, { label: "\u041A\u043E\u043C\u043C\u0443\u043D\u0438\u043A\u0430\u0431\u0435\u043B\u044C\u043D\u043E\u0441\u0442\u044C", desc: "\u0443\u043C\u0435\u043D\u0438\u0435 \u0431\u044B\u0441\u0442\u0440\u043E \u0432\u044B\u0441\u0442\u0440\u0430\u0438\u0432\u0430\u0442\u044C \u043A\u043E\u043D\u0442\u0430\u043A\u0442 \u0438 \u0434\u043E\u0432\u0435\u0440\u0438\u0435", rating: 3, icon: "fa-comments" }),
+                            React.createElement(StarRating, { label: "\u041E\u0442\u0432\u0435\u0442\u0441\u0442\u0432\u0435\u043D\u043D\u043E\u0441\u0442\u044C", desc: "\u0434\u043E\u0432\u043E\u0436\u0443 \u0437\u0430\u0434\u0430\u0447\u0438 \u0438 \u0441\u0434\u0435\u043B\u043A\u0438 \u0434\u043E \u0440\u0435\u0437\u0443\u043B\u044C\u0442\u0430\u0442\u0430", rating: 4, icon: "fa-circle-check" }),
+                            React.createElement(StarRating, { label: "\u041F\u0443\u043D\u043A\u0442\u0443\u0430\u043B\u044C\u043D\u043E\u0441\u0442\u044C", desc: "\u0442\u043E\u0447\u043D\u043E\u0441\u0442\u044C \u0432\u043E \u0432\u0440\u0435\u043C\u0435\u043D\u0438 \u0438 \u043E\u0431\u044F\u0437\u0430\u0442\u0435\u043B\u044C\u0441\u0442\u0432\u0430\u0445", rating: 5, icon: "fa-clock" }),
+                            React.createElement(StarRating, { label: "\u0413\u0438\u0431\u043A\u043E\u0441\u0442\u044C", desc: "\u0431\u044B\u0441\u0442\u0440\u043E \u0430\u0434\u0430\u043F\u0442\u0438\u0440\u0443\u044E\u0441\u044C \u043A \u043E\u0431\u0441\u0442\u043E\u044F\u0442\u0435\u043B\u044C\u0441\u0442\u0432\u0430\u043C", rating: 3, icon: "fa-sliders" }),
+                            React.createElement(StarRating, { label: "\u041E\u043F\u0440\u044F\u0442\u043D\u043E\u0441\u0442\u044C", desc: "\u0430\u043A\u043A\u0443\u0440\u0430\u0442\u043D\u043E\u0441\u0442\u044C \u0432\u043E \u0432\u043D\u0435\u0448\u043D\u0435\u043C \u0432\u0438\u0434\u0435 \u0438 \u0440\u0430\u0431\u043E\u0442\u0435", rating: 3, icon: "fa-shirt" }),
+                            React.createElement(StarRating, { label: "\u0421\u043E\u0431\u0440\u0430\u043D\u043D\u043E\u0441\u0442\u044C", desc: "\u043A\u043E\u043D\u0446\u0435\u043D\u0442\u0440\u0430\u0446\u0438\u044F \u043D\u0430 \u0440\u0435\u0437\u0443\u043B\u044C\u0442\u0430\u0442\u0435 \u0438 \u0437\u0430\u0434\u0430\u0447\u0430\u0445", rating: 3, icon: "fa-bullseye" }),
+                            React.createElement(StarRating, { label: "\u0423\u0431\u0435\u0434\u0438\u0442\u0435\u043B\u044C\u043D\u043E\u0441\u0442\u044C", desc: "\u0430\u0440\u0433\u0443\u043C\u0435\u043D\u0442\u0430\u0446\u0438\u044F \u0438 \u0432\u0435\u0434\u0435\u043D\u0438\u0435 \u043F\u0435\u0440\u0435\u0433\u043E\u0432\u043E\u0440\u043E\u0432", rating: 3, icon: "fa-bullhorn" }),
+                            React.createElement(StarRating, { label: "\u0418\u043D\u0438\u0446\u0438\u0430\u0442\u0438\u0432\u043D\u043E\u0441\u0442\u044C", desc: "\u043D\u0435 \u0436\u0434\u0443 \u0443\u043A\u0430\u0437\u0430\u043D\u0438\u0439, \u043F\u0440\u0435\u0434\u043B\u0430\u0433\u0430\u044E \u0440\u0435\u0448\u0435\u043D\u0438\u044F", rating: 2, icon: "fa-lightbulb" }))))))),
             activeSection === 'personal' && (React.createElement("div", { className: "space-y-8 animate-fade-up max-w-4xl mx-auto pb-10" },
                 React.createElement("div", { className: "bg-gradient-to-br from-[#f5f5f7] to-white dark:from-[#1c1c1e] dark:to-[#121214] p-8 md:p-10 rounded-[2.5rem] border border-gray-100 dark:border-gray-800 apple-shadow text-center relative overflow-hidden" },
                     React.createElement("div", { className: "relative z-10 space-y-4" },
@@ -1320,8 +1372,15 @@ const App = () => {
                         React.createElement("div", { className: "w-11 h-11 rounded-[1rem] bg-white dark:bg-black flex items-center justify-center text-blue-600 shrink-0 apple-shadow border border-gray-50 dark:border-gray-800" },
                             React.createElement("i", { className: "fa-solid fa-mobile-screen-button text-sm" })),
                         React.createElement("div", null,
-                            React.createElement("div", { className: "text-sm font-bold mb-1" }, "\u0414\u043E\u0431\u0430\u0432\u0438\u0442\u044C \u043D\u0430 \u044D\u043A\u0440\u0430\u043D"),
-                            React.createElement("div", { className: "text-xs text-gray-500 dark:text-gray-400 leading-relaxed" }, "\u0414\u043E\u0431\u0430\u0432\u044C\u0442\u0435 \u0441\u0430\u0439\u0442 \u043D\u0430 \u044D\u043A\u0440\u0430\u043D \u0447\u0435\u0440\u0435\u0437 \u043C\u0435\u043D\u044E \u0431\u0440\u0430\u0443\u0437\u0435\u0440\u0430 \u0438\u043B\u0438 \u0443\u0441\u0442\u0430\u043D\u043E\u0432\u0438\u0442\u0435 \u044F\u0440\u043B\u044B\u043A, \u0435\u0441\u043B\u0438 \u043A\u043D\u043E\u043F\u043A\u0430 \u0434\u043E\u0441\u0442\u0443\u043F\u043D\u0430 \u043D\u0438\u0436\u0435 \u2014 \u0442\u0430\u043A \u043E\u043D \u0431\u0443\u0434\u0435\u0442 \u043E\u0442\u043A\u0440\u044B\u0432\u0430\u0442\u044C\u0441\u044F \u043A\u0430\u043A \u043C\u043E\u0431\u0438\u043B\u044C\u043D\u043E\u0435 \u043F\u0440\u0438\u043B\u043E\u0436\u0435\u043D\u0438\u0435, \u0438 \u043F\u043E\u043B\u044C\u0437\u043E\u0432\u0430\u0442\u044C\u0441\u044F \u0438\u043C \u0431\u0443\u0434\u0435\u0442 \u0443\u0434\u043E\u0431\u043D\u0435\u0435."))),
+                            React.createElement("div", { className: "text-sm font-bold mb-1" }, "Открыть как приложение"),
+                            React.createElement("div", { className: "text-xs text-gray-500 dark:text-gray-400 leading-relaxed" }, "Добавьте сайт на экран через меню браузера"),
+                            React.createElement("div", { className: "mt-3 space-y-2 text-[11px] text-gray-500 dark:text-gray-400" },
+                                React.createElement("div", { className: "flex items-center gap-2" },
+                                    React.createElement("i", { className: "fa-solid fa-share-from-square text-[11px] text-blue-600" }),
+                                    React.createElement("span", null, "iPhone: Поделиться → На экран «Домой»")),
+                                React.createElement("div", { className: "flex items-center gap-2" },
+                                    React.createElement("i", { className: "fa-solid fa-ellipsis-vertical text-[11px] text-blue-600" }),
+                                    React.createElement("span", null, "Android: Меню ⋮ → На главный экран"))))),
                     React.createElement("button", { onClick: closeInstallPrompt, className: "w-8 h-8 rounded-full bg-white dark:bg-black flex items-center justify-center shrink-0", "aria-label": "\u0417\u0430\u043A\u0440\u044B\u0442\u044C" },
                         React.createElement("i", { className: "fa-solid fa-xmark text-[11px]" }))),
                 React.createElement("div", { className: "mt-4 flex gap-3" },
